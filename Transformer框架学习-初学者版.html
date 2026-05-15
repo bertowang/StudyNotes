@@ -1,0 +1,3653 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Transformer框架学习-初学者版.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> or <div class="page"></div> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="transformer-框架学习--初学者版">Transformer 框架学习 —— 初学者版</h1>
+<p><strong>作者</strong>：汪亮（bertonwang）<br>
+<strong>邮箱</strong>：<a href="mailto:47608843@qq.com">47608843@qq.com</a><br>
+<strong>版本</strong>：v1.0 ｜ <strong>最后更新</strong>：2026-05-15</p>
+<blockquote>
+<p>转载或引用请保留作者署名与本文链接，欢迎来信交流与勘误。</p>
+</blockquote>
+<blockquote>
+<p>目标读者：对深度学习有基本了解（知道什么是神经网络、向量、矩阵乘法），但没系统学过 Transformer 的同学。</p>
+<p>本文风格：尽量用大白话讲清楚&quot;为什么&quot;，再讲&quot;怎么做&quot;，最后给出<strong>最小可读代码</strong>和<strong>逐行解析</strong>，让你能自己动手跑通。</p>
+</blockquote>
+<style>
+/* 一级标题：黑体 + 更大字号，方便阅读和导出 */
+h1 {
+  font-family: "SimHei", "Microsoft YaHei", "Heiti SC", sans-serif;
+  font-size: 2.25em;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #000;
+  margin-top: 0.8em;
+  margin-bottom: 0.6em;
+}
+
+/* 优化代码段在预览和 PDF 导出中的显示效果 */
+pre {
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 0.65em 0.85em;
+  margin: 0.75em 0;
+  border-radius: 6px;
+  overflow-x: auto;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+pre code {
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: pre;
+}
+
+:not(pre) > code {
+  font-size: 0.95em;
+  padding: 0.1em 0.25em;
+}
+
+@media print {
+  pre,
+  pre code {
+    font-size: 10.5px;
+    line-height: 1.32;
+  }
+}
+</style>
+<p><strong>阅读路线</strong>：</p>
+<ol>
+<li>先知道 Transformer 是什么、为什么出现。</li>
+<li>再拆开 6 个核心零件：Embedding、位置编码、Attention、MHA、FFN、Add &amp; Norm。</li>
+<li>然后把零件拼成一个最小可运行 Encoder。</li>
+<li>接着理解 Decoder / GPT 为什么能生成。</li>
+<li>最后看训练、推理和现代大模型的演进方向。</li>
+</ol>
+<blockquote>
+<p>如果你是第一次读，建议按顺序看；如果你已经有基础，可以把第 4～10 章当作核心速查区。</p>
+</blockquote>
+<h2 id="目录">目录</h2>
+<ul>
+<li><a href="#%E5%A6%82%E4%BD%95%E9%98%85%E8%AF%BB%E8%BF%99%E4%BB%BD%E6%96%87%E6%A1%A3%E5%85%88%E7%9C%8B-demo%E5%86%8D%E5%9B%9E%E5%88%B0%E9%9B%B6%E4%BB%B6">如何阅读这份文档：先看 demo，再回到零件</a></li>
+<li><a href="#0-%E4%B8%80%E5%8F%A5%E8%AF%9D%E5%85%88%E8%AF%B4%E6%B8%85%E6%A5%9A-transformer-%E6%98%AF%E4%BB%80%E4%B9%88">0. 一句话先说清楚 Transformer 是什么</a></li>
+<li><a href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E6%9C%89-transformer-%E5%8E%86%E5%8F%B2%E8%83%8C%E6%99%AF">1. 为什么会有 Transformer？—— 历史背景</a></li>
+<li><a href="#2-%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84%E9%B8%9F%E7%9E%B0%E5%9B%BE">2. 整体架构鸟瞰图</a></li>
+<li><a href="#3-%E4%B8%80%E4%B8%AA%E5%AE%8C%E6%95%B4-transformer-%E7%9A%84%E9%9B%B6%E4%BB%B6%E6%B8%85%E5%8D%95">3. 一个完整 Transformer 的&quot;零件清单&quot;</a></li>
+<li><a href="#4-%E9%9B%B6%E4%BB%B6-1%E8%AF%8D%E5%B5%8C%E5%85%A5token-embedding">4. 零件 1：词嵌入（Token Embedding）</a></li>
+<li><a href="#5-%E9%9B%B6%E4%BB%B6-2%E4%BD%8D%E7%BD%AE%E7%BC%96%E7%A0%81positional-encoding">5. 零件 2：位置编码（Positional Encoding）</a></li>
+<li><a href="#6-%E9%9B%B6%E4%BB%B6-3%E8%87%AA%E6%B3%A8%E6%84%8F%E5%8A%9Bself-attention--%E6%9C%80%E6%A0%B8%E5%BF%83">6. 零件 3：自注意力（Self-Attention） ⭐ 最核心</a></li>
+<li><a href="#7-%E9%9B%B6%E4%BB%B6-4%E5%A4%9A%E5%A4%B4%E6%B3%A8%E6%84%8F%E5%8A%9Bmulti-head-attention">7. 零件 4：多头注意力（Multi-Head Attention）</a></li>
+<li><a href="#8-%E9%9B%B6%E4%BB%B6-5%E5%89%8D%E9%A6%88%E7%BD%91%E7%BB%9Cfeed-forward-network-ffn">8. 零件 5：前馈网络（Feed Forward Network, FFN）</a></li>
+<li><a href="#9-%E9%9B%B6%E4%BB%B6-6%E6%AE%8B%E5%B7%AE%E8%BF%9E%E6%8E%A5--%E5%B1%82%E5%BD%92%E4%B8%80%E5%8C%96add--norm">9. 零件 6：残差连接 + 层归一化（Add &amp; Norm）</a></li>
+<li><a href="#10-%E6%8A%8A%E6%89%80%E6%9C%89%E9%9B%B6%E4%BB%B6%E6%8B%BC%E8%B5%B7%E6%9D%A5%E4%B8%80%E4%B8%AA%E6%9C%80%E5%B0%8F-transformer-encoder">10. 把所有零件拼起来：一个最小 Transformer Encoder</a></li>
+<li><a href="#11-%E6%8C%89-demo-%E6%B5%81%E7%A8%8B%E6%8B%86%E8%A7%A3%E6%AF%8F%E4%B8%AA%E8%8A%82%E7%82%B9%E7%9A%84%E8%BE%93%E5%85%A5%E5%92%8C%E8%BE%93%E5%87%BA">11. 按 demo 流程拆解：每个节点的输入和输出</a></li>
+<li><a href="#12-decoder-%E5%92%8C-encoder-%E7%9A%84%E5%B7%AE%E5%88%AB">12. Decoder 和 Encoder 的差别</a></li>
+<li><a href="#13-%E8%AE%AD%E7%BB%83-transformer-%E6%98%AF%E4%B8%AA%E4%BB%80%E4%B9%88%E8%BF%87%E7%A8%8B">13. 训练 Transformer 是个什么过程？</a></li>
+<li><a href="#14-%E6%8E%A8%E7%90%86%E7%94%9F%E6%88%90%E9%98%B6%E6%AE%B5%E6%98%AF%E4%BB%80%E4%B9%88%E6%A0%B7">14. 推理（生成）阶段是什么样？</a></li>
+<li><a href="#15-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E7%AD%94%E7%96%91faq">15. 常见问题答疑（FAQ）</a></li>
+<li><a href="#16-%E5%AD%A6%E4%B9%A0%E8%B7%AF%E7%BA%BF%E5%BB%BA%E8%AE%AE">16. 学习路线建议</a></li>
+<li><a href="#17-%E4%B8%80%E5%9B%BE%E6%80%BB%E7%BB%93">17. 一图总结</a></li>
+<li><a href="#18-%E5%9F%BA%E7%A1%80-transformer-%E7%9A%84%E6%BC%94%E8%BF%9B%E6%80%9D%E8%B7%AF">18. 基础 Transformer 的演进思路</a></li>
+<li><a href="#19-%E5%86%99%E5%9C%A8%E6%9C%80%E5%90%8E">19. 写在最后</a></li>
+<li><a href="#%E9%99%84%E5%BD%95-a%E4%BB%A3%E7%A0%81%E5%B8%B8%E7%94%A8-api-%E9%80%9F%E6%9F%A5%E8%A1%A8">附录 A：代码常用 API 速查表</a></li>
+<li><a href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99">参考资料</a></li>
+</ul>
+<hr>
+<h2 id="如何阅读这份文档先看-demo再回到零件">如何阅读这份文档：先看 demo，再回到零件</h2>
+<p>为了让逻辑更接近“先完整 demo，再逐节点拆解”的学习方式，本文可以按下面这条主线阅读：</p>
+<pre class="hljs"><code><div>先理解 Transformer 要解决什么问题
+→ 看整体架构和零件清单
+→ 逐个理解 6 个核心零件
+→ 在第 10 章把零件拼成最小 Encoder demo
+→ 按 10.1 节的节点表回看每个零件的输入、处理和输出
+→ 再理解 Decoder / GPT、训练、推理和现代演进
+</div></code></pre>
+<p>也就是说，第 4～9 章是“零件说明书”，第 10 章是“完整参考 demo”，第 10.1 节是“把 demo 和零件一一对应起来”。</p>
+<table>
+<thead>
+<tr>
+<th>学习阶段</th>
+<th>重点问题</th>
+<th>对应章节</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>先看整体</td>
+<td>Transformer 是什么，为什么比 RNN/CNN 更适合长距离依赖？</td>
+<td>第 0～3 章</td>
+</tr>
+<tr>
+<td>拆零件</td>
+<td>Embedding、位置编码、Attention、MHA、FFN、Add &amp; Norm 分别做什么？</td>
+<td>第 4～9 章</td>
+</tr>
+<tr>
+<td>看 demo</td>
+<td>一个最小 Encoder 如何把这些零件串起来？</td>
+<td>第 10 章</td>
+</tr>
+<tr>
+<td>对节点</td>
+<td>每个处理节点的输入、输出、对应函数是什么？</td>
+<td>第 10.1 节</td>
+</tr>
+<tr>
+<td>扩展到 GPT</td>
+<td>Encoder 和 Decoder / GPT 有什么差别？</td>
+<td>第 11 章</td>
+</tr>
+<tr>
+<td>看完整闭环</td>
+<td>模型如何训练、如何生成、如何演进到现代大模型？</td>
+<td>第 12～17 章</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="0-一句话先说清楚-transformer-是什么">0. 一句话先说清楚 Transformer 是什么</h2>
+<blockquote>
+<p><strong>Transformer = 一种用&quot;自注意力机制&quot;（Self-Attention）替代 RNN/CNN，让模型能并行处理整段序列、并自动学到&quot;哪些词跟哪些词有关系&quot;的神经网络结构。</strong></p>
+</blockquote>
+<p>它是 2017 年 Google 提出的，现在你听到的 BERT、GPT、ChatGPT、LLaMA、通义千问、文心一言…… <strong>底层全是 Transformer</strong>。</p>
+<p>学懂 Transformer，等于拿到了大模型时代的&quot;入场券&quot;。</p>
+<hr>
+<h2 id="1-为什么会有-transformer-历史背景">1. 为什么会有 Transformer？—— 历史背景</h2>
+<h3 id="11-在-transformer-之前处理序列用什么">1.1 在 Transformer 之前，处理序列用什么？</h3>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>代表</th>
+<th>优点</th>
+<th>致命问题</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RNN</td>
+<td>LSTM、GRU</td>
+<td>天然适合序列、参数少</td>
+<td><strong>必须一步一步算</strong>，不能并行；长距离依赖会&quot;忘事&quot;</td>
+</tr>
+<tr>
+<td>CNN</td>
+<td>TextCNN、ByteNet</td>
+<td>可以并行</td>
+<td>感受野有限，捕捉远距离关系要堆很多层</td>
+</tr>
+</tbody>
+</table>
+<p>举个例子：句子 &quot;<strong>The animal didn't cross the street because it was too tired</strong>&quot;，里面的 <code>it</code> 指的是 <code>animal</code> 还是 <code>street</code>？这两个词隔了 7、8 个位置。</p>
+<ul>
+<li>RNN：信息要一步步传过去，传到 <code>it</code> 时 <code>animal</code> 的信息已经被稀释。</li>
+<li>CNN：要好几层卷积才能让 <code>it</code> &quot;看到&quot; <code>animal</code>。</li>
+<li><strong>Transformer</strong>：一步到位，让 <code>it</code> 直接和句子里<strong>每一个词</strong>算一次&quot;相关度&quot;，自动找到 <code>animal</code>。</li>
+</ul>
+<h3 id="12-transformer-的核心创新">1.2 Transformer 的核心创新</h3>
+<ol>
+<li><strong>抛弃循环结构</strong>，全部用 Attention。</li>
+<li><strong>可以并行计算</strong>，训练速度暴涨（GPU 友好）。</li>
+<li><strong>任意两个位置的距离都是 1</strong>（一次注意力就能连上）。</li>
+</ol>
+<p>这就是论文标题 <em>Attention Is All You Need</em> 的含义：你不需要 RNN，也不需要 CNN，<strong>注意力就够了</strong>。</p>
+<hr>
+<h2 id="2-整体架构鸟瞰图">2. 整体架构鸟瞰图</h2>
+<p>原始论文的 Transformer 是一个 <strong>Encoder-Decoder（编码器-解码器）</strong> 结构，用于机器翻译。</p>
+<pre class="hljs"><code><div>                ┌───────────────────────┐         ┌───────────────────────┐
+                │       Encoder         │         │       Decoder         │
+   输入序列 ──&gt;  │  N × (Self-Attn +     │  ──&gt;    │  N × (Masked Self-    │ ──&gt; 输出序列
+   (中文句子)    │       FFN)            │         │   Attn + Cross-Attn   │     (英文句子)
+                │                       │         │      + FFN)           │
+                └───────────────────────┘         └───────────────────────┘
+</div></code></pre>
+<p>后来演化出三大流派：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>只用</th>
+<th>代表模型</th>
+<th>擅长</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Encoder-only</strong></td>
+<td>编码器</td>
+<td>BERT、RoBERTa</td>
+<td>理解类任务（分类、抽取）</td>
+</tr>
+<tr>
+<td><strong>Decoder-only</strong></td>
+<td>解码器</td>
+<td>GPT 系列、LLaMA</td>
+<td>生成类任务（写文章、对话）</td>
+</tr>
+<tr>
+<td><strong>Encoder-Decoder</strong></td>
+<td>两者</td>
+<td>T5、原始 Transformer</td>
+<td>翻译、摘要</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>现在的大模型（ChatGPT、Claude、Gemini）<strong>绝大多数是 Decoder-only</strong>。</p>
+</blockquote>
+<hr>
+<h2 id="3-一个完整-transformer-的零件清单">3. 一个完整 Transformer 的&quot;零件清单&quot;</h2>
+<p>我们把它拆成 6 个核心零件，逐个吃透：</p>
+<ol>
+<li><strong>词嵌入（Token Embedding）</strong>：把字/词变成向量</li>
+<li><strong>位置编码（Positional Encoding）</strong>：告诉模型&quot;谁在前谁在后&quot;</li>
+<li><strong>自注意力（Self-Attention）</strong> ⭐ 最核心</li>
+<li><strong>多头注意力（Multi-Head Attention）</strong></li>
+<li><strong>前馈网络（Feed Forward Network, FFN）</strong></li>
+<li><strong>残差连接 + 层归一化（Add &amp; Norm）</strong></li>
+</ol>
+<p>下面一个个讲。</p>
+<h3 id="31-常用符号与张量形状速查表">3.1 常用符号与张量形状速查表</h3>
+<p>后面会频繁看到 <code>B</code>、<code>L</code>、<code>d_model</code>、<code>d_k</code> 这些符号。先不用背公式，记住它们大概代表什么即可：</p>
+<table>
+<thead>
+<tr>
+<th>符号</th>
+<th>含义</th>
+<th>常见例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>B</code></td>
+<td>batch size，一次喂给模型多少句话 / 文档片段</td>
+<td><code>2</code>、<code>32</code></td>
+</tr>
+<tr>
+<td><code>L</code></td>
+<td>sequence length，每条输入有多少个 token</td>
+<td><code>128</code>、<code>2048</code></td>
+</tr>
+<tr>
+<td><code>d_model</code></td>
+<td>每个 token 向量的总维度</td>
+<td><code>512</code>、<code>768</code>、<code>4096</code></td>
+</tr>
+<tr>
+<td><code>H</code> / <code>num_heads</code></td>
+<td>注意力头数</td>
+<td><code>8</code>、<code>16</code>、<code>32</code></td>
+</tr>
+<tr>
+<td><code>d_k</code></td>
+<td>每个注意力头分到的维度，通常是 <code>d_model / H</code></td>
+<td><code>512 / 8 = 64</code></td>
+</tr>
+<tr>
+<td><code>V</code> / <code>vocab_size</code></td>
+<td>词表大小，也就是模型能预测多少种 token</td>
+<td><code>30000</code>、<code>100000</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>看代码时只抓一条主线</strong>：输入通常是 token id <code>(B, L)</code>，进模型后变成向量 <code>(B, L, d_model)</code>，最后做语言模型预测时再变成词表分数 <code>(B, L, vocab_size)</code>。</p>
+</blockquote>
+<hr>
+<h2 id="4-零件-1词嵌入token-embedding">4. 零件 1：词嵌入（Token Embedding）</h2>
+<h3 id="41-解决什么问题">4.1 解决什么问题？</h3>
+<p>计算机不认字，只认数字。完整的文本处理流程需要两步：</p>
+<ol>
+<li><strong>Tokenization（词元化）</strong>：将原始文本（&quot;我 爱 你&quot;）分割成一个个离散的 token，并为每个 token 分配一个数字 ID。这一步通常是预处理完成的，<strong>不是模型学习的</strong>。</li>
+<li><strong>Embedding（词嵌入）</strong>：将数字 ID 转换为<strong>稠密向量</strong>（比如 512 维），这才是模型学习的第一步。</li>
+</ol>
+<p>简言之：Tokenization 是 <strong>准备食材</strong>（把文章切好、编好号），Embedding 是 <strong>下锅炒菜</strong>（把编号变成向量供模型学习）。</p>
+<h3 id="42-通俗理解tokenization-vs-embedding">4.2 通俗理解：Tokenization vs Embedding</h3>
+<ul>
+<li><strong>Tokenization</strong>：把 &quot;我爱北京天安门&quot; 切分成 <code>[我, 爱, 北京, 天安门]</code> 或 BPE 后的 <code>[我, 爱, 北, 京, 天, 安, 门]</code>，每个片段分配一个整数 ID。</li>
+<li><strong>Embedding</strong>：有一张巨大的表格（矩阵），ID=1 对应向量 <code>[0.1, 0.5, ..., 0.9]</code>，ID=2 对应 <code>[-0.3, 0.8, ..., 0.2]</code>……这张表是可学习的参数，能让意思相近的词向量也相近。</li>
+</ul>
+<h3 id="43-完整流程示例">4.3 完整流程示例</h3>
+<p>一个完整的文本处理 pipeline 如下（<strong>此代码可直接复制运行</strong>）：</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">import</span> torch
+<span class="hljs-keyword">import</span> torch.nn <span class="hljs-keyword">as</span> nn
+
+<span class="hljs-comment"># 定义一个简单的tokenizer用于示例</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">SimpleTokenizer</span>:
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self</span>):
+        <span class="hljs-comment"># 创建一个简单的中文字典</span>
+        <span class="hljs-variable language_">self</span>.vocab = {
+            <span class="hljs-string">&quot;&lt;pad&gt;&quot;</span>: <span class="hljs-number">0</span>,
+            <span class="hljs-string">&quot;&lt;unk&gt;&quot;</span>: <span class="hljs-number">1</span>,
+            <span class="hljs-string">&quot;我&quot;</span>: <span class="hljs-number">101</span>,
+            <span class="hljs-string">&quot;爱&quot;</span>: <span class="hljs-number">234</span>,
+            <span class="hljs-string">&quot;北&quot;</span>: <span class="hljs-number">345</span>,
+            <span class="hljs-string">&quot;京&quot;</span>: <span class="hljs-number">456</span>,
+            <span class="hljs-string">&quot;天&quot;</span>: <span class="hljs-number">567</span>,
+            <span class="hljs-string">&quot;安&quot;</span>: <span class="hljs-number">678</span>,
+            <span class="hljs-string">&quot;门&quot;</span>: <span class="hljs-number">789</span>
+        }
+        <span class="hljs-variable language_">self</span>.inverse_vocab = {v: k <span class="hljs-keyword">for</span> k, v <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.vocab.items()}
+        
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">encode</span>(<span class="hljs-params">self, text</span>):
+        <span class="hljs-comment"># 简单的分词：按字切分中文</span>
+        tokens = <span class="hljs-built_in">list</span>(text)
+        token_ids = []
+        <span class="hljs-keyword">for</span> token <span class="hljs-keyword">in</span> tokens:
+            <span class="hljs-keyword">if</span> token <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.vocab:
+                token_ids.append(<span class="hljs-variable language_">self</span>.vocab[token])
+            <span class="hljs-keyword">else</span>:
+                token_ids.append(<span class="hljs-variable language_">self</span>.vocab[<span class="hljs-string">&quot;&lt;unk&gt;&quot;</span>])
+        <span class="hljs-keyword">return</span> token_ids
+    
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">decode</span>(<span class="hljs-params">self, token_ids</span>):
+        <span class="hljs-comment"># 将token id解码回文本</span>
+        tokens = []
+        <span class="hljs-keyword">for</span> token_id <span class="hljs-keyword">in</span> token_ids:
+            <span class="hljs-keyword">if</span> token_id <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.inverse_vocab:
+                tokens.append(<span class="hljs-variable language_">self</span>.inverse_vocab[token_id])
+            <span class="hljs-keyword">else</span>:
+                tokens.append(<span class="hljs-string">&quot;&lt;unk&gt;&quot;</span>)
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&#x27;</span>.join(tokens)
+
+<span class="hljs-comment"># 1. Tokenization（预处理）</span>
+text = <span class="hljs-string">&quot;我爱北京天安门&quot;</span>
+tokenizer = SimpleTokenizer()  <span class="hljs-comment"># 创建tokenizer实例</span>
+<span class="hljs-comment"># 使用 tokenizer 分割文本并映射为 token id</span>
+token_ids = tokenizer.encode(text)  <span class="hljs-comment"># 输出: [101, 234, 345, 456, 567, 678, 789]</span>
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Token IDs: <span class="hljs-subst">{token_ids}</span>&quot;</span>)
+
+<span class="hljs-comment"># 2. Embedding（模型第一步）</span>
+<span class="hljs-comment"># 这里为了容纳示例中的最大 token id=789，临时设成 1000。</span>
+<span class="hljs-comment"># 真实项目中，vocab_size 应该等于 tokenizer 的真实词表大小，且所有 token id 都必须 &lt; vocab_size。</span>
+vocab_size = <span class="hljs-number">1000</span>
+d_model = <span class="hljs-number">512</span>        <span class="hljs-comment"># 每个词向量的维度</span>
+
+embedding = nn.Embedding(vocab_size, d_model)
+
+<span class="hljs-comment"># 输入 token id（形状：batch_size × seq_len）</span>
+tokens = torch.tensor([token_ids])  <span class="hljs-comment"># shape: (1, 7)</span>
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Tokens shape: <span class="hljs-subst">{tokens.shape}</span>&quot;</span>)
+
+<span class="hljs-comment"># Embedding 层将 ID 映射为向量</span>
+x = embedding(tokens)   <span class="hljs-comment"># shape: (1, 7, 512)</span>
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;Embedding shape: <span class="hljs-subst">{x.shape}</span>&quot;</span>)          <span class="hljs-comment"># torch.Size([1, 7, 512])</span>
+
+<span class="hljs-comment"># 可选：演示解码</span>
+<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;解码结果: <span class="hljs-subst">{tokenizer.decode(token_ids)}</span>&quot;</span>)
+</div></code></pre>
+<p><strong>注</strong>：上面的 <code>SimpleTokenizer</code> 仅用于教学演示。实际项目中，建议使用预训练模型配套的 tokenizer（如 <code>transformers</code> 库中的 <code>BertTokenizer</code> 或 <code>AutoTokenizer</code>），以确保词汇表和分词方式与模型训练时一致。</p>
+<h4 id="-重要函数解释小白版">📖 重要函数解释（小白版）</h4>
+<table>
+<thead>
+<tr>
+<th>函数 / 用法</th>
+<th>一句话作用</th>
+<th>形象类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nn.Embedding(vocab_size, d_model)</code></td>
+<td>创建一张「词表 → 向量」的查表矩阵，行数=词表大小，列数=每个词向量维度</td>
+<td>一本「字典」：每个字（ID）对应一页内容（向量）</td>
+</tr>
+<tr>
+<td><code>embedding(tokens)</code></td>
+<td>输入一批 token ID，<strong>按行查表</strong>取出对应向量；输出形状 <code>(batch, seq_len, d_model)</code></td>
+<td>拿着 ID 翻字典，把对应那一页内容抄出来</td>
+</tr>
+<tr>
+<td><code>torch.tensor([...])</code></td>
+<td>把 Python 列表变成 PyTorch 张量（GPU 能算的多维数组）</td>
+<td>把 Excel 数据装进可计算容器</td>
+</tr>
+<tr>
+<td><code>tokens.shape</code></td>
+<td>查看张量的维度，例如 <code>(1, 7)</code> = 1 句话、7 个 token</td>
+<td>看一下盒子有几行几列</td>
+</tr>
+<tr>
+<td><code>tokenizer.encode(text)</code></td>
+<td>把字符串拆成 token 并映射成整数 ID 列表</td>
+<td>把句子翻译成「数字暗号」</td>
+</tr>
+<tr>
+<td><code>tokenizer.decode(ids)</code></td>
+<td>把整数 ID 列表还原成字符串</td>
+<td>把「数字暗号」翻译回句子</td>
+</tr>
+<tr>
+<td><code>nn.Embedding.from_pretrained(weights, freeze=...)</code></td>
+<td>用别人训练好的向量初始化 Embedding；<code>freeze=True</code> 表示冻结不再训练</td>
+<td>直接把别人的字典抄过来用，可选要不要再修订</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>小白记忆点</strong>：<code>nn.Embedding</code> 本质就是一个<strong>可学习的二维矩阵 + 行号查找操作</strong>，没有任何复杂数学。看到它就想「查字典」三个字。</p>
+</blockquote>
+<h3 id="44-在-transformer-整体中的位置">4.4 在 Transformer 整体中的位置</h3>
+<p>经过 Token Embedding 后，输入已经从离散的 token id 变成了连续稠密向量：</p>
+<pre class="hljs"><code><div>tokens → Token Embedding → x
+</div></code></pre>
+<p>此时的 <code>x</code> 已经具备语义表示能力，但还缺少一个关键信息：<strong>token 的位置顺序</strong>。</p>
+<p>因此，下一步需要进入第 5 章，为 <code>x</code> 加上位置编码。</p>
+<p><strong>关键点</strong>：</p>
+<ol>
+<li><strong>Tokenization 和 Embedding 是分开的</strong>：Tokenization 是数据预处理，Embedding 是模型第一层。</li>
+<li><strong>Embedding 只是查表</strong>：<code>nn.Embedding</code> 内部就是一个 <code>(vocab_size, d_model)</code> 的可学习矩阵，输入整数 ID，输出对应行的向量。</li>
+<li><strong>Embedding 只解决语义表示问题</strong>：它把 token id 变成向量，但不负责表达顺序；位置信息会在下一章补上。</li>
+</ol>
+<h3 id="45-embedding-表的内容最初是怎么来的">4.5 Embedding 表的内容最初是怎么来的？</h3>
+<p>这是初学者最容易困惑的问题之一：既然 Embedding 是&quot;查表&quot;，那这张表里的数字最初是从哪里来的？</p>
+<h4 id="451-答案随机初始化--训练学习--收敛成有意义的向量">4.5.1 答案：<strong>随机初始化 → 训练学习 → 收敛成有意义的向量</strong></h4>
+<p>整个过程分三步：</p>
+<p><strong>第一步：随机初始化（出生时）</strong></p>
+<p>在模型刚创建时，<code>nn.Embedding(vocab_size, d_model)</code> 内部的矩阵是<strong>随机的</strong>——PyTorch 默认从标准正态分布 N(0, 1) 中采样。也就是说，刚创建时&quot;我&quot;和&quot;猫&quot;的向量完全没有任何语义关系，只是一堆随机数字。</p>
+<pre class="hljs"><code><div>embedding = nn.Embedding(<span class="hljs-number">50000</span>, <span class="hljs-number">512</span>)
+<span class="hljs-built_in">print</span>(embedding.weight)   <span class="hljs-comment"># 一堆随机数，没有任何语义</span>
+<span class="hljs-built_in">print</span>(embedding.weight.shape)  <span class="hljs-comment"># torch.Size([50000, 512])</span>
+</div></code></pre>
+<p><strong>第二步：训练学习（成长过程）</strong></p>
+<p>随着模型在大量语料上训练（例如让模型预测&quot;今天天气真___&quot;的下一个词），通过反向传播和梯度下降，<strong>Embedding 矩阵会被不断更新</strong>。它和模型的其他权重一样，是<strong>可学习参数</strong>（<code>requires_grad=True</code>）。</p>
+<p><strong>第三步：收敛成有意义的向量（成年后）</strong></p>
+<p>训练完成后，神奇的事情发生了：</p>
+<ul>
+<li>语义相近的词向量在空间中<strong>彼此靠近</strong>：<code>vec(&quot;猫&quot;) ≈ vec(&quot;狗&quot;)</code></li>
+<li>甚至能体现<strong>类比关系</strong>：<code>vec(&quot;国王&quot;) - vec(&quot;男人&quot;) + vec(&quot;女人&quot;) ≈ vec(&quot;女王&quot;)</code></li>
+</ul>
+<p>这不是人为设计的，而是模型为了<strong>最小化预测损失</strong>，自己&quot;悟出来&quot;的。</p>
+<h4 id="452-不同模型有不同的-embedding-表吗">4.5.2 不同模型有不同的 Embedding 表吗？</h4>
+<p><strong>是的，每个模型都有自己独立的、互不通用的 Embedding 表。</strong> 因为：</p>
+<table>
+<thead>
+<tr>
+<th>差异点</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>词表（Vocabulary）不同</strong></td>
+<td>BERT 用 WordPiece，GPT 用 BPE，LLaMA 用 SentencePiece，分词结果完全不同</td>
+</tr>
+<tr>
+<td><strong>维度（d_model）不同</strong></td>
+<td>BERT-base 是 768 维，GPT-2 small 是 768 维，LLaMA-7B 是 4096 维</td>
+</tr>
+<tr>
+<td><strong>训练语料不同</strong></td>
+<td>中文模型 vs 英文模型，通用 vs 医疗领域，向量分布完全不同</td>
+</tr>
+<tr>
+<td><strong>训练目标不同</strong></td>
+<td>BERT 用 MLM（完形填空），GPT 用自回归，学到的语义空间不同</td>
+</tr>
+</tbody>
+</table>
+<p>所以 BERT 的 Embedding 表<strong>不能</strong>直接拿给 GPT 用，反之亦然。</p>
+<h4 id="453-那么-43-节代码中的-embedding-表对应的是哪个模型">4.5.3 那么 4.3 节代码中的 Embedding 表，对应的是哪个模型？</h4>
+<p><strong>答案是：不对应任何已经训练好的模型，它就是一张&quot;刚出生&quot;的随机表。</strong></p>
+<pre class="hljs"><code><div>embedding = nn.Embedding(vocab_size, d_model)
+</div></code></pre>
+<p>这一行只是<strong>创建</strong>了一个随机初始化的矩阵，它没有加载任何预训练权重。所以：</p>
+<ul>
+<li>✅ 它能演示<strong>数据形状的变换</strong>（ID → 向量）；</li>
+<li>❌ 但向量本身<strong>没有任何语义</strong>——<code>vec(&quot;我&quot;)</code> 和 <code>vec(&quot;爱&quot;)</code> 之间的关系是随机的。</li>
+</ul>
+<p>如果想要<strong>有语义的 Embedding</strong>，需要加载预训练模型：</p>
+<pre class="hljs"><code><div><span class="hljs-comment"># 方案一：加载完整预训练模型（推荐）</span>
+<span class="hljs-keyword">from</span> transformers <span class="hljs-keyword">import</span> BertModel, BertTokenizer
+
+tokenizer = BertTokenizer.from_pretrained(<span class="hljs-string">&#x27;bert-base-chinese&#x27;</span>)
+model = BertModel.from_pretrained(<span class="hljs-string">&#x27;bert-base-chinese&#x27;</span>)
+
+<span class="hljs-comment"># 此时 model.embeddings.word_embeddings 就是 BERT 训练好的 Embedding 表</span>
+embedding_layer = model.embeddings.word_embeddings
+<span class="hljs-built_in">print</span>(embedding_layer.weight.shape)  <span class="hljs-comment"># torch.Size([21128, 768])，BERT-base-Chinese 的真实参数</span>
+
+<span class="hljs-comment"># 方案二：只取 Embedding 的权重，迁移到自己的模型</span>
+<span class="hljs-keyword">import</span> torch.nn <span class="hljs-keyword">as</span> nn
+my_embedding = nn.Embedding.from_pretrained(
+    embedding_layer.weight, freeze=<span class="hljs-literal">False</span>  <span class="hljs-comment"># freeze=True 表示训练时不更新</span>
+)
+</div></code></pre>
+<h4 id="454-一句话总结">4.5.4 一句话总结</h4>
+<blockquote>
+<p>Embedding 表 = <strong>一组随机数字 + 大量训练 = 蕴含语义的向量空间</strong>。<br>
+4.3 节的示例只演示了&quot;形状变换&quot;，<strong>没有真实语义</strong>；要获得有意义的向量，必须加载某个具体模型（如 BERT、GPT）训练好的权重。</p>
+</blockquote>
+<hr>
+<h2 id="5-零件-2位置编码positional-encoding">5. 零件 2：位置编码（Positional Encoding）</h2>
+<p>在进入 Self-Attention 之前，Transformer 不会直接使用 Token Embedding 的输出。</p>
+<p>因为 Self-Attention 本身不天然知道 token 的先后顺序，所以需要把位置编码加到 token 向量上：</p>
+<pre class="hljs"><code><div>x = Token Embedding(tokens) + Positional Encoding
+</div></code></pre>
+<p>加完位置编码后，<code>x</code> 才真正变成可以送入后续 Transformer 层的输入。</p>
+<h3 id="51-解决什么问题">5.1 解决什么问题？</h3>
+<p>注意力机制有个&quot;BUG&quot;：<strong>它不管词的顺序</strong>！<br>
+&quot;我打你&quot; 和 &quot;你打我&quot;，在纯 Attention 看来是一样的（因为它是把所有词当成&quot;一锅粥&quot;两两算关系）。</p>
+<p>所以必须<strong>显式地把&quot;位置信息&quot;塞进去</strong>。</p>
+<h3 id="52-通俗理解">5.2 通俗理解</h3>
+<p>给每个位置（第 0 个、第 1 个、第 2 个……）造一个&quot;位置指纹&quot;向量，加到词向量上。模型就知道：&quot;哦，这个词在第 3 个位置。&quot;</p>
+<h3 id="53-原版的做法正弦位置编码">5.3 原版的做法：正弦位置编码</h3>
+<p>公式（不必死记，看懂思想即可）：</p>
+<pre class="hljs"><code><div>PE(pos, 2i)   = sin(pos / 10000^(2i / d_model))
+PE(pos, 2i+1) = cos(pos / 10000^(2i / d_model))
+</div></code></pre>
+<p><strong>为什么用 sin/cos？</strong></p>
+<ul>
+<li>不同频率的三角函数能给每个位置一个<strong>独一无二</strong>的指纹。</li>
+<li>正弦位置编码可以为任意更长位置继续生成编码，比固定长度的可学习位置编码更容易外推；但模型在远超训练长度的上下文中是否表现良好，还取决于训练长度、数据分布和注意力机制。</li>
+</ul>
+<h3 id="54-代码片段">5.4 代码片段</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">import</span> math
+<span class="hljs-keyword">import</span> torch
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">positional_encoding</span>(<span class="hljs-params">max_len, d_model</span>):
+    pe = torch.zeros(max_len, d_model)
+    position = torch.arange(<span class="hljs-number">0</span>, max_len).unsqueeze(<span class="hljs-number">1</span>).<span class="hljs-built_in">float</span>()       <span class="hljs-comment"># (max_len, 1)</span>
+    div_term = torch.exp(torch.arange(<span class="hljs-number">0</span>, d_model, <span class="hljs-number">2</span>).<span class="hljs-built_in">float</span>() *
+                         -(math.log(<span class="hljs-number">10000.0</span>) / d_model))            <span class="hljs-comment"># (d_model/2,)</span>
+    pe[:, <span class="hljs-number">0</span>::<span class="hljs-number">2</span>] = torch.sin(position * div_term)   <span class="hljs-comment"># 偶数维用 sin</span>
+    pe[:, <span class="hljs-number">1</span>::<span class="hljs-number">2</span>] = torch.cos(position * div_term)   <span class="hljs-comment"># 奇数维用 cos</span>
+    <span class="hljs-keyword">return</span> pe   <span class="hljs-comment"># shape: (max_len, d_model)</span>
+
+pe = positional_encoding(max_len=<span class="hljs-number">50</span>, d_model=<span class="hljs-number">512</span>)
+<span class="hljs-comment"># 使用时：x = token_embedding + pe[:seq_len]</span>
+</div></code></pre>
+<p><strong>逻辑解析</strong>：</p>
+<ul>
+<li><code>position</code> 是 <code>[0, 1, 2, ..., max_len-1]</code>。</li>
+<li><code>div_term</code> 控制不同维度上 sin/cos 的&quot;频率&quot;：前面的维度变化更快，后面的维度变化更慢、周期更长。</li>
+<li>偶数维填 sin，奇数维填 cos，组合起来形成位置指纹。</li>
+<li>最终 shape 是 <code>(max_len, d_model)</code>，可以直接和词向量相加。</li>
+</ul>
+<h4 id="-重要函数解释小白版-1">📖 重要函数解释（小白版）</h4>
+<table>
+<thead>
+<tr>
+<th>函数 / 用法</th>
+<th>一句话作用</th>
+<th>形象类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>torch.zeros(max_len, d_model)</code></td>
+<td>创建一个全 0 的二维张量，作为位置编码的「空表格」</td>
+<td>准备一张空白方格纸，等会儿填数</td>
+</tr>
+<tr>
+<td><code>torch.arange(0, max_len)</code></td>
+<td>生成等差数列 <code>[0,1,2,...,max_len-1]</code>，代表每个位置的下标</td>
+<td>报数：第 0 位、第 1 位……</td>
+</tr>
+<tr>
+<td><code>.unsqueeze(1)</code></td>
+<td>在第 1 维插入一个长度为 1 的轴，把 <code>(max_len,)</code> 变成 <code>(max_len, 1)</code></td>
+<td>把横排数字立起来变成一列</td>
+</tr>
+<tr>
+<td><code>.float()</code></td>
+<td>把整数张量转成浮点数（位置编码涉及小数运算）</td>
+<td>把「整数 5」改写成「5.0」方便算小数</td>
+</tr>
+<tr>
+<td><code>torch.exp(...)</code> 配合 <code>math.log(10000)</code></td>
+<td>用「指数+对数」技巧计算 <code>1/10000^(2i/d_model)</code>，得到不同维度的「频率系数」</td>
+<td>给不同维度配「不同转速的秒针」</td>
+</tr>
+<tr>
+<td><code>pe[:, 0::2]</code> / <code>pe[:, 1::2]</code></td>
+<td>Python 切片：每隔 2 列取偶数列 / 奇数列</td>
+<td>隔一个抽一个，分两组放 sin / cos</td>
+</tr>
+<tr>
+<td><code>torch.sin(...)</code> / <code>torch.cos(...)</code></td>
+<td>逐元素计算正弦 / 余弦</td>
+<td>把每个数过一遍三角函数</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>小白记忆点</strong>：位置编码的输出是一个<strong>和 token Embedding 一样形状的矩阵</strong>，第 i 行就是「第 i 个位置的指纹」，<strong>直接相加</strong>注入到词向量里就完事了。</p>
+</blockquote>
+<blockquote>
+<p>现在很多新模型用 <strong>可学习位置编码（BERT）</strong> 或 <strong>RoPE 旋转位置编码（LLaMA）</strong>，思想类似，但实现不同。初学先掌握正弦版本即可。</p>
+<p>需要提前知道的一点是：原版正弦位置编码是<strong>直接加到 token embedding 上</strong>；而 RoPE 通常不是直接加到输入向量上，而是在 Attention 里作用到 <code>Q</code> / <code>K</code> 上。后面第 17 章讲现代演进时会再展开。</p>
+</blockquote>
+<hr>
+<h2 id="6-零件-3自注意力self-attention--最核心">6. 零件 3：自注意力（Self-Attention） ⭐ 最核心</h2>
+<p>如果整篇只能学一个东西，就学这个。</p>
+<h3 id="61-用一个生活例子理解">6.1 用一个生活例子理解</h3>
+<p>你在图书馆找资料，过程是：</p>
+<ol>
+<li>你脑子里有个<strong>问题</strong>（Query, Q）—— &quot;我想找关于动物的书&quot;。</li>
+<li>每本书有个<strong>标签</strong>（Key, K）—— &quot;动物&quot;、&quot;科幻&quot;、&quot;历史&quot;…</li>
+<li>每本书有<strong>实际内容</strong>（Value, V）—— 书里的字。</li>
+</ol>
+<p>流程：</p>
+<ul>
+<li>拿你的 Q 去和每本书的 K 比一比相似度（点积）。</li>
+<li>相似度高的书，权重就大。</li>
+<li>按权重把所有书的 V 加权平均，就是你最终得到的&quot;知识&quot;。</li>
+</ul>
+<p><strong>自注意力 = 句子里每个词同时扮演 Q、K、V 三个角色，自己跟自己（包括其他词）做这场&quot;图书馆查询&quot;。</strong></p>
+<h3 id="62-数学公式">6.2 数学公式</h3>
+<pre class="hljs"><code><div>Attention(Q, K, V) = softmax((QK^T) / sqrt(d_k)) V
+</div></code></pre>
+<ul>
+<li><code>QK^T</code>：算相似度（点积越大越相似）。</li>
+<li>除以 sqrt{d_k}：防止数值过大导致 softmax 梯度消失（<strong>缩放</strong>）。</li>
+<li>softmax：把相似度变成&quot;权重&quot;（和为 1）。</li>
+<li>乘 V：按权重加权求和。</li>
+</ul>
+<h3 id="63-代码实现最小版">6.3 代码实现（最小版）</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">import</span> torch
+<span class="hljs-keyword">import</span> torch.nn.functional <span class="hljs-keyword">as</span> F
+<span class="hljs-keyword">import</span> math
+
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">scaled_dot_product_attention</span>(<span class="hljs-params">Q, K, V, mask=<span class="hljs-literal">None</span></span>):
+    <span class="hljs-string">&quot;&quot;&quot;
+    Q, K, V: shape (..., seq_len, d_k)
+    例如普通注意力是 (B, L, d_k)，多头注意力是 (B, H, L, d_k)。
+    &quot;&quot;&quot;</span>
+    d_k = Q.size(-<span class="hljs-number">1</span>)
+
+    <span class="hljs-comment"># 1. 计算 Q 和 K 的相似度: (..., seq_len, seq_len)</span>
+    scores = torch.matmul(Q, K.transpose(-<span class="hljs-number">2</span>, -<span class="hljs-number">1</span>)) / math.sqrt(d_k)
+
+    <span class="hljs-comment"># 2. （可选）mask：把不该看的位置设成 -inf，softmax 后变 0</span>
+    <span class="hljs-keyword">if</span> mask <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:
+        scores = scores.masked_fill(mask == <span class="hljs-number">0</span>, <span class="hljs-built_in">float</span>(<span class="hljs-string">&#x27;-inf&#x27;</span>))
+
+    <span class="hljs-comment"># 3. softmax 得到注意力权重</span>
+    attn = F.softmax(scores, dim=-<span class="hljs-number">1</span>)   <span class="hljs-comment"># (..., seq_len, seq_len)</span>
+
+    <span class="hljs-comment"># 4. 用权重对 V 做加权求和</span>
+    out = torch.matmul(attn, V)        <span class="hljs-comment"># (..., seq_len, d_k)</span>
+    <span class="hljs-keyword">return</span> out, attn
+</div></code></pre>
+<p><strong>逐行解析</strong>：</p>
+<ul>
+<li>第 1 步：<code>scores[i][j]</code> 表示&quot;第 i 个词应该多关注第 j 个词&quot;的原始分数。</li>
+<li>第 2 步：mask 主要用在 Decoder（不让看未来）和 padding 位置。</li>
+<li>第 3 步：每行经过 softmax 变成概率分布，所有列加起来 = 1。</li>
+<li>第 4 步：用这个分布对所有 V 做加权和，得到融合了上下文的新表示。</li>
+</ul>
+<p><strong>两种常见 Mask 别混淆</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>Mask 类型</th>
+<th>用在哪里</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Padding Mask</strong></td>
+<td>Encoder / Decoder 都可能用</td>
+<td>忽略 <code>&lt;pad&gt;</code> 这类填充 token，避免模型关注无意义空位</td>
+</tr>
+<tr>
+<td><strong>Causal Mask</strong> / <strong>Look-ahead Mask</strong></td>
+<td>Decoder / GPT</td>
+<td>禁止当前位置看未来 token，保证生成时不能&quot;偷看答案&quot;</td>
+</tr>
+</tbody>
+</table>
+<p>常见构造方式如下：</p>
+<pre class="hljs"><code><div><span class="hljs-comment"># tokens: (B, L)，pad_id 是填充符号的 token id</span>
+padding_mask = (tokens != pad_id).unsqueeze(<span class="hljs-number">1</span>).unsqueeze(<span class="hljs-number">2</span>)  <span class="hljs-comment"># (B, 1, 1, L)</span>
+
+<span class="hljs-comment"># causal mask: 第 i 个位置只能看 0...i</span>
+causal_mask = torch.tril(torch.ones(L, L)).unsqueeze(<span class="hljs-number">0</span>).unsqueeze(<span class="hljs-number">0</span>)  <span class="hljs-comment"># (1, 1, L, L)</span>
+</div></code></pre>
+<blockquote>
+<p>⚠️ <strong>工程提醒</strong>：上面的代码是教学最小版。进入多头注意力后，<code>scores</code> 的形状通常是 <code>(B, H, L, L)</code>；causal mask 常写成 <code>(1, 1, L, L)</code>，padding mask 常写成 <code>(B, 1, 1, L)</code>，这样才能自动广播到每个 batch、每个 head。</p>
+</blockquote>
+<h4 id="-重要函数解释小白版-2">📖 重要函数解释（小白版）</h4>
+<table>
+<thead>
+<tr>
+<th>函数 / 用法</th>
+<th>一句话作用</th>
+<th>形象类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Q.size(-1)</code></td>
+<td>取张量最后一维的长度，即每个头的特征维度 <code>d_k</code></td>
+<td>量一下「每张卡片有多宽」</td>
+</tr>
+<tr>
+<td><code>torch.matmul(Q, K.transpose(-2, -1))</code></td>
+<td>矩阵乘法：把 K 的最后两维转置后再与 Q 相乘，得到所有词两两的「相似度分数矩阵」</td>
+<td>让每个 Q 卡片和每张 K 卡片对一对暗号</td>
+</tr>
+<tr>
+<td><code>K.transpose(-2, -1)</code></td>
+<td>交换最后两个维度，把 K 从 <code>(B, L, d_k)</code> 变成 <code>(B, d_k, L)</code>，方便相乘</td>
+<td>把卡片横着放变成竖着放</td>
+</tr>
+<tr>
+<td><code>math.sqrt(d_k)</code></td>
+<td>计算 √d_k，用于缩放分数防止数值过大导致 softmax 梯度消失</td>
+<td>给「分贝」做一次降噪</td>
+</tr>
+<tr>
+<td><code>scores.masked_fill(mask == 0, -inf)</code></td>
+<td>把 mask 为 0 的位置在 scores 中替换成 -∞</td>
+<td>把不能看的位置「打码」</td>
+</tr>
+<tr>
+<td><code>F.softmax(scores, dim=-1)</code></td>
+<td>沿最后一维做 softmax，让每行变成和为 1 的概率分布</td>
+<td>把分数转成「百分比」，所有比例加起来 = 100%</td>
+</tr>
+<tr>
+<td><code>torch.matmul(attn, V)</code></td>
+<td>用注意力权重对 V 做加权求和</td>
+<td>按比例从每个仓库取货，混合成一袋</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>关键直觉</strong>：注意力机制的输出，本质是 V 的&quot;加权平均&quot;，权重由 Q 和 K 决定。</p>
+<p>💡 <strong>小白记忆点</strong>：4 行代码 = <strong>算分 → 缩放 → 归一化 → 加权和</strong>，记住这 4 个动词就抓住了 Self-Attention。</p>
+<p>⚙️ <strong>复杂度提醒</strong>：标准 Attention 要显式比较每两个 token，注意力矩阵大小是 <code>L × L</code>，所以时间复杂度约为 (O(L^2 d))，注意力矩阵空间复杂度约为 (O(L^2))。这也是长上下文模型很吃显存、后来需要 FlashAttention / 稀疏注意力等优化的根本原因。</p>
+</blockquote>
+<h3 id="64-qkv-怎么来的">6.4 Q、K、V 怎么来的？</h3>
+<p>不是凭空冒出来的，而是<strong>用同一个输入 x 经过三个不同的线性变换</strong>得到：</p>
+<pre class="hljs"><code><div>W_q = nn.Linear(d_model, d_model)
+W_k = nn.Linear(d_model, d_model)
+W_v = nn.Linear(d_model, d_model)
+
+Q = W_q(x)   <span class="hljs-comment"># x 是词向量，shape (batch, seq_len, d_model)</span>
+K = W_k(x)
+V = W_v(x)
+</div></code></pre>
+<p>W_q、W_k、W_v 是模型学习的参数，分别决定&quot;如何提问&quot;、&quot;如何贴标签&quot;、&quot;如何呈现内容&quot;。</p>
+<h4 id="-重要函数解释小白版-3">📖 重要函数解释（小白版）</h4>
+<table>
+<thead>
+<tr>
+<th>函数 / 用法</th>
+<th>一句话作用</th>
+<th>形象类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nn.Linear(in_features, out_features)</code></td>
+<td>创建一个全连接层，本质是一个可学习的矩阵 W 加一个偏置 b，做 <code>y = xW + b</code></td>
+<td>一台「翻译机」：输入维度 in，输出维度 out</td>
+</tr>
+<tr>
+<td><code>W_q(x)</code> / <code>W_k(x)</code> / <code>W_v(x)</code></td>
+<td>把同一个 x 用三个不同的「翻译机」分别加工成 Q、K、V</td>
+<td>同一段原文，用三本字典翻译成三种「角色」用途</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>小白记忆点</strong>：Q/K/V 不是天生不同，而是<strong>用同一段输入 x、过 3 个不同的线性层</strong>变出来的「同人三分身」。</p>
+</blockquote>
+<hr>
+<h2 id="7-零件-4多头注意力multi-head-attention">7. 零件 4：多头注意力（Multi-Head Attention）</h2>
+<h3 id="71-解决什么问题">7.1 解决什么问题？</h3>
+<p>一次注意力只能学到一种&quot;关注模式&quot;，但语言里关系很多：</p>
+<ul>
+<li>谁是主语？</li>
+<li>谁修饰谁？</li>
+<li>谁和谁押韵？</li>
+<li>……</li>
+</ul>
+<p><strong>多头</strong>就是把注意力<strong>做 h 次</strong>（一般 h=8 或 16），每个头关注不同的角度，最后拼起来。</p>
+<h3 id="72-通俗理解">7.2 通俗理解</h3>
+<p>像一个评审团：8 个评委各看一遍，每人侧重不同（一个看主谓宾，一个看时态，一个看情感……），最后把意见汇总。</p>
+<h3 id="73-代码片段">7.3 代码片段</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">class</span> <span class="hljs-title class_">MultiHeadAttention</span>(nn.Module):
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, d_model, num_heads</span>):
+        <span class="hljs-built_in">super</span>().__init__()
+        <span class="hljs-keyword">assert</span> d_model % num_heads == <span class="hljs-number">0</span>
+        <span class="hljs-variable language_">self</span>.d_model = d_model
+        <span class="hljs-variable language_">self</span>.num_heads = num_heads
+        <span class="hljs-variable language_">self</span>.d_k = d_model // num_heads     <span class="hljs-comment"># 每个头的维度</span>
+
+        <span class="hljs-variable language_">self</span>.W_q = nn.Linear(d_model, d_model)
+        <span class="hljs-variable language_">self</span>.W_k = nn.Linear(d_model, d_model)
+        <span class="hljs-variable language_">self</span>.W_v = nn.Linear(d_model, d_model)
+        <span class="hljs-variable language_">self</span>.W_o = nn.Linear(d_model, d_model)   <span class="hljs-comment"># 拼接后的输出投影</span>
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x, mask=<span class="hljs-literal">None</span></span>):
+        B, L, _ = x.shape    <span class="hljs-comment"># batch, seq_len, d_model</span>
+
+        <span class="hljs-comment"># 1. 线性变换 + 拆成多头: (B, L, d_model) -&gt; (B, num_heads, L, d_k)</span>
+        Q = <span class="hljs-variable language_">self</span>.W_q(x).view(B, L, <span class="hljs-variable language_">self</span>.num_heads, <span class="hljs-variable language_">self</span>.d_k).transpose(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>)
+        K = <span class="hljs-variable language_">self</span>.W_k(x).view(B, L, <span class="hljs-variable language_">self</span>.num_heads, <span class="hljs-variable language_">self</span>.d_k).transpose(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>)
+        V = <span class="hljs-variable language_">self</span>.W_v(x).view(B, L, <span class="hljs-variable language_">self</span>.num_heads, <span class="hljs-variable language_">self</span>.d_k).transpose(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>)
+
+        <span class="hljs-comment"># 2. 每个头独立做 attention</span>
+        out, attn = scaled_dot_product_attention(Q, K, V, mask)
+        <span class="hljs-comment"># out shape: (B, num_heads, L, d_k)</span>
+
+        <span class="hljs-comment"># 3. 把多头拼回去: (B, L, d_model)</span>
+        out = out.transpose(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>).contiguous().view(B, L, <span class="hljs-variable language_">self</span>.d_model)
+
+        <span class="hljs-comment"># 4. 最后再过一个线性层混合各头信息</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.W_o(out)
+</div></code></pre>
+<p><strong>逻辑解析</strong>：</p>
+<ul>
+<li>用 <code>view + transpose</code> 把 <code>d_model</code> 拆分成 <code>num_heads × d_k</code>。</li>
+<li>多头是<strong>并行算的</strong>（一次矩阵乘法搞定所有头），不是循环 8 次。</li>
+<li>最后 <code>W_o</code> 是个学习到的&quot;投票汇总器&quot;。</li>
+</ul>
+<h4 id="-重要函数解释小白版-4">📖 重要函数解释（小白版）</h4>
+<table>
+<thead>
+<tr>
+<th>函数 / 用法</th>
+<th>一句话作用</th>
+<th>形象类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>super().__init__()</code></td>
+<td>调用父类 <code>nn.Module</code> 的初始化（必须写，否则注册不了参数）</td>
+<td>先按公司流程办入职，才能领工号</td>
+</tr>
+<tr>
+<td><code>assert d_model % num_heads == 0</code></td>
+<td>断言：模型维度必须能被头数整除（每个头要拿到等长切片）</td>
+<td>一个蛋糕要切 8 等份，必须能整除</td>
+</tr>
+<tr>
+<td><code>B, L, _ = x.shape</code></td>
+<td>一行把 batch、seq_len 解包出来；<code>_</code> 表示维度用不到</td>
+<td>一次性拆包裹，只关心前两层</td>
+</tr>
+<tr>
+<td><code>.view(B, L, num_heads, d_k)</code></td>
+<td>在不复制数据的前提下「重新排版」张量形状</td>
+<td>把一长条排成多列方阵，<strong>纸不变，只是折一下</strong></td>
+</tr>
+<tr>
+<td><code>.transpose(1, 2)</code></td>
+<td>交换第 1 维和第 2 维，把头维放到 batch 后面（<code>(B, H, L, d_k)</code>），方便每头独立算</td>
+<td>把同一摞按「主题」重新分堆</td>
+</tr>
+<tr>
+<td><code>.contiguous()</code></td>
+<td>让张量在内存里重新连续排列（<code>transpose</code> 后内存不连续，<code>view</code> 会报错）</td>
+<td>把刚整理乱的卡片重新码整齐</td>
+</tr>
+<tr>
+<td><code>nn.ModuleList([...])</code></td>
+<td>容器：装一组层，PyTorch 会自动把它们的参数注册进来</td>
+<td>一个文件夹，把多个零件一起归档</td>
+</tr>
+<tr>
+<td><code>self.W_o = nn.Linear(d_model, d_model)</code></td>
+<td>把 8 个头拼接后的结果再过一层线性层做「混合」</td>
+<td>把 8 位评委的打分汇总，得到最终意见</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>小白记忆点</strong>：多头的本质就是 <strong>「reshape + transpose 一下，让矩阵乘法一口气帮你算 8 份注意力」</strong>，并没有真的写 for 循环。</p>
+</blockquote>
+<hr>
+<h2 id="8-零件-5前馈网络feed-forward-network-ffn">8. 零件 5：前馈网络（Feed Forward Network, FFN）</h2>
+<h3 id="81-解决什么问题">8.1 解决什么问题？</h3>
+<p>注意力主要负责<strong>信息混合</strong>（让词之间互相看），但缺乏<strong>非线性变换能力</strong>。<br>
+FFN 就是给每个位置加一个&quot;小型全连接神经网络&quot;，提升模型的表达力。</p>
+<h3 id="82-结构">8.2 结构</h3>
+<p>每个位置独立地过：</p>
+<pre class="hljs"><code><div>Linear(d_model, d_ff) → ReLU/GELU → Linear(d_ff, d_model)
+</div></code></pre>
+<p>通常 <code>d_ff = 4 * d_model</code>（先升维再降维，制造表达空间）。</p>
+<h3 id="83-代码">8.3 代码</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">class</span> <span class="hljs-title class_">FeedForward</span>(nn.Module):
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, d_model, d_ff=<span class="hljs-number">2048</span></span>):
+        <span class="hljs-built_in">super</span>().__init__()
+        <span class="hljs-variable language_">self</span>.fc1 = nn.Linear(d_model, d_ff)
+        <span class="hljs-variable language_">self</span>.fc2 = nn.Linear(d_ff, d_model)
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x</span>):
+        <span class="hljs-keyword">return</span> <span class="hljs-variable language_">self</span>.fc2(F.relu(<span class="hljs-variable language_">self</span>.fc1(x)))
+</div></code></pre>
+<p><strong>关键点</strong>：FFN 是**逐位置（position-wise）**的，每个 token 单独过同一个网络，不跨位置混合信息。混合工作交给 Attention 完成。</p>
+<h4 id="-重要函数解释小白版-5">📖 重要函数解释（小白版）</h4>
+<table>
+<thead>
+<tr>
+<th>函数 / 用法</th>
+<th>一句话作用</th>
+<th>形象类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>self.fc1 = nn.Linear(d_model, d_ff)</code></td>
+<td>第一层全连接：把 512 维<strong>升维</strong>到 2048 维，制造更大的特征空间</td>
+<td>把小屋子换到大会议厅</td>
+</tr>
+<tr>
+<td><code>self.fc2 = nn.Linear(d_ff, d_model)</code></td>
+<td>第二层全连接：把 2048 维<strong>降回</strong> 512 维，方便和后续层衔接</td>
+<td>开完会再回到小屋子</td>
+</tr>
+<tr>
+<td><code>F.relu(x)</code></td>
+<td>激活函数：<code>max(0, x)</code>，把负数全砍成 0，引入非线性</td>
+<td>一道关卡：分数为正才放行，负分淘汰</td>
+</tr>
+<tr>
+<td><code>self.fc2(F.relu(self.fc1(x)))</code></td>
+<td>嵌套调用：先线性升维 → 激活 → 线性降维</td>
+<td>三步流水线</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>小白记忆点</strong>：FFN = <strong>「升维 → 非线性 → 降维」三步走</strong>；它不让词之间互相说话（那是 Attention 的活），它只负责给每个词「单独深加工」。</p>
+</blockquote>
+<blockquote>
+<p>原版 Transformer 常用 ReLU，BERT / GPT-2 常用 GELU，现代 LLaMA / Qwen 等大模型常用 SwiGLU。激活函数会变，但 FFN 的核心骨架仍然是：<strong>升维 → 非线性加工 → 降回 <code>d_model</code></strong>。</p>
+</blockquote>
+<hr>
+<h2 id="9-零件-6残差连接--层归一化add--norm">9. 零件 6：残差连接 + 层归一化（Add &amp; Norm）</h2>
+<h3 id="91-解决什么问题">9.1 解决什么问题？</h3>
+<p>Transformer 通常堆 6~96 层，深网络会遇到<strong>梯度消失/爆炸</strong>和<strong>训练不稳定</strong>。</p>
+<ul>
+<li><strong>残差连接（Residual）</strong>：<code>output = SubLayer(x) + x</code>。让梯度可以&quot;抄近道&quot;传回来。</li>
+<li><strong>层归一化（LayerNorm）</strong>：把每一层输出标准化（均值 0、方差 1），让数值稳定。</li>
+</ul>
+<h3 id="92-代码">9.2 代码</h3>
+<pre class="hljs"><code><div><span class="hljs-keyword">class</span> <span class="hljs-title class_">EncoderLayer</span>(nn.Module):
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, d_model, num_heads, d_ff, dropout=<span class="hljs-number">0.1</span></span>):
+        <span class="hljs-built_in">super</span>().__init__()
+        <span class="hljs-variable language_">self</span>.attn = MultiHeadAttention(d_model, num_heads)
+        <span class="hljs-variable language_">self</span>.ffn = FeedForward(d_model, d_ff)
+        <span class="hljs-variable language_">self</span>.norm1 = nn.LayerNorm(d_model)
+        <span class="hljs-variable language_">self</span>.norm2 = nn.LayerNorm(d_model)
+        <span class="hljs-variable language_">self</span>.dropout = nn.Dropout(dropout)
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x, mask=<span class="hljs-literal">None</span></span>):
+        <span class="hljs-comment"># 子层 1：自注意力 + 残差 + 归一化</span>
+        attn_out = <span class="hljs-variable language_">self</span>.attn(x, mask)
+        x = <span class="hljs-variable language_">self</span>.norm1(x + <span class="hljs-variable language_">self</span>.dropout(attn_out))
+
+        <span class="hljs-comment"># 子层 2：FFN + 残差 + 归一化</span>
+        ffn_out = <span class="hljs-variable language_">self</span>.ffn(x)
+        x = <span class="hljs-variable language_">self</span>.norm2(x + <span class="hljs-variable language_">self</span>.dropout(ffn_out))
+        <span class="hljs-keyword">return</span> x
+</div></code></pre>
+<h4 id="-重要函数解释小白版-6">📖 重要函数解释（小白版）</h4>
+<table>
+<thead>
+<tr>
+<th>函数 / 用法</th>
+<th>一句话作用</th>
+<th>形象类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nn.LayerNorm(d_model)</code></td>
+<td>对每个 token 的向量做归一化（减均值、除标准差），让数值分布稳定</td>
+<td>班里每次考试都按平均分 0、标准差 1 重新打分</td>
+</tr>
+<tr>
+<td><code>nn.Dropout(p)</code></td>
+<td>训练时随机把 p 比例的元素置 0，防止过拟合；推理时自动关闭</td>
+<td>上课随机点名抽查，逼大家都得会</td>
+</tr>
+<tr>
+<td><code>x + self.dropout(attn_out)</code></td>
+<td><strong>残差连接（Residual）</strong>：原输入 x 加上子层输出，让梯度有「高速公路」直接传回去</td>
+<td>多一条「抄近路的小道」，万一主路堵了也能通</td>
+</tr>
+<tr>
+<td><code>self.norm1(x + ...)</code></td>
+<td>残差相加之后再做 LayerNorm（即原始论文 Post-LN 顺序）</td>
+<td>加完料后再统一调味</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>小白记忆点</strong>：在原始论文的 Post-LN 写法中，每个子层通常是同一个套路 —— <strong>「子层运算 → Dropout → 加残差 → LayerNorm」</strong>。</p>
+</blockquote>
+<blockquote>
+<p><strong>小知识</strong>：原始论文用的是 Post-LN（先 Add 再 Norm）；现在大模型基本用 Pre-LN（先 Norm 再进子层，常写成 <code>x = x + Sublayer(LayerNorm(x))</code>），训练更稳定。</p>
+</blockquote>
+<hr>
+<h2 id="10-把所有零件拼起来一个最小-transformer-encoder">10. 把所有零件拼起来：一个最小 Transformer Encoder</h2>
+<blockquote>
+<p>运行本节代码前，请先把前文的 <code>positional_encoding</code>、<code>scaled_dot_product_attention</code>、<code>MultiHeadAttention</code>、<code>FeedForward</code>、<code>EncoderLayer</code> 放在同一个文件中。本节重点是展示这些零件如何拼装成完整 Encoder。</p>
+</blockquote>
+<pre class="hljs"><code><div><span class="hljs-keyword">import</span> torch
+<span class="hljs-keyword">import</span> torch.nn <span class="hljs-keyword">as</span> nn
+<span class="hljs-keyword">import</span> torch.nn.functional <span class="hljs-keyword">as</span> F
+<span class="hljs-keyword">import</span> math
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">TransformerEncoder</span>(nn.Module):
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, vocab_size, d_model=<span class="hljs-number">512</span>, num_heads=<span class="hljs-number">8</span>,
+                 num_layers=<span class="hljs-number">6</span>, d_ff=<span class="hljs-number">2048</span>, max_len=<span class="hljs-number">512</span>, dropout=<span class="hljs-number">0.1</span></span>):
+        <span class="hljs-built_in">super</span>().__init__()
+        <span class="hljs-variable language_">self</span>.embedding = nn.Embedding(vocab_size, d_model)
+        <span class="hljs-variable language_">self</span>.register_buffer(<span class="hljs-string">&#x27;pe&#x27;</span>, positional_encoding(max_len, d_model))
+        <span class="hljs-variable language_">self</span>.layers = nn.ModuleList([
+            EncoderLayer(d_model, num_heads, d_ff, dropout)
+            <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(num_layers)
+        ])
+        <span class="hljs-variable language_">self</span>.dropout = nn.Dropout(dropout)
+        <span class="hljs-variable language_">self</span>.d_model = d_model
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, tokens, mask=<span class="hljs-literal">None</span></span>):
+        <span class="hljs-comment"># 1. 词嵌入 + 位置编码</span>
+        x = <span class="hljs-variable language_">self</span>.embedding(tokens) * math.sqrt(<span class="hljs-variable language_">self</span>.d_model)
+        x = x + <span class="hljs-variable language_">self</span>.pe[:x.size(<span class="hljs-number">1</span>)].unsqueeze(<span class="hljs-number">0</span>)
+        x = <span class="hljs-variable language_">self</span>.dropout(x)
+
+        <span class="hljs-comment"># 2. 堆叠 N 层 EncoderLayer</span>
+        <span class="hljs-keyword">for</span> layer <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.layers:
+            x = layer(x, mask)
+        <span class="hljs-keyword">return</span> x   <span class="hljs-comment"># (batch, seq_len, d_model)</span>
+
+
+<span class="hljs-comment"># === 跑一下试试 ===</span>
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:
+    model = TransformerEncoder(vocab_size=<span class="hljs-number">10000</span>)
+    tokens = torch.randint(<span class="hljs-number">0</span>, <span class="hljs-number">10000</span>, (<span class="hljs-number">2</span>, <span class="hljs-number">16</span>))   <span class="hljs-comment"># batch=2, seq_len=16</span>
+    out = model(tokens)
+    <span class="hljs-built_in">print</span>(out.shape)   <span class="hljs-comment"># torch.Size([2, 16, 512])</span>
+</div></code></pre>
+<h4 id="-重要函数解释小白版-7">📖 重要函数解释（小白版）</h4>
+<table>
+<thead>
+<tr>
+<th>函数 / 用法</th>
+<th>一句话作用</th>
+<th>形象类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>self.register_buffer('pe', ...)</code></td>
+<td>把位置编码注册为「buffer」：会随模型 <code>.to(device)</code> 一起搬到 GPU，但<strong>不会被当作可训练参数更新</strong></td>
+<td>行李里的「常量配件」，跟着走但不被改</td>
+</tr>
+<tr>
+<td><code>nn.ModuleList([EncoderLayer(...) for _ in range(N)])</code></td>
+<td>构建 N 层一模一样结构（参数各自独立）的编码器层</td>
+<td>流水线上摆 N 台同型号机器</td>
+</tr>
+<tr>
+<td><code>self.embedding(tokens) * math.sqrt(self.d_model)</code></td>
+<td>词向量乘以 √d_model（论文做法，缓和位置编码相加后的尺度差异）</td>
+<td>给原料先「放大一档」，方便和调料混匀</td>
+</tr>
+<tr>
+<td><code>self.pe[:x.size(1)].unsqueeze(0)</code></td>
+<td>取出前 seq_len 行位置编码，并补一个 batch 维以便广播相加</td>
+<td>按句子长度截一段尺子，复制给整个 batch</td>
+</tr>
+<tr>
+<td><code>torch.randint(0, 10000, (2, 16))</code></td>
+<td>在 <code>[0, 10000)</code> 范围内随机生成 <code>(2, 16)</code> 的整数张量，模拟 token id</td>
+<td>随机出题，假装这是真实输入</td>
+</tr>
+<tr>
+<td><code>if __name__ == &quot;__main__&quot;:</code></td>
+<td>Python 习惯写法：当文件被「直接执行」时才跑下面的代码，被 import 时不跑</td>
+<td>「自家用」开关，别人借文件不会误触发</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>小白记忆点</strong>：整个 Encoder = <strong>Embedding → +PE → 堆 N 层（Attn+FFN+残差）</strong>，看上去复杂，其实<strong>循环结构非常清晰</strong>。</p>
+</blockquote>
+<p><strong>逻辑解析（数据从输入到输出走了什么路）</strong>：</p>
+<ol>
+<li>输入 token id <code>(B, L)</code>。</li>
+<li>经过 Embedding → <code>(B, L, d_model)</code>。</li>
+<li>加上位置编码（让模型知道顺序）。</li>
+<li>进入第 1 层 EncoderLayer：自注意力 → Add&amp;Norm → FFN → Add&amp;Norm。</li>
+<li>重复 N 次。</li>
+<li>输出每个位置的&quot;上下文感知向量&quot; <code>(B, L, d_model)</code>。</li>
+</ol>
+<h4 id="️-整体数据流图示">🖼️ 整体数据流图示</h4>
+<p>下面这张图把上面的 6 步「画」出来。为了便于 PDF 阅读，这里拆成 <strong>主干数据流</strong> 和 <strong>输出任务头</strong> 两层：</p>
+<pre><code class="language-mermaid"><div class="mermaid">%%{init: {"themeVariables": {"fontSize": "8.8px"}, "flowchart": {"nodeSpacing": 10, "rankSpacing": 14, "curve": "linear"}}}%%
+flowchart LR
+    subgraph MAIN["主干：Encoder 数据流"]
+        direction LR
+        A["Token ID<br/>(B,L)"] --> B["Embedding<br/>(B,L,d)"]
+        B --> C["×√d"]
+        C --> D["+ PE<br/>位置"]
+        D --> E["Dropout"]
+        E --> F["EncoderLayer<br/>×N"]
+        F --> G["上下文向量<br/>(B,L,d)"]
+    end
+
+    subgraph HEAD["输出：接不同任务头"]
+        direction TB
+        H1["分类头<br/>BERT 分类"]
+        H2["MLM 头<br/>BERT 预训练"]
+        H3["Causal Block<br/>+ LM Head<br/>GPT 生成*"]
+    end
+
+    G --> H1
+    G --> H2
+    G --> H3
+
+    classDef input fill:#e1f5ff,stroke:#0288d1,font-size:8.8px;
+    classDef core fill:#fff8e1,stroke:#f57c00,font-size:8.8px;
+    classDef output fill:#c8e6c9,stroke:#2e7d32,font-size:8.8px;
+    classDef head fill:#f3e5f5,stroke:#7b1fa2,font-size:8.5px;
+    class A input;
+    class B,C,D,E,F core;
+    class G output;
+    class H1,H2,H3 head;
+</div></code></pre>
+<blockquote>
+<p>⚠️ <strong>重要澄清</strong>：GPT 不是普通 Encoder 直接接一个 <code>LM Head</code> 就得到的。GPT / LLaMA 使用的是 <strong>Decoder-only / causal Transformer block</strong>：每个位置只能看自己和左边历史 token，不能像 Encoder 那样双向看完整句。上图里的 <code>GPT 生成*</code> 是为了说明“下游生成接口”的位置，不表示 Encoder 能直接变成 GPT。</p>
+</blockquote>
+<h4 id="-关于-encoderlayer--n-层-的关键澄清">🔗 关于 &quot;EncoderLayer × N 层&quot; 的关键澄清</h4>
+<p>很多初学者看到 <code>× N</code> 会有疑问：<strong>这 N 层是怎么连的？输入输出的 shape 会变吗？</strong></p>
+<p><strong>两句话回答</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>答案</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>N 层是串联还是并联？</strong></td>
+<td><strong>串联</strong>：第 1 层输出 → 第 2 层输入 → … → 第 N 层输入 → 最终输出</td>
+</tr>
+<tr>
+<td><strong>shape 会改变吗？</strong></td>
+<td><strong>完全不变</strong>：每一层输入输出都是 <code>(B, L, d_model)</code>，只是&quot;内容&quot;被刷新</td>
+</tr>
+</tbody>
+</table>
+<p><strong>对应代码</strong>（来自上面 <code>Encoder.forward</code>）：</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">for</span> layer <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.layers:   <span class="hljs-comment"># self.layers 是 ModuleList，里面是 N 个 EncoderLayer</span>
+    x = layer(x)            <span class="hljs-comment"># 关键：x 进、x 出，名字相同 → shape 一定相同</span>
+</div></code></pre>
+<p><strong>形象图示——&quot;流水线&quot;视角</strong>：</p>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+    IN["输入<br/>(B, L, d_model)"] --> E1["EncoderLayer 1"]
+    E1 -->|"(B, L, d_model)"| E2["EncoderLayer 2"]
+    E2 -->|"(B, L, d_model)"| E3["EncoderLayer 3"]
+    E3 -->|"..."| EN["EncoderLayer N"]
+    EN --> OUT["输出<br/>(B, L, d_model)"]
+
+    style IN fill:#e1f5ff,stroke:#0288d1
+    style OUT fill:#c8e6c9,stroke:#2e7d32
+    style E1 fill:#fff8e1,stroke:#f57c00
+    style E2 fill:#fff8e1,stroke:#f57c00
+    style E3 fill:#fff8e1,stroke:#f57c00
+    style EN fill:#fff8e1,stroke:#f57c00
+</div></code></pre>
+<p><strong>为什么必须 shape 不变？三个硬性原因</strong>：</p>
+<ol>
+<li><strong>要能串联</strong>：下一层期望的输入维度 = 上一层产生的输出维度 = <code>d_model</code>，否则接不上。</li>
+<li><strong>要支持残差连接</strong>：每层内部有 <code>x + 子层(x)</code> 的加法，加法两边 shape 必须完全一致。</li>
+<li><strong>要能任意加深</strong>：N 可以是 6、12、24、96……只要 shape 不变，<strong>理论上可以无限堆</strong>（GPT-3 就堆了 96 层）。</li>
+</ol>
+<p><strong>那&quot;内容&quot;到底变了什么？</strong>——<strong>变的是每个位置向量的语义浓度</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>层数</th>
+<th>每个位置向量的&quot;含义&quot;</th>
+<th>类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第 0 层（Embedding 后）</td>
+<td>只是这个词本身的含义 + 位置</td>
+<td>单字的字典释义</td>
+</tr>
+<tr>
+<td>第 1 层后</td>
+<td>融合了周围几个词的信息</td>
+<td>看了一眼左右邻居</td>
+</tr>
+<tr>
+<td>第 3 层后</td>
+<td>融合了整句的浅层关系（语法）</td>
+<td>读懂了句子的主谓宾</td>
+</tr>
+<tr>
+<td>第 N 层后</td>
+<td>融合了整句的深层关系（语义、指代、逻辑）</td>
+<td>真正&quot;理解&quot;了这句话</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>一句话比喻</strong>：N 层 EncoderLayer 就像 <strong>N 道工序的流水线</strong>——零件（向量）的<strong>外形（shape）始终不变</strong>，但每过一道工序，<strong>它的&quot;成色&quot;就更精纯一分</strong>。</p>
+</blockquote>
+<h4 id="-单个-encoderlayer-内部结构">🔁 单个 EncoderLayer 内部结构</h4>
+<p>这是上面主流程中 F 节点（&quot;EncoderLayer × N 层&quot;）的内部展开。为了避免一张图塞太多信息，这里按 <strong>从外到内</strong> 的方式分层展示：</p>
+<ol>
+<li>先看 <code>EncoderLayer</code> 的<strong>模块关系</strong>。</li>
+<li>再展开 <code>Multi-Head Self-Attention</code> 的内部组成。</li>
+<li>再展开 <code>Feed Forward Network</code> 的内部组成。</li>
+<li>最后单独说明 <code>Add &amp; Norm</code> 在两个子层中的复用位置。</li>
+</ol>
+<h5 id="第一层encoderlayer-的模块关系总览">第一层：EncoderLayer 的模块关系总览</h5>
+<p>一个 <code>EncoderLayer</code> 不是一整坨黑盒，而是两个大子层串起来：</p>
+<pre><code class="language-mermaid"><div class="mermaid">%%{init: {"themeVariables": {"fontSize": "10px"}, "flowchart": {"nodeSpacing": 18, "rankSpacing": 18, "curve": "linear"}}}%%
+flowchart LR
+    X["输入 x<br/>(B,L,d_model)"] --> A["子层 1<br/>Multi-Head Self-Attention"]
+    A --> N1["Add & Norm"]
+    N1 --> F["子层 2<br/>Feed Forward Network"]
+    F --> N2["Add & Norm"]
+    N2 --> Y["输出 x'<br/>(B,L,d_model)"]
+
+    classDef io fill:#e1f5ff,stroke:#0288d1,font-size:10px;
+    classDef block fill:#fff8e1,stroke:#f57c00,font-size:10px;
+    classDef norm fill:#f3e5f5,stroke:#7b1fa2,font-size:10px;
+    class X,Y io;
+    class A,F block;
+    class N1,N2 norm;
+</div></code></pre>
+<blockquote>
+<p>💡 <strong>关键点</strong>：<code>EncoderLayer</code> 的输入和输出 shape 都是 <code>(B, L, d_model)</code>。层内部会改变向量的&quot;内容&quot;，但不会改变向量的&quot;外形&quot;。</p>
+</blockquote>
+<h5 id="第二层self-attention-子模块组成">第二层：Self-Attention 子模块组成</h5>
+<p><code>Multi-Head Self-Attention</code> 负责让每个 token 去看整句话里其他 token，决定&quot;我应该重点参考谁&quot;。</p>
+<pre><code class="language-mermaid"><div class="mermaid">%%{init: {"themeVariables": {"fontSize": "9.5px"}, "flowchart": {"nodeSpacing": 12, "rankSpacing": 14, "curve": "linear"}}}%%
+flowchart LR
+    X["x"] --> QKV["线性映射<br/>得到 Q/K/V"]
+    QKV --> SPLIT["拆成 h 个头"]
+    SPLIT --> SCORE["QKᵀ / √d_k<br/>算相关度"]
+    SCORE --> SM["Softmax<br/>变权重"]
+    SM --> V["加权求和 V"]
+    V --> CAT["拼接多头"]
+    CAT --> WO["输出线性层 W_o"]
+    WO --> OUT["attn_out"]
+
+    classDef attn fill:#e8f5e9,stroke:#2e7d32,font-size:9.5px;
+    class X,QKV,SPLIT,SCORE,SM,V,CAT,WO,OUT attn;
+</div></code></pre>
+<p>可以把它理解成三步：</p>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>做什么</th>
+<th>直观理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>生成 <code>Q/K/V</code></td>
+<td>给每个 token 生成查询、键和值</td>
+<td>先准备&quot;我要找什么&quot;、&quot;我有什么特征&quot;、&quot;我能提供什么信息&quot;</td>
+</tr>
+<tr>
+<td>多头注意力</td>
+<td>多组视角并行计算注意力</td>
+<td>有的头看语法，有的头看指代，有的头看局部搭配</td>
+</tr>
+<tr>
+<td>拼接输出</td>
+<td>把多个头的结果合并回 <code>d_model</code></td>
+<td>多个专家意见合并成一个新向量</td>
+</tr>
+</tbody>
+</table>
+<h5 id="第三层ffn-子模块组成">第三层：FFN 子模块组成</h5>
+<p><code>Feed Forward Network</code> 负责对每个位置的向量做进一步加工。它不负责 token 之间交流，而是对每个 token 的表示单独做&quot;升维、激活、降维&quot;。</p>
+<pre><code class="language-mermaid"><div class="mermaid">%%{init: {"themeVariables": {"fontSize": "9.5px"}, "flowchart": {"nodeSpacing": 14, "rankSpacing": 14, "curve": "linear"}}}%%
+flowchart LR
+    X["输入<br/>(d_model)"] --> L1["Linear 1<br/>d_model → d_ff"]
+    L1 --> ACT["激活函数<br/>ReLU / GELU / SwiGLU"]
+    ACT --> DO["Dropout"]
+    DO --> L2["Linear 2<br/>d_ff → d_model"]
+    L2 --> Y["输出<br/>(d_model)"]
+
+    classDef ffn fill:#fff3e0,stroke:#ef6c00,font-size:9.5px;
+    class X,L1,ACT,DO,L2,Y ffn;
+</div></code></pre>
+<p>可以把 FFN 理解成一个&quot;小型加工厂&quot;：</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>作用</th>
+<th>为什么需要</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Linear 1</code></td>
+<td>从 <code>d_model</code> 升到更大的 <code>d_ff</code></td>
+<td>给模型更大的中间表达空间</td>
+</tr>
+<tr>
+<td>激活函数</td>
+<td>引入非线性</td>
+<td>否则多层线性叠加还是线性，表达能力不足</td>
+</tr>
+<tr>
+<td><code>Linear 2</code></td>
+<td>从 <code>d_ff</code> 降回 <code>d_model</code></td>
+<td>保持输出 shape 不变，方便继续堆下一层</td>
+</tr>
+</tbody>
+</table>
+<h5 id="第四层add--norm-在哪里">第四层：Add &amp; Norm 在哪里？</h5>
+<p><code>Add &amp; Norm</code> 不是单独改变语义的大模块，而是每个子层后面的&quot;稳定器&quot;：</p>
+<pre class="hljs"><code><div>Attention 子层后：x1 = LayerNorm(x + Dropout(SelfAttention(x)))
+FFN 子层后：      x2 = LayerNorm(x1 + Dropout(FFN(x1)))
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>作用</th>
+<th>小白理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Add</code> / 残差连接</td>
+<td>把子层输出加回原输入</td>
+<td>保留原信息，避免越学越跑偏</td>
+</tr>
+<tr>
+<td><code>Dropout</code></td>
+<td>训练时随机丢掉一部分连接</td>
+<td>防止模型死记硬背</td>
+</tr>
+<tr>
+<td><code>LayerNorm</code></td>
+<td>对每个 token 的向量做归一化</td>
+<td>让数值更稳定，训练更顺</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>一句话总结这一层结构</strong>：一个 <code>EncoderLayer</code> = <strong>Self-Attention 负责&quot;和别人交流&quot;，FFN 负责&quot;自己加工&quot;，每一步后面都用 Add &amp; Norm 保持稳定</strong>。</p>
+</blockquote>
+<p><strong>这就是 BERT 的骨架。</strong> 在它上面接个分类头，就是 BERT 分类；接个 MLM 头，就是 BERT 预训练。</p>
+<h2 id="11-按-demo-流程拆解每个节点的输入和输出">11 按 demo 流程拆解：每个节点的输入和输出</h2>
+<p>这一节对应前面的 <code>TransformerEncoder</code> demo。它的作用类似一张“流程对照表”：把完整代码拆成一个个处理节点，说明每个节点的<strong>输入是什么、处理做了什么、输出是什么、应该回看哪一章</strong>。</p>
+<h4 id="节点-1输入-token-id-tokens">节点 1：输入 token id <code>tokens</code></h4>
+<p>对应代码：</p>
+<pre class="hljs"><code><div>tokens = torch.randint(<span class="hljs-number">0</span>, <span class="hljs-number">10000</span>, (<span class="hljs-number">2</span>, <span class="hljs-number">16</span>))   <span class="hljs-comment"># batch=2, seq_len=16</span>
+out = model(tokens)
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入</td>
+<td>离散的 token id，形状是 <code>(B, L)</code>。</td>
+</tr>
+<tr>
+<td>示例</td>
+<td><code>(2, 16)</code> 表示一次输入 2 句话，每句话 16 个 token。</td>
+</tr>
+<tr>
+<td>处理</td>
+<td>只是准备模型输入，此时每个 token 还是整数编号。</td>
+</tr>
+<tr>
+<td>输出</td>
+<td><code>tokens</code>。</td>
+</tr>
+<tr>
+<td>回看章节</td>
+<td>第 4 章 Token Embedding。</td>
+</tr>
+</tbody>
+</table>
+<p>初学者要记住：模型真正吃进去的不是原始文字，而是 tokenizer 处理后的 token id。本文 demo 用随机整数模拟真实 token id。</p>
+<h4 id="节点-2词嵌入-selfembeddingtokens">节点 2：词嵌入 <code>self.embedding(tokens)</code></h4>
+<p>对应代码：</p>
+<pre class="hljs"><code><div>x = <span class="hljs-variable language_">self</span>.embedding(tokens) * math.sqrt(<span class="hljs-variable language_">self</span>.d_model)
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入</td>
+<td><code>tokens</code>，形状 <code>(B, L)</code>。</td>
+</tr>
+<tr>
+<td>处理</td>
+<td>通过 <code>nn.Embedding</code> 查表，把每个 token id 映射成一个 <code>d_model</code> 维向量。</td>
+</tr>
+<tr>
+<td>输出</td>
+<td><code>x</code>，形状 <code>(B, L, d_model)</code>。</td>
+</tr>
+<tr>
+<td>回看章节</td>
+<td>第 4 章。</td>
+</tr>
+</tbody>
+</table>
+<p>这一步完成了从“离散编号”到“连续向量”的转换。后面的 Attention、FFN 都是在向量上计算。</p>
+<h4 id="节点-3加入位置编码--pe">节点 3：加入位置编码 <code>+ PE</code></h4>
+<p>对应代码：</p>
+<pre class="hljs"><code><div>x = x + <span class="hljs-variable language_">self</span>.pe[:x.size(<span class="hljs-number">1</span>)].unsqueeze(<span class="hljs-number">0</span>)
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入</td>
+<td>token 向量 <code>x</code> 和位置编码 <code>pe</code>。</td>
+</tr>
+<tr>
+<td>处理</td>
+<td>截取当前序列长度对应的位置编码，并加到 token embedding 上。</td>
+</tr>
+<tr>
+<td>输出</td>
+<td>带位置信息的 <code>x</code>，形状仍是 <code>(B, L, d_model)</code>。</td>
+</tr>
+<tr>
+<td>回看章节</td>
+<td>第 5 章。</td>
+</tr>
+</tbody>
+</table>
+<p>如果没有位置编码，Self-Attention 本身不知道 token 的先后顺序；加入位置编码后，模型才能区分“我打你”和“你打我”。</p>
+<h4 id="节点-4dropout-正则化">节点 4：Dropout 正则化</h4>
+<p>对应代码：</p>
+<pre class="hljs"><code><div>x = <span class="hljs-variable language_">self</span>.dropout(x)
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入</td>
+<td>加过位置编码的 <code>x</code>。</td>
+</tr>
+<tr>
+<td>处理</td>
+<td>训练时随机丢弃一部分特征，降低过拟合风险。</td>
+</tr>
+<tr>
+<td>输出</td>
+<td>形状不变的 <code>x</code>。</td>
+</tr>
+<tr>
+<td>回看章节</td>
+<td>第 9 章和第 10 章。</td>
+</tr>
+</tbody>
+</table>
+<p>Dropout 不改变张量形状，只是在训练阶段增加一点“扰动”，让模型不要死记硬背。</p>
+<h4 id="节点-5进入第-1-到第-n-个-encoderlayer">节点 5：进入第 1 到第 N 个 <code>EncoderLayer</code></h4>
+<p>对应代码：</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">for</span> layer <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.layers:
+    x = layer(x, mask)
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入</td>
+<td><code>x</code>，形状 <code>(B, L, d_model)</code>。</td>
+</tr>
+<tr>
+<td>处理</td>
+<td>串联经过 N 个 <code>EncoderLayer</code>。每一层都包含 Self-Attention、FFN、残差连接和 LayerNorm。</td>
+</tr>
+<tr>
+<td>输出</td>
+<td>上下文感知后的 <code>x</code>，形状仍是 <code>(B, L, d_model)</code>。</td>
+</tr>
+<tr>
+<td>回看章节</td>
+<td>第 6～10 章。</td>
+</tr>
+</tbody>
+</table>
+<p>这里最关键的一点是：N 层是<strong>串联</strong>，不是并联。每一层的 shape 不变，但每个 token 向量里的语义信息会越来越丰富。</p>
+<h4 id="节点-6self-attention-让-token-彼此交流">节点 6：Self-Attention 让 token 彼此交流</h4>
+<p>对应概念代码：</p>
+<pre class="hljs"><code><div>scores = torch.matmul(Q, K.transpose(-<span class="hljs-number">2</span>, -<span class="hljs-number">1</span>)) / math.sqrt(d_k)
+attn = F.softmax(scores, dim=-<span class="hljs-number">1</span>)
+out = torch.matmul(attn, V)
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入</td>
+<td>当前层的 <code>x</code>，以及由 <code>x</code> 线性变换得到的 <code>Q</code>、<code>K</code>、<code>V</code>。</td>
+</tr>
+<tr>
+<td>处理</td>
+<td>每个 token 和其他 token 计算相关度，再按权重汇总信息。</td>
+</tr>
+<tr>
+<td>输出</td>
+<td>融合上下文后的 attention 输出。</td>
+</tr>
+<tr>
+<td>回看章节</td>
+<td>第 6 章。</td>
+</tr>
+</tbody>
+</table>
+<p>Self-Attention 是 Transformer 的核心：它让每个位置都能直接“看见”其他位置，因此更容易处理长距离依赖。</p>
+<h4 id="节点-7multi-head-attention-从多个视角看句子">节点 7：Multi-Head Attention 从多个视角看句子</h4>
+<p>对应核心代码：</p>
+<pre class="hljs"><code><div><span class="hljs-variable language_">self</span>.attn = MultiHeadAttention(d_model, num_heads)
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入</td>
+<td>当前层的 <code>x</code>。</td>
+</tr>
+<tr>
+<td>处理</td>
+<td>把注意力拆成多个 head 并行计算，再拼接回 <code>d_model</code>。</td>
+</tr>
+<tr>
+<td>输出</td>
+<td>多视角融合后的 attention 输出。</td>
+</tr>
+<tr>
+<td>回看章节</td>
+<td>第 7 章。</td>
+</tr>
+</tbody>
+</table>
+<p>可以把多头注意力理解成多个专家同时读同一句话：有的看语法关系，有的看指代关系，有的看局部搭配。</p>
+<h4 id="节点-8ffn-对每个-token-单独深加工">节点 8：FFN 对每个 token 单独深加工</h4>
+<p>对应核心代码：</p>
+<pre class="hljs"><code><div><span class="hljs-variable language_">self</span>.ffn = FeedForward(d_model, d_ff)
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入</td>
+<td>Attention 之后的 <code>x</code>。</td>
+</tr>
+<tr>
+<td>处理</td>
+<td>对每个位置独立执行“升维 → 激活 → 降维”。</td>
+</tr>
+<tr>
+<td>输出</td>
+<td>形状仍为 <code>(B, L, d_model)</code> 的新表示。</td>
+</tr>
+<tr>
+<td>回看章节</td>
+<td>第 8 章。</td>
+</tr>
+</tbody>
+</table>
+<p>Attention 负责“和别人交流”，FFN 负责“自己加工”。两者配合，才构成完整的 Transformer 层。</p>
+<h4 id="节点-9add--norm-保持信息和训练稳定">节点 9：Add &amp; Norm 保持信息和训练稳定</h4>
+<p>对应结构：</p>
+<pre class="hljs"><code><div>Attention 子层后：x1 = LayerNorm(x + Dropout(SelfAttention(x)))
+FFN 子层后：      x2 = LayerNorm(x1 + Dropout(FFN(x1)))
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入</td>
+<td>子层输入和子层输出。</td>
+</tr>
+<tr>
+<td>处理</td>
+<td>残差连接保留原信息，LayerNorm 稳定数值分布。</td>
+</tr>
+<tr>
+<td>输出</td>
+<td>稳定后的 <code>x</code>。</td>
+</tr>
+<tr>
+<td>回看章节</td>
+<td>第 9 章。</td>
+</tr>
+</tbody>
+</table>
+<p>没有残差连接，深层网络容易越学越难；没有归一化，训练过程容易数值不稳定。</p>
+<h4 id="节点-10输出上下文感知向量-out">节点 10：输出上下文感知向量 <code>out</code></h4>
+<p>对应代码：</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">return</span> x   <span class="hljs-comment"># (batch, seq_len, d_model)</span>
+<span class="hljs-built_in">print</span>(out.shape)   <span class="hljs-comment"># torch.Size([2, 16, 512])</span>
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入</td>
+<td>最后一层 <code>EncoderLayer</code> 的输出。</td>
+</tr>
+<tr>
+<td>处理</td>
+<td>直接作为 Encoder 的最终输出返回。</td>
+</tr>
+<tr>
+<td>输出</td>
+<td><code>out</code>，形状 <code>(B, L, d_model)</code>。</td>
+</tr>
+<tr>
+<td>回看章节</td>
+<td>第 10 章。</td>
+</tr>
+</tbody>
+</table>
+<p>这个输出不是最终文字，而是每个 token 的上下文感知向量。后续可以接分类头、抽取头、MLM 头，或者作为 Encoder-Decoder 架构中 Decoder 的参考信息。</p>
+<h4 id="整个-demo-的数据流总结">整个 demo 的数据流总结</h4>
+<table>
+<thead>
+<tr>
+<th>流程节点</th>
+<th>输入</th>
+<th>处理函数 / 模块</th>
+<th>输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>准备输入</td>
+<td>原始文本经过 tokenizer 后的 token id</td>
+<td><code>tokens</code></td>
+<td><code>(B, L)</code></td>
+</tr>
+<tr>
+<td>词嵌入</td>
+<td><code>tokens</code></td>
+<td><code>nn.Embedding</code></td>
+<td><code>(B, L, d_model)</code></td>
+</tr>
+<tr>
+<td>加位置</td>
+<td>token 向量 + <code>pe</code></td>
+<td><code>positional_encoding</code>、<code>+</code></td>
+<td><code>(B, L, d_model)</code></td>
+</tr>
+<tr>
+<td>正则化</td>
+<td><code>x</code></td>
+<td><code>Dropout</code></td>
+<td><code>(B, L, d_model)</code></td>
+</tr>
+<tr>
+<td>堆叠编码层</td>
+<td><code>x</code></td>
+<td><code>EncoderLayer × N</code></td>
+<td><code>(B, L, d_model)</code></td>
+</tr>
+<tr>
+<td>注意力交流</td>
+<td><code>Q</code>、<code>K</code>、<code>V</code></td>
+<td><code>scaled_dot_product_attention</code>、<code>MultiHeadAttention</code></td>
+<td>attention 输出</td>
+</tr>
+<tr>
+<td>单点加工</td>
+<td>attention 后的 <code>x</code></td>
+<td><code>FeedForward</code></td>
+<td><code>(B, L, d_model)</code></td>
+</tr>
+<tr>
+<td>稳定训练</td>
+<td>子层输入和输出</td>
+<td><code>Add &amp; Norm</code></td>
+<td><code>(B, L, d_model)</code></td>
+</tr>
+<tr>
+<td>最终输出</td>
+<td>最后一层输出</td>
+<td><code>return x</code></td>
+<td><code>out</code></td>
+</tr>
+</tbody>
+</table>
+<p>用一条线表示就是：</p>
+<pre class="hljs"><code><div>tokens
+→ Embedding
+→ + Positional Encoding
+→ Dropout
+→ EncoderLayer 1
+→ EncoderLayer 2
+→ ...
+→ EncoderLayer N
+→ out
+</div></code></pre>
+<p>如果只记住一句话：</p>
+<blockquote>
+<p>Transformer Encoder demo 的主线就是：<strong>先把 token id 变成带位置的向量，再让这些向量反复经过 Attention 交流、FFN 加工、Add &amp; Norm 稳定，最后得到上下文感知向量。</strong></p>
+</blockquote>
+<hr>
+<h2 id="12-decoder-和-encoder-的差别">12. Decoder 和 Encoder 的差别</h2>
+<p>在原始 <strong>Encoder-Decoder Transformer</strong> 中，Decoder 相比 Encoder 主要多了两类机制：</p>
+<ol>
+<li><strong>带 Mask 的自注意力（Masked Self-Attention）</strong>：生成时不能偷看未来。</li>
+<li><strong>交叉注意力（Cross-Attention）</strong>：生成目标序列时，要参考 Encoder 对输入序列的理解。</li>
+</ol>
+<blockquote>
+<p>注意：GPT / LLaMA 这类 <strong>Decoder-only</strong> 模型只有第 1 类，也就是 Masked Self-Attention；它们没有独立 Encoder，所以也没有 Cross-Attention。</p>
+</blockquote>
+<h3 id="121-带-mask-的自注意力masked-self-attention">12.1 带 Mask 的自注意力（Masked Self-Attention）</h3>
+<p>为什么？因为 Decoder 是<strong>生成</strong>——一个词一个词往外吐。第 t 步只能看 ≤ t 的词，<strong>绝不能偷看未来</strong>。</p>
+<p>实现：在 attention 的 score 矩阵上<strong>屏蔽上三角</strong>：</p>
+<pre class="hljs"><code><div>seq_len = <span class="hljs-number">5</span>
+mask = torch.tril(torch.ones(seq_len, seq_len))   <span class="hljs-comment"># 下三角全 1，上三角全 0</span>
+<span class="hljs-comment"># tensor([[1,0,0,0,0],</span>
+<span class="hljs-comment">#         [1,1,0,0,0],</span>
+<span class="hljs-comment">#         [1,1,1,0,0],</span>
+<span class="hljs-comment">#         [1,1,1,1,0],</span>
+<span class="hljs-comment">#         [1,1,1,1,1]])</span>
+</div></code></pre>
+<p>把 mask=0 的位置在 score 里设为 <code>-inf</code>，softmax 后就是 0，相当于&quot;看不见&quot;。</p>
+<h4 id="-重要函数解释小白版-8">📖 重要函数解释（小白版）</h4>
+<table>
+<thead>
+<tr>
+<th>函数 / 用法</th>
+<th>一句话作用</th>
+<th>形象类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>torch.ones(L, L)</code></td>
+<td>生成一个 L×L 的全 1 方阵</td>
+<td>一张全部填满 ✅ 的棋盘</td>
+</tr>
+<tr>
+<td><code>torch.tril(M)</code></td>
+<td>取矩阵的<strong>下三角</strong>（含对角线），其余位置置 0</td>
+<td>把右上角的格子全部擦掉</td>
+</tr>
+<tr>
+<td>配套 <code>torch.triu(M)</code></td>
+<td>取<strong>上三角</strong>（不常用，但可记一下，反方向）</td>
+<td>反过来，留右上、擦左下</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>小白记忆点</strong>：因果 mask = <strong>「下三角全 1」的方阵</strong>，第 i 行只放 i+1 个 1，对应「第 i 步只能看到自己和前面的人」。</p>
+</blockquote>
+<h3 id="122-交叉注意力cross-attention">12.2 交叉注意力（Cross-Attention）</h3>
+<p>在 Encoder-Decoder 架构中，Decoder 还要&quot;参考&quot;Encoder 的输出。<br>
+Cross-Attention 里：</p>
+<ul>
+<li>Q 来自 Decoder（&quot;我想生成下一个英文词，需要哪些信息？&quot;）</li>
+<li>K、V 来自 Encoder（&quot;中文句子的信息都在这里&quot;）</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-comment"># 伪代码</span>
+Q = W_q(decoder_x)
+K = W_k(encoder_output)
+V = W_v(encoder_output)
+out = attention(Q, K, V)
+</div></code></pre>
+<blockquote>
+<p>Decoder-only 模型（GPT、LLaMA）<strong>没有 Cross-Attention</strong>，只有 Masked Self-Attention，因为它没有独立的 Encoder。</p>
+</blockquote>
+<h3 id="123-一个最小-decoder-only--gpt-闭环">12.3 一个最小 Decoder-only / GPT 闭环</h3>
+<p>为了把第 12 章训练和第 13 章生成串起来，这里给出一个<strong>极简 GPT 风格模型骨架</strong>。它和第 10 章 Encoder 最大的不同是：每一层都使用 <code>causal_mask</code>，保证当前位置只能看自己和左边历史 token。</p>
+<blockquote>
+<p>运行这段代码前，也需要先准备好前文的 <code>positional_encoding</code>、<code>MultiHeadAttention</code>、<code>FeedForward</code> 等零件；这里重点展示 Decoder-only 的拼装方式。</p>
+</blockquote>
+<pre class="hljs"><code><div><span class="hljs-keyword">class</span> <span class="hljs-title class_">GPTBlock</span>(nn.Module):
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, d_model, num_heads, d_ff, dropout=<span class="hljs-number">0.1</span></span>):
+        <span class="hljs-built_in">super</span>().__init__()
+        <span class="hljs-variable language_">self</span>.norm1 = nn.LayerNorm(d_model)
+        <span class="hljs-variable language_">self</span>.attn = MultiHeadAttention(d_model, num_heads)
+        <span class="hljs-variable language_">self</span>.norm2 = nn.LayerNorm(d_model)
+        <span class="hljs-variable language_">self</span>.ffn = FeedForward(d_model, d_ff)
+        <span class="hljs-variable language_">self</span>.dropout = nn.Dropout(dropout)
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x</span>):
+        L = x.size(<span class="hljs-number">1</span>)
+        causal_mask = torch.tril(torch.ones(L, L, device=x.device))
+        causal_mask = causal_mask.unsqueeze(<span class="hljs-number">0</span>).unsqueeze(<span class="hljs-number">0</span>)  <span class="hljs-comment"># (1, 1, L, L)</span>
+
+        <span class="hljs-comment"># Pre-LN 写法：先归一化，再进子层，最后加残差</span>
+        attn_out = <span class="hljs-variable language_">self</span>.attn(<span class="hljs-variable language_">self</span>.norm1(x), causal_mask)
+        x = x + <span class="hljs-variable language_">self</span>.dropout(attn_out)
+
+        ffn_out = <span class="hljs-variable language_">self</span>.ffn(<span class="hljs-variable language_">self</span>.norm2(x))
+        x = x + <span class="hljs-variable language_">self</span>.dropout(ffn_out)
+        <span class="hljs-keyword">return</span> x
+
+
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">MiniGPT</span>(nn.Module):
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, vocab_size, d_model=<span class="hljs-number">512</span>, num_heads=<span class="hljs-number">8</span>,
+                 num_layers=<span class="hljs-number">6</span>, d_ff=<span class="hljs-number">2048</span>, max_len=<span class="hljs-number">512</span>, dropout=<span class="hljs-number">0.1</span></span>):
+        <span class="hljs-built_in">super</span>().__init__()
+        <span class="hljs-variable language_">self</span>.embedding = nn.Embedding(vocab_size, d_model)
+        <span class="hljs-variable language_">self</span>.register_buffer(<span class="hljs-string">&#x27;pe&#x27;</span>, positional_encoding(max_len, d_model))
+        <span class="hljs-variable language_">self</span>.blocks = nn.ModuleList([
+            GPTBlock(d_model, num_heads, d_ff, dropout)
+            <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(num_layers)
+        ])
+        <span class="hljs-variable language_">self</span>.norm = nn.LayerNorm(d_model)
+        <span class="hljs-variable language_">self</span>.lm_head = nn.Linear(d_model, vocab_size, bias=<span class="hljs-literal">False</span>)
+
+        <span class="hljs-comment"># 常见工程技巧：输入 Embedding 和输出 LM Head 共享权重，减少参数并提升效果</span>
+        <span class="hljs-variable language_">self</span>.lm_head.weight = <span class="hljs-variable language_">self</span>.embedding.weight
+        <span class="hljs-variable language_">self</span>.d_model = d_model
+
+    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, tokens</span>):
+        x = <span class="hljs-variable language_">self</span>.embedding(tokens) * math.sqrt(<span class="hljs-variable language_">self</span>.d_model)
+        x = x + <span class="hljs-variable language_">self</span>.pe[:x.size(<span class="hljs-number">1</span>)].unsqueeze(<span class="hljs-number">0</span>)
+
+        <span class="hljs-keyword">for</span> block <span class="hljs-keyword">in</span> <span class="hljs-variable language_">self</span>.blocks:
+            x = block(x)
+
+        hidden = <span class="hljs-variable language_">self</span>.norm(x)
+        logits = <span class="hljs-variable language_">self</span>.lm_head(hidden)  <span class="hljs-comment"># (B, L, vocab_size)</span>
+        <span class="hljs-keyword">return</span> logits
+</div></code></pre>
+<p><strong>一句话区别</strong>：普通 Encoder 输出的是双向上下文向量，适合理解；<code>MiniGPT</code> 输出的是每个位置的下一 token 词表分数，适合自回归生成。</p>
+<hr>
+<h2 id="13-训练-transformer-是个什么过程">13. 训练 Transformer 是个什么过程？</h2>
+<p>以&quot;语言建模&quot;（GPT 那种）为例：</p>
+<ol>
+<li><strong>任务</strong>：给一段文本，预测下一个 token。
+<ul>
+<li>输入：<code>我 爱 北 京</code></li>
+<li>标签：<code>爱 北 京 天</code>（每个位置预测下一个）</li>
+</ul>
+</li>
+<li><strong>模型</strong>：必须是带 <code>causal_mask</code> 的 Decoder-only / GPT 模型，不能用普通双向 Encoder 偷看未来 token。</li>
+<li><strong>损失函数</strong>：交叉熵（CrossEntropy）。</li>
+<li><strong>优化器</strong>：Adam / AdamW，配合 warmup 学习率调度。</li>
+<li><strong>批大小</strong>：越大越稳定（大模型常用上百万 token/batch）。</li>
+</ol>
+<pre class="hljs"><code><div><span class="hljs-comment"># 假设 model 是第 11.3 节那类完整语言模型：</span>
+<span class="hljs-comment"># Token Embedding + causal Transformer blocks + LM Head</span>
+
+<span class="hljs-comment"># 1. 完整语言模型直接输出词表分数: (B, L, vocab_size)</span>
+logits = model(tokens)
+
+<span class="hljs-comment"># 2. 错位一格：第 i 个位置的 logits 预测第 i+1 个 token</span>
+loss = F.cross_entropy(logits[:, :-<span class="hljs-number">1</span>].reshape(-<span class="hljs-number">1</span>, vocab_size),
+                       tokens[:, <span class="hljs-number">1</span>:].reshape(-<span class="hljs-number">1</span>))  <span class="hljs-comment"># 预测下一位</span>
+
+<span class="hljs-comment"># 3. 标准训练四件套：清梯度 → 反向传播 → 更新参数</span>
+optimizer.zero_grad()
+loss.backward()
+optimizer.step()
+</div></code></pre>
+<blockquote>
+<p>💡 <strong>形状闭环</strong>：<code>tokens (B, L)</code> → <code>logits (B, L, vocab_size)</code> → <code>loss</code>。只有变成 <code>vocab_size</code> 维，才能和真实 token id 做交叉熵。</p>
+<p>⚠️ <strong>工程提醒 1</strong>：训练时用真实前缀预测下一个 token，这叫 <strong>teacher forcing</strong>；推理时则只能用模型自己刚生成的 token 继续往后生成。</p>
+<p>⚠️ <strong>工程提醒 2</strong>：<code>LM Head</code> 应该在模型初始化时创建一次，并加入 <code>optimizer</code> 一起训练；不要在每个 batch 里临时新建，否则参数会反复随机初始化，模型学不到东西。很多语言模型还会让 <code>lm_head.weight</code> 和 <code>embedding.weight</code> 共享，也就是第 11.3 节里的 weight tying。</p>
+</blockquote>
+<h4 id="-重要函数解释小白版-9">📖 重要函数解释（小白版）</h4>
+<table>
+<thead>
+<tr>
+<th>函数 / 用法</th>
+<th>一句话作用</th>
+<th>形象类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>logits</code></td>
+<td>模型输出的「未归一化分数」，形状 <code>(B, L, vocab)</code>，每个位置给词表里每个词打分</td>
+<td>一张「下一字得分榜」</td>
+</tr>
+<tr>
+<td><code>logits[:, :-1]</code></td>
+<td>切片：取每句话前 L-1 个位置的预测（最后一位没下一字可预测，丢掉）</td>
+<td>班里所有同学，最后一名不参加排名</td>
+</tr>
+<tr>
+<td><code>tokens[:, 1:]</code></td>
+<td>切片：取每句话从第 2 个 token 开始的真实词，作为「下一位」的标准答案</td>
+<td>把答案整体往前挪一格</td>
+</tr>
+<tr>
+<td><code>.reshape(-1, vocab_size)</code> / <code>.reshape(-1)</code></td>
+<td>把 <code>(B, L-1, V)</code> 拍平成 <code>(B*(L-1), V)</code>，便于一次性送进 cross_entropy</td>
+<td>把多张试卷叠成一摞统一改</td>
+</tr>
+<tr>
+<td><code>F.cross_entropy(pred, target)</code></td>
+<td>交叉熵损失：内部自动 softmax + log + 取真标签那一项的负值</td>
+<td>老师对着标准答案打一个「差了多少」的分</td>
+</tr>
+<tr>
+<td><code>optimizer.zero_grad()</code></td>
+<td>清空上一轮累计下来的梯度，通常每个 batch 反向传播前都要调用</td>
+<td>擦掉上一题的草稿，避免和这题混在一起</td>
+</tr>
+<tr>
+<td><code>loss.backward()</code></td>
+<td>自动求导：从 loss 反向传播，计算每个参数的梯度</td>
+<td>老师批完卷后，把「错在哪」逐层反馈回去</td>
+</tr>
+<tr>
+<td><code>optimizer.step()</code></td>
+<td>用上一步算出的梯度，按学习率更新所有可训练参数</td>
+<td>学生根据反馈，调整下次的答题策略</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>小白记忆点</strong>：训练就是 <strong>「前向 → 算 loss → 反向 → 更新」四件套</strong>，每一个 batch 都重复这个循环。语言模型的核心是**「错位一格做下一字预测」**。</p>
+</blockquote>
+<hr>
+<h3 id="131-什么时候停止训练什么时候算练好了">13.1 什么时候停止训练？（&quot;什么时候算练好了&quot;）</h3>
+<p>很多初学者会问：<strong>模型不是一直跑下去就行了吗？为什么要停？什么时候停？</strong></p>
+<p><strong>核心答案</strong>：训练<strong>不是越久越好</strong>——跑太久会&quot;练废&quot;（过拟合 / 性价比骤降）。判断&quot;该停了&quot;主要看 <strong>3 类信号</strong>。</p>
+<h4 id="-信号一验证集-loss-不再下降最常用">🚦 信号一：验证集 loss 不再下降（最常用）</h4>
+<p>把数据集<strong>切成 3 份</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>用途</th>
+<th>模型见过吗</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>训练集 (train)</strong></td>
+<td>喂给模型，更新参数</td>
+<td>✅ 见过</td>
+</tr>
+<tr>
+<td><strong>验证集 (validation / dev)</strong></td>
+<td><strong>每隔 N 步算一次 loss</strong>，监控泛化能力</td>
+<td>❌ 没见过</td>
+</tr>
+<tr>
+<td><strong>测试集 (test)</strong></td>
+<td>训练全部结束后，<strong>只跑一次</strong>，给最终成绩</td>
+<td>❌ 没见过</td>
+</tr>
+</tbody>
+</table>
+<p><strong>典型曲线</strong>：</p>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+    A["训练初期<br/>train_loss ↓<br/>val_loss ↓"] --> B["训练中期<br/>两条曲线一起下降<br/>👍 健康"]
+    B --> C["训练后期<br/>train_loss 还在 ↓<br/>val_loss 开始 ↑"]
+    C --> D["⛔ 过拟合<br/>必须停！"]
+
+    style A fill:#e1f5ff,stroke:#0288d1
+    style B fill:#c8e6c9,stroke:#2e7d32
+    style C fill:#fff8e1,stroke:#f57c00
+    style D fill:#ffcdd2,stroke:#c62828
+</div></code></pre>
+<p><strong>实操做法——Early Stopping（早停）</strong>：</p>
+<pre class="hljs"><code><div>best_val_loss = <span class="hljs-built_in">float</span>(<span class="hljs-string">&#x27;inf&#x27;</span>)
+patience = <span class="hljs-number">3</span>          <span class="hljs-comment"># 连续 3 次没改进就停</span>
+counter = <span class="hljs-number">0</span>
+
+<span class="hljs-keyword">for</span> epoch <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(max_epochs):
+    train_one_epoch(...)
+    val_loss = evaluate(val_loader)
+
+    <span class="hljs-keyword">if</span> val_loss &lt; best_val_loss - <span class="hljs-number">1e-4</span>:   <span class="hljs-comment"># 有明显改进</span>
+        best_val_loss = val_loss
+        save_checkpoint(model)             <span class="hljs-comment"># 保存&quot;目前最好&quot;的版本</span>
+        counter = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">else</span>:
+        counter += <span class="hljs-number">1</span>
+        <span class="hljs-keyword">if</span> counter &gt;= patience:
+            <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;Early stopping!&quot;</span>)       <span class="hljs-comment"># 连跌 N 次就停</span>
+            <span class="hljs-keyword">break</span>
+</div></code></pre>
+<blockquote>
+<p>🎯 <strong>形象比喻</strong>：就像跑步训练，<strong>成绩在下降说明在进步</strong>，<strong>成绩反弹说明在劳损</strong>——该休息了。</p>
+</blockquote>
+<h4 id="-信号二达到预设的算力预算或步数大模型最常用">🚦 信号二：达到预设的&quot;算力预算&quot;或&quot;步数&quot;（大模型最常用）</h4>
+<p>训练 GPT-3、LLaMA 这种大模型时，<strong>根本没人等到 val_loss 收敛</strong>——太贵了。</p>
+<p>业界用 <strong>Scaling Law（规模定律）</strong> 提前算好：</p>
+<ul>
+<li>模型多大（参数量 N）</li>
+<li>数据多少（token 数 D）</li>
+<li>算力多少（FLOPs C）</li>
+</ul>
+<p>按公式 <code>C ≈ 6 · N · D</code> 估算总预算，<strong>算完即停</strong>。例如：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>训练 token 数</th>
+<th>训练步数</th>
+<th>停止理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPT-3 (175B)</td>
+<td>300B tokens</td>
+<td>跑完即停</td>
+<td>算力预算用完</td>
+</tr>
+<tr>
+<td>LLaMA-2 (7B)</td>
+<td>2T tokens</td>
+<td>跑完即停</td>
+<td>数据规划用完</td>
+</tr>
+<tr>
+<td>Chinchilla</td>
+<td>按 N:D ≈ 1:20 配比</td>
+<td>配比满即停</td>
+<td>Scaling Law 最优点</td>
+</tr>
+</tbody>
+</table>
+<h4 id="-信号三下游任务指标饱和业务向">🚦 信号三：下游任务指标饱和（业务向）</h4>
+<p>如果你的目标是<strong>让模型在某个具体任务上达到某个指标</strong>（比如准确率 &gt; 95%），那就：</p>
+<pre class="hljs"><code><div>每隔 N 步 → 在下游任务上评估一次 → 指标连续不再涨 → 停
+</div></code></pre>
+<p>例如：BERT 微调做情感分类，验证集 accuracy 连续 5 个 epoch 不再上涨 → 停。</p>
+<h4 id="-三种停止信号速查表">📋 三种停止信号速查表</h4>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>主要看哪个信号</th>
+<th>典型做法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>小模型 / 微调</td>
+<td>val_loss 反弹</td>
+<td><strong>Early Stopping</strong> + 保存最佳 ckpt</td>
+</tr>
+<tr>
+<td>大模型预训练</td>
+<td>算力预算 / token 数</td>
+<td>跑完预定步数即停</td>
+</tr>
+<tr>
+<td>业务落地</td>
+<td>下游任务指标</td>
+<td>指标饱和即停</td>
+</tr>
+</tbody>
+</table>
+<h4 id="️-三个不能用的停止信号小白常踩坑">⚠️ 三个&quot;不能用&quot;的停止信号（小白常踩坑）</h4>
+<table>
+<thead>
+<tr>
+<th>❌ 错误做法</th>
+<th>为什么错</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&quot;train_loss 降到 0 就停&quot;</td>
+<td>train_loss=0 多半是<strong>过拟合</strong>（背答案了），val_loss 早炸了</td>
+</tr>
+<tr>
+<td>&quot;loss 看着差不多了就停&quot;</td>
+<td>主观判断不靠谱，<strong>必须看曲线</strong></td>
+</tr>
+<tr>
+<td>&quot;跑满预设的 100 个 epoch&quot;</td>
+<td>可能 30 个 epoch 就该停，强跑只会过拟合</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="132-训练数据集长什么样要什么样的">13.2 训练数据集长什么样？要什么样的？</h3>
+<p><strong>核心答案</strong>：训练数据 = 模型的&quot;教科书&quot;。<strong>教材的质量直接决定学生的水平</strong>——这一句比任何模型架构都重要。</p>
+<h4 id="-数据长什么样不同任务对应不同格式">📦 数据长什么样？（不同任务对应不同格式）</h4>
+<table>
+<thead>
+<tr>
+<th>模型类型</th>
+<th>数据格式</th>
+<th>一条样本举例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GPT 类（语言模型）</strong></td>
+<td><strong>纯文本</strong>，无需标签</td>
+<td><code>&quot;今天天气真好，我想去公园散步。&quot;</code></td>
+</tr>
+<tr>
+<td><strong>BERT 类（MLM 预训练）</strong></td>
+<td><strong>纯文本</strong>，自动 mask 一部分</td>
+<td><code>&quot;今天[MASK]气真好&quot;</code> → 标签是 <code>&quot;天&quot;</code></td>
+</tr>
+<tr>
+<td><strong>机器翻译（Encoder-Decoder）</strong></td>
+<td><strong>平行语料对</strong></td>
+<td><code>(&quot;我爱你&quot;, &quot;I love you&quot;)</code></td>
+</tr>
+<tr>
+<td><strong>指令微调（SFT）</strong></td>
+<td><strong>指令 + 回答</strong></td>
+<td><code>{&quot;instruction&quot;: &quot;翻译&quot;, &quot;input&quot;: &quot;你好&quot;, &quot;output&quot;: &quot;Hello&quot;}</code></td>
+</tr>
+<tr>
+<td><strong>分类任务</strong></td>
+<td><strong>文本 + 标签</strong></td>
+<td><code>(&quot;这部电影太棒了！&quot;, &quot;正面&quot;)</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>实际文件长这样</strong>（以 GPT 预训练为例，一行一个文档）：</p>
+<pre class="hljs"><code><div>今天天气真好，阳光明媚，适合出门散步。
+机器学习是人工智能的一个分支，主要研究如何让计算机从数据中学习。
+《三国演义》是中国古典四大名著之一，描写了东汉末年到三国时期的历史。
+...（数百亿行）
+</div></code></pre>
+<h4 id="-数据要多大才够量级参考">📊 数据要&quot;多大&quot;才够？（量级参考）</h4>
+<table>
+<thead>
+<tr>
+<th>模型规模</th>
+<th>推荐 token 数</th>
+<th>大致体量</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>玩具 Transformer（练手）</td>
+<td>1M ~ 10M</td>
+<td>几十 MB</td>
+<td>TinyShakespeare</td>
+</tr>
+<tr>
+<td>小模型（1 亿参数）</td>
+<td>几十亿 token</td>
+<td>几十 GB</td>
+<td>GPT-2 small</td>
+</tr>
+<tr>
+<td>中模型（10 亿参数）</td>
+<td>几千亿 token</td>
+<td>几百 GB</td>
+<td>LLaMA-1 7B</td>
+</tr>
+<tr>
+<td>大模型（百亿参数+）</td>
+<td>几万亿 token</td>
+<td>几 TB ~ 几十 TB</td>
+<td>LLaMA-2 70B / GPT-4</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>Chinchilla 法则</strong>：参数量 N 与训练 token 数 D 的最优配比 ≈ <strong>1 : 20</strong>（10 亿参数 → 200 亿 token）。</p>
+</blockquote>
+<h4 id="-好数据集的-5-个标准">✅ 好数据集的 5 个标准</h4>
+<table>
+<thead>
+<tr>
+<th>标准</th>
+<th>含义</th>
+<th>反例（坏数据）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. 量大</strong></td>
+<td>越大越好（前提是质量过关）</td>
+<td>只有 1MB 的语料</td>
+</tr>
+<tr>
+<td><strong>2. 多样</strong></td>
+<td>涵盖多领域、多风格、多语言</td>
+<td>只爬了一个论坛</td>
+</tr>
+<tr>
+<td><strong>3. 干净</strong></td>
+<td>去除乱码、广告、HTML 标签、重复内容</td>
+<td>含大量 <code>&lt;div&gt;</code> 残留</td>
+</tr>
+<tr>
+<td><strong>4. 去重</strong></td>
+<td>完全相同 / 近似重复的段落要删掉</td>
+<td>同一篇文章出现 1000 次</td>
+</tr>
+<tr>
+<td><strong>5. 安全合规</strong></td>
+<td>去除违法、隐私、有害内容</td>
+<td>含个人身份证号</td>
+</tr>
+</tbody>
+</table>
+<h4 id="️-数据预处理流水线业界标准-5-步">🛠️ 数据预处理流水线（业界标准 5 步）</h4>
+<pre><code class="language-mermaid"><div class="mermaid">flowchart LR
+    R["原始数据<br/>网页 / 书 / 代码<br/>(几十 TB)"] --> C1["1. 清洗<br/>去 HTML / 广告"]
+    C1 --> C2["2. 质量过滤<br/>语言识别 / 启发式规则"]
+    C2 --> C3["3. 去重<br/>MinHash / 模糊匹配"]
+    C3 --> C4["4. 分词<br/>BPE / SentencePiece"]
+    C4 --> C5["5. 打包<br/>切成定长 token 块"]
+    C5 --> OUT["训练就绪数据<br/>(几 TB)"]
+
+    style R fill:#ffcdd2,stroke:#c62828
+    style OUT fill:#c8e6c9,stroke:#2e7d32
+</div></code></pre>
+<p><strong>每一步在干啥</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>步骤</th>
+<th>干啥</th>
+<th>工具举例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. 清洗</strong></td>
+<td>扔掉 HTML 标签、JS 代码、广告、菜单栏</td>
+<td>trafilatura, jusText</td>
+</tr>
+<tr>
+<td><strong>2. 质量过滤</strong></td>
+<td>用规则 / 小模型打分，丢掉低质量段落</td>
+<td>KenLM 困惑度过滤</td>
+</tr>
+<tr>
+<td><strong>3. 去重</strong></td>
+<td>文档级 + 段落级去重，防止&quot;背答案&quot;</td>
+<td>MinHash, SimHash</td>
+</tr>
+<tr>
+<td><strong>4. 分词</strong></td>
+<td>把文本切成 token id（整数序列）</td>
+<td>tiktoken, SentencePiece</td>
+</tr>
+<tr>
+<td><strong>5. 打包</strong></td>
+<td>把 token 流切成等长块（如 2048），便于 batch</td>
+<td>自定义脚本</td>
+</tr>
+</tbody>
+</table>
+<h4 id="-入门常用公开数据集">📚 入门常用公开数据集</h4>
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>规模</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>TinyShakespeare</strong></td>
+<td>~1 MB</td>
+<td>玩具级，手搓 Transformer 练手</td>
+</tr>
+<tr>
+<td><strong>WikiText-103</strong></td>
+<td>~500 MB</td>
+<td>学术 benchmark，小模型练手</td>
+</tr>
+<tr>
+<td><strong>OpenWebText</strong></td>
+<td>~40 GB</td>
+<td>GPT-2 复现用</td>
+</tr>
+<tr>
+<td><strong>The Pile</strong></td>
+<td>~800 GB</td>
+<td>大模型预训练标杆</td>
+</tr>
+<tr>
+<td><strong>C4 (Colossal Clean Crawled Corpus)</strong></td>
+<td>~750 GB</td>
+<td>T5 / LLaMA 用过</td>
+</tr>
+<tr>
+<td><strong>RedPajama</strong></td>
+<td>~1.2 TB</td>
+<td>LLaMA 开源复现版</td>
+</tr>
+</tbody>
+</table>
+<h4 id="️-数据集-4-大坑小白必读">⚠️ 数据集 4 大坑（小白必读）</h4>
+<table>
+<thead>
+<tr>
+<th>坑</th>
+<th>后果</th>
+<th>对策</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>训练集和验证集&quot;串了&quot;</strong></td>
+<td>val_loss 假性很低，模型其实没学会</td>
+<td>严格按文档级 / URL 级切分</td>
+</tr>
+<tr>
+<td><strong>数据有大量重复</strong></td>
+<td>模型背答案，泛化能力差</td>
+<td>跑一次去重</td>
+</tr>
+<tr>
+<td><strong>类别极不均衡</strong></td>
+<td>模型只会预测大类，小类全错</td>
+<td>上采样 / 加权 loss</td>
+</tr>
+<tr>
+<td><strong>测试集泄漏到训练集</strong></td>
+<td>报出来的指标全是&quot;作弊分&quot;</td>
+<td>严格物理隔离测试集</td>
+</tr>
+</tbody>
+</table>
+<h4 id="-一句话总结">🎯 一句话总结</h4>
+<blockquote>
+<p><strong>训练数据 ≠ &quot;找一堆文本扔进去&quot;</strong>。它是 <strong>&quot;清洗 → 过滤 → 去重 → 分词 → 打包&quot;</strong> 的完整工程，<strong>90% 的模型效果差距来自数据，不是模型架构</strong>。</p>
+</blockquote>
+<hr>
+<h2 id="14-推理生成阶段是什么样">14. 推理（生成）阶段是什么样？</h2>
+<p>GPT 类模型的生成是**自回归（autoregressive）**的：</p>
+<pre class="hljs"><code><div>输入: &quot;今天天气&quot;
+→ 模型预测下一个 token: &quot;真&quot;
+→ 拼接: &quot;今天天气真&quot;
+→ 再预测: &quot;好&quot;
+→ 拼接: &quot;今天天气真好&quot;
+→ 直到生成 [END]
+</div></code></pre>
+<p>下面先看一个<strong>教学版</strong>伪代码：它每一步都把完整上下文重新喂给模型，写法最直观，但速度不是最优。</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">def</span> <span class="hljs-title function_">generate</span>(<span class="hljs-params">model, prompt_ids, max_new_tokens=<span class="hljs-number">50</span>, end_token_id=<span class="hljs-literal">None</span></span>):
+    <span class="hljs-comment"># 这里的 model 指完整语言模型，内部已经包含 Embedding、causal blocks 和 LM Head，输出 logits。</span>
+    ids = prompt_ids
+    <span class="hljs-keyword">for</span> _ <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(max_new_tokens):
+        logits = model(ids)                <span class="hljs-comment"># (1, L, vocab)</span>
+        next_token = logits[:, -<span class="hljs-number">1</span>].argmax(-<span class="hljs-number">1</span>, keepdim=<span class="hljs-literal">True</span>)
+        ids = torch.cat([ids, next_token], dim=-<span class="hljs-number">1</span>)
+        <span class="hljs-keyword">if</span> end_token_id <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span> <span class="hljs-keyword">and</span> next_token.item() == end_token_id:
+            <span class="hljs-keyword">break</span>
+    <span class="hljs-keyword">return</span> ids
+</div></code></pre>
+<p>实际项目中，<code>end_token_id</code> 通常来自 tokenizer，例如 <code>tokenizer.eos_token_id</code>。如果手里只有 Transformer 主体而没有 <code>LM Head</code>，还需要先把 hidden states 映射成 <code>vocab_size</code> 维的 logits，才能做生成。</p>
+<p><strong>生产版推理通常会再做三类优化</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>优化点</th>
+<th>解决什么问题</th>
+<th>直观理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>KV-Cache</strong></td>
+<td>避免每生成 1 个 token 都重算全部历史</td>
+<td>过去读过的内容先记笔记，下次只看新增部分</td>
+</tr>
+<tr>
+<td><strong>温度 / Top-k / Top-p 采样</strong></td>
+<td>避免 <code>argmax</code> 过于死板，让回答更多样</td>
+<td>不总选第一名，而是在高分候选里按概率挑</td>
+</tr>
+<tr>
+<td><strong>停止条件</strong></td>
+<td>避免无限生成</td>
+<td>遇到结束符、达到最大长度或命中停止词就停</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>所以，教学代码适合理解流程；真实框架里的生成函数通常会同时处理 KV-Cache、批量生成、采样策略、停止条件和显存管理。</p>
+</blockquote>
+<h4 id="-重要函数解释小白版-10">📖 重要函数解释（小白版）</h4>
+<table>
+<thead>
+<tr>
+<th>函数 / 用法</th>
+<th>一句话作用</th>
+<th>形象类比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>logits[:, -1]</code></td>
+<td>只取最后一个位置的得分（要预测的就是「下一字」）</td>
+<td>只看排行榜最末尾那一行</td>
+</tr>
+<tr>
+<td><code>.argmax(-1, keepdim=True)</code></td>
+<td>沿最后一维取<strong>最大值的下标</strong>（即得分最高的那个 token id）；<code>keepdim=True</code> 保留维度形状方便拼接</td>
+<td>选出冠军的「学号」，并保持卡片形状</td>
+</tr>
+<tr>
+<td><code>torch.cat([ids, next_token], dim=-1)</code></td>
+<td>沿最后一维<strong>拼接张量</strong>，把刚生成的字接到原文末尾</td>
+<td>接龙：把新写的一字续到尾巴</td>
+</tr>
+<tr>
+<td><code>next_token.item()</code></td>
+<td>把只含一个元素的张量取出 Python 数值，便于和 <code>end_token_id</code> 比较</td>
+<td>拆礼物盒，把里面唯一那颗糖拿出来</td>
+</tr>
+<tr>
+<td><code>for _ in range(max_new_tokens)</code></td>
+<td>最多生成 N 个新 token；<code>_</code> 表示用不到循环变量</td>
+<td>设个「最多续写 50 字」的安全上限，防死循环</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>小白记忆点</strong>：自回归生成 = <strong>「输入 → 取最后一格分数 → 选出下一个 token → 拼回去 → 再来一遍」</strong>，直到遇到结束符或写满 N 字。</p>
+<p>⚠️ <strong>生产做法</strong>：实际推理一般不用纯 <code>argmax</code>（太死板），而是用 <strong>温度采样 / Top-k / Top-p (nucleus)</strong>；同时配合 <strong>KV-Cache</strong>，把过去算过的 K、V 存下来，避免每步都重新算整段。</p>
+</blockquote>
+<hr>
+<h2 id="15-常见问题答疑faq">15. 常见问题答疑（FAQ）</h2>
+<p><strong>Q1：为什么 attention 要除以 √d_k？</strong><br>
+A：当 d_k 很大时，Q·K 的点积值会很大，softmax 会非常陡峭（接近 one-hot），梯度近乎为 0，模型学不动。除以 √d_k 让分数维持在合理范围。</p>
+<p><strong>Q2：多头注意力会让参数量增加吗？</strong><br>
+A：<strong>不会</strong>。8 个头每个 d_k=64，总和还是 d_model=512。是把同一份算力切成多份，不是增加。</p>
+<p><strong>Q3：Transformer 为什么显存吃得这么狠？</strong><br>
+A：注意力矩阵 $QK^T$ 的形状是 <code>(L, L)</code>，序列长度 L=4096 时光这一个矩阵就有 1600 万元素。这是为什么长上下文很难做、催生了 FlashAttention、稀疏注意力等优化。</p>
+<p><strong>Q4：BERT 和 GPT 都是 Transformer，区别是什么？</strong><br>
+A：</p>
+<ul>
+<li>BERT = <strong>Encoder-only</strong>，做&quot;完形填空&quot;（双向看上下文），擅长理解。</li>
+<li>GPT = <strong>Decoder-only</strong>，做&quot;接龙&quot;（只看左边），擅长生成。</li>
+</ul>
+<p><strong>Q5：现在还需要 Encoder-Decoder 结构吗？</strong><br>
+A：在翻译、摘要等&quot;输入到输出&quot;任务还是有用（如 T5、BART）。但通用大模型已经用 Decoder-only 一统江湖，因为它够灵活、训练简单。</p>
+<hr>
+<h2 id="16-学习路线建议">16. 学习路线建议</h2>
+<pre><code class="language-mermaid"><div class="mermaid">graph LR
+    A[读完本文 + 跑通最小代码] --> B[读 Illustrated Transformer 图解]
+    B --> C[读论文原文 Attention Is All You Need]
+    C --> D[读 The Annotated Transformer 逐行注释代码]
+    D --> E[理解 BERT 论文 + GPT-1/2 论文]
+    E --> F[动手训练 nanoGPT 等小模型]
+    F --> G[研究 LLaMA / RoPE / FlashAttention 等现代改进]
+</div></code></pre>
+<p><strong>建议练手项目</strong>：</p>
+<ol>
+<li><a href="https://github.com/karpathy/nanoGPT"><strong>nanoGPT</strong>（Karpathy）</a>：不到 300 行的 GPT。</li>
+<li><a href="https://github.com/karpathy/minGPT"><strong>MinGPT</strong>（同作者）</a>：偏教学，注释更多。</li>
+<li><a href="https://github.com/huggingface/transformers"><strong>Hugging Face Transformers</strong></a>：调包熟悉接口，再去看源码。</li>
+</ol>
+<hr>
+<h2 id="17-一图总结">17. 一图总结</h2>
+<pre class="hljs"><code><div>        词 token id
+            │
+            ▼
+    [Token Embedding]   ←── 学一个查找表
+            │
+            +  位置编码    ←── 注入位置信息
+            │
+            ▼
+   ┌─────────────────────────┐
+   │   N × Transformer 层    │
+   │ ┌─────────────────────┐ │
+   │ │ Multi-Head Attn     │ │ ←── 让 token 互相&quot;看&quot;
+   │ │ Add &amp; Norm          │ │
+   │ │ Feed Forward (FFN)  │ │ ←── 每个位置独立深加工
+   │ │ Add &amp; Norm          │ │
+   │ └─────────────────────┘ │
+   └─────────────────────────┘
+            │
+            ▼
+       上下文感知向量
+            │
+            ▼
+       任务头（分类/生成/...）
+</div></code></pre>
+<hr>
+<h2 id="18-基础-transformer-的演进思路">18. 基础 Transformer 的演进思路</h2>
+<blockquote>
+<p>如果你是第一次学习 Transformer，本章可以先快速浏览。等第 1～16 章的基础结构和最小代码都跑通后，再回来细看 RoPE、FlashAttention、GQA、MoE 等现代改进，会更容易吸收。</p>
+</blockquote>
+<p>原版 Transformer（2017）虽然惊艳，但拿到今天来用会暴露很多问题：<strong>显存吃太多、序列长度上不去、推理太慢、位置编码外推差、训练不稳定……</strong> 现代大模型（LLaMA、GPT-4、Qwen、DeepSeek 等）几乎每一处零件都被&quot;魔改&quot;过。</p>
+<p>下面按&quot;<strong>痛点 → 解决思路 → 代表方案</strong>&quot;的顺序串一遍主要演进方向，方便你以后看论文时能快速对号入座。</p>
+<h3 id="181-演进总览图">18.1 演进总览图</h3>
+<pre class="hljs"><code><div>                  原版 Transformer (2017)
+                          │
+   ┌──────────────┬───────┼───────┬──────────────┬──────────────┐
+   ▼              ▼       ▼       ▼              ▼              ▼
+位置编码改进   注意力提速  注意力变体  归一化改进   FFN/MoE 改进   训练&amp;对齐
+(RoPE/ALiBi)  (Flash)    (MQA/GQA)  (RMSNorm)   (SwiGLU/MoE)   (RLHF/DPO)
+</div></code></pre>
+<h3 id="182-演进方向一位置编码--让模型撑得住长上下文">18.2 演进方向一：位置编码 —— 让模型&quot;撑得住&quot;长上下文</h3>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>出现背景</th>
+<th>核心思想</th>
+<th>代表模型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>绝对正弦编码</strong>（原版）</td>
+<td>论文初版方案</td>
+<td>sin/cos 给每个位置一个固定指纹</td>
+<td>原版 Transformer</td>
+</tr>
+<tr>
+<td><strong>可学习位置编码</strong></td>
+<td>简单直接，效果好</td>
+<td>把位置当作可训练 Embedding</td>
+<td>BERT、GPT-2</td>
+</tr>
+<tr>
+<td><strong>相对位置编码</strong></td>
+<td>绝对位置外推差</td>
+<td>让 attention 关注&quot;相对距离&quot;而不是绝对位置</td>
+<td>T5、Transformer-XL</td>
+</tr>
+<tr>
+<td><strong>RoPE（旋转位置编码）</strong> ⭐</td>
+<td>既要相对又要能外推</td>
+<td>把 Q、K <strong>旋转一个和位置相关的角度</strong>，点积后自然带上相对位置</td>
+<td>LLaMA、Qwen、ChatGLM</td>
+</tr>
+<tr>
+<td><strong>ALiBi</strong></td>
+<td>想零成本外推到超长</td>
+<td>在 attention 分数上<strong>线性加一个距离惩罚</strong></td>
+<td>BLOOM、MPT</td>
+</tr>
+</tbody>
+</table>
+<p><strong>通俗理解 RoPE</strong>：把每个 token 的 Q/K 想成时钟指针，<strong>位置越靠后，指针多转一些角度</strong>。两个 token 的 Q·K 点积自动带上&quot;角度差&quot;信息，等价于相对位置。<br>
+👉 现在主流大模型几乎都用 RoPE。</p>
+<h3 id="183-演进方向二注意力提速--让训练和推理跑得起">18.3 演进方向二：注意力提速 —— 让训练和推理跑得起</h3>
+<p>注意力的算力/显存瓶颈是 $O(L^2)$（L 是序列长度）。L=8192 时，仅 attention 矩阵就是 6700 万元素 × 多头 × 多层，显存吃到爆。</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>解决什么</th>
+<th>核心思想</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>FlashAttention</strong> ⭐</td>
+<td>显存爆 + IO 慢</td>
+<td>不存完整 attention 矩阵，<strong>按块（tiling）在 SRAM 里算</strong>，速度快 2~4 倍，显存降一个量级</td>
+</tr>
+<tr>
+<td><strong>PagedAttention</strong>（vLLM）</td>
+<td>KV-Cache 内存碎片</td>
+<td>像操作系统分页内存一样管理 KV-Cache，吞吐提升数倍</td>
+</tr>
+<tr>
+<td><strong>稀疏注意力</strong></td>
+<td>不需要让每个词看所有词</td>
+<td>只看局部窗口 + 少数全局 token（如 Longformer、BigBird）</td>
+</tr>
+<tr>
+<td><strong>Linear Attention</strong></td>
+<td>想把 $O(L^2)$ 降到 $O(L)$</td>
+<td>用核函数近似 softmax，实现线性复杂度</td>
+</tr>
+<tr>
+<td><strong>Mamba / SSM</strong></td>
+<td>干脆不用 attention</td>
+<td>用状态空间模型处理超长序列</td>
+</tr>
+</tbody>
+</table>
+<p><strong>直觉</strong>：FlashAttention 不改变数学结果，只是&quot;换了一种算法实现&quot;，所以是<strong>几乎免费的提速</strong>，已经成为默认配置。</p>
+<h3 id="184-演进方向三注意力结构--推理时省显存">18.4 演进方向三：注意力结构 —— 推理时省显存</h3>
+<p>推理（生成）阶段，每多一个 token 就要存一份 K、V，<strong>KV-Cache 越涨越大</strong>，长对话直接 OOM。</p>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>思想</th>
+<th>谁在用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MHA</strong>（Multi-Head Attention）</td>
+<td>原版：每个头独立 K、V</td>
+<td>原版 Transformer、GPT-2</td>
+</tr>
+<tr>
+<td><strong>MQA</strong>（Multi-Query Attention）</td>
+<td><strong>所有头共享一组 K、V</strong>，KV-Cache 缩小 N 倍</td>
+<td>PaLM、Falcon</td>
+</tr>
+<tr>
+<td><strong>GQA</strong>（Grouped-Query Attention）⭐</td>
+<td>MHA 和 MQA 的折中：分组共享 K、V</td>
+<td>LLaMA-2/3、Qwen、Mistral</td>
+</tr>
+<tr>
+<td><strong>MLA</strong>（Multi-head Latent Attention）</td>
+<td>把 K、V 压缩成低秩潜变量再展开</td>
+<td>DeepSeek-V2/V3</td>
+</tr>
+</tbody>
+</table>
+<p><strong>一句话总结</strong>：<strong>Q 多分身、K/V 共享</strong>，质量几乎不掉，KV-Cache 大幅缩水。</p>
+<h3 id="185-演进方向四归一化--残差--让训练不崩">18.5 演进方向四：归一化 &amp; 残差 —— 让训练不崩</h3>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>痛点</th>
+<th>改进</th>
+<th>代表模型 / 使用者</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Post-LN</strong>（原版）</td>
+<td>深层训练不稳定，梯度爆</td>
+<td>论文最早版本，先残差相加再 LayerNorm</td>
+<td>原版 Transformer</td>
+</tr>
+<tr>
+<td><strong>Pre-LN</strong> ⭐</td>
+<td>解决稳定性</td>
+<td>把 LayerNorm 放到子层<strong>前面</strong>，深层训练更稳</td>
+<td>GPT、LLaMA、Qwen 等现代大模型</td>
+</tr>
+<tr>
+<td><strong>RMSNorm</strong> ⭐</td>
+<td>LayerNorm 计算稍慢</td>
+<td>去掉减均值步骤，<strong>只除以均方根</strong>，更快、效果不掉</td>
+<td>LLaMA 系列默认</td>
+</tr>
+<tr>
+<td><strong>DeepNorm</strong></td>
+<td>想堆到 1000 层</td>
+<td>残差连接乘一个缩放系数，让超深网络稳定</td>
+<td>微软、智谱部分模型</td>
+</tr>
+</tbody>
+</table>
+<h3 id="186-演进方向五ffn-改造--把算力花在刀刃上">18.6 演进方向五：FFN 改造 —— 把&quot;算力&quot;花在刀刃上</h3>
+<p>FFN 占了模型大部分参数（通常 2/3 以上）。两条进化路线：</p>
+<p><strong>A. 激活函数升级</strong></p>
+<table>
+<thead>
+<tr>
+<th>激活</th>
+<th>公式</th>
+<th>效果</th>
+<th>代表模型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ReLU（原版）</td>
+<td>max(0, x)</td>
+<td>简单、有死神经元</td>
+<td>原版 Transformer</td>
+</tr>
+<tr>
+<td>GELU</td>
+<td>x · Φ(x)</td>
+<td>更平滑，训练表现通常优于 ReLU</td>
+<td>BERT、GPT-2</td>
+</tr>
+<tr>
+<td><strong>SwiGLU</strong> ⭐</td>
+<td>(Swish(xW₁)) ⊙ (xW₂)，再过 W₃</td>
+<td>引入门控，质量更好</td>
+<td>LLaMA、PaLM、Qwen 默认</td>
+</tr>
+</tbody>
+</table>
+<p><strong>B. MoE（Mixture of Experts，专家混合）</strong> ⭐</p>
+<ul>
+<li><strong>痛点</strong>：模型越大效果越好，但全量激活算不动。</li>
+<li><strong>思路</strong>：FFN 拆成 N 个&quot;专家&quot;，每个 token 只激活 2~4 个，<strong>总参数巨大但算力不变</strong>。</li>
+<li><strong>代表</strong>：Switch Transformer、Mixtral 8×7B、DeepSeek-MoE、Qwen-MoE。</li>
+</ul>
+<blockquote>
+<p><strong>通俗类比</strong>：原来每道题都让全班 100 人一起做（贵）；MoE 改成根据题目类型，每题只挑 2 个最擅长的专家做（便宜又好）。</p>
+</blockquote>
+<h3 id="187-演进方向六训练范式--对齐--从会接龙到听人话">18.7 演进方向六：训练范式 &amp; 对齐 —— 从&quot;会接龙&quot;到&quot;听人话&quot;</h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>解决什么</th>
+<th>做什么</th>
+<th>代表模型 / 方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>预训练</strong>（Pre-training）</td>
+<td>先学通用语言能力</td>
+<td>海量文本上做 next-token 预测</td>
+<td>GPT、LLaMA</td>
+</tr>
+<tr>
+<td><strong>SFT</strong>（监督微调）</td>
+<td>学会按指令回答</td>
+<td>用高质量&quot;指令-回答&quot;对再训一遍</td>
+<td>Alpaca、Vicuna</td>
+</tr>
+<tr>
+<td><strong>RLHF</strong>（人类反馈强化学习） ⭐</td>
+<td>让回答更符合人类偏好</td>
+<td>用人类偏好训练奖励模型，再用 PPO 优化</td>
+<td>ChatGPT、Claude</td>
+</tr>
+<tr>
+<td><strong>DPO</strong></td>
+<td>简化偏好对齐流程</td>
+<td>直接用偏好数据优化策略，不显式训练奖励模型</td>
+<td>LLaMA-3 等</td>
+</tr>
+<tr>
+<td><strong>GRPO</strong></td>
+<td>提升复杂推理能力</td>
+<td>用 group-relative reward / advantage 做强化学习式策略优化</td>
+<td>DeepSeek-R1</td>
+</tr>
+<tr>
+<td><strong>推理增强（Reasoning）</strong></td>
+<td>想让模型会思考</td>
+<td>用强化学习激励&quot;长思考链&quot;（CoT）</td>
+<td>OpenAI o1、DeepSeek-R1</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>这一块和你之前那份《强化学习算法总结》正好衔接：<strong>RLHF/PPO/DPO/GRPO 都可以看作强化学习或偏好优化思想在大模型上的落地</strong>。</p>
+</blockquote>
+<h3 id="188-演进方向七上下文长度--从-2k-到-1m">18.8 演进方向七：上下文长度 —— 从 2K 到 1M+</h3>
+<p>原版 Transformer 训练时一般 512~2048 token。现在动辄 128K、1M。靠的是组合拳：</p>
+<ol>
+<li><strong>位置编码外推</strong>：RoPE + NTK-aware / YaRN，让训练时 4K 的模型能用到 128K。</li>
+<li><strong>稀疏/线性注意力</strong>：跳过不必要的关注。</li>
+<li><strong>FlashAttention + 分块计算</strong>：硬件层面省显存。</li>
+<li><strong>滑动窗口注意力</strong>（Sliding Window）：每个 token 只看附近 N 个 + 少量全局 token（Mistral 用过）。</li>
+<li><strong>检索增强（RAG）</strong>：与其硬塞进上下文，不如外挂向量库即用即取。</li>
+</ol>
+<h3 id="189-演进方向八多模态--不只是文本">18.9 演进方向八：多模态 —— 不只是文本</h3>
+<p>把&quot;图像 / 音频 / 视频&quot;先编码成 token 序列，再喂给 Transformer：</p>
+<ul>
+<li><strong>ViT</strong>：把图片切成 16×16 patch，每个 patch 当一个 token —— <strong>CV 也能用 Transformer</strong>。</li>
+<li><strong>CLIP</strong>：图文双塔对齐，让 Transformer 能&quot;看懂&quot;图像描述。</li>
+<li><strong>Whisper</strong>：音频转 token 后做 Encoder-Decoder。</li>
+<li><strong>GPT-4V / Qwen-VL / Gemini</strong>：把图像 patch 直接拼到文本 token 序列里，统一一个 Transformer 处理。</li>
+</ul>
+<p><strong>核心思想没变</strong>：<strong>只要能把数据切成 token，Transformer 就能学。</strong></p>
+<h3 id="1810-给初学者的演进学习路径">18.10 给初学者的演进学习路径</h3>
+<pre><code class="language-mermaid"><div class="mermaid">graph LR
+    A[原版 Transformer] --> B[Pre-LN + RMSNorm]
+    B --> C[RoPE 位置编码]
+    C --> D[GQA/MQA 注意力]
+    D --> E[SwiGLU 激活]
+    E --> F[FlashAttention 提速]
+    F --> G[MoE 扩参数]
+    G --> H[RLHF/DPO 对齐]
+    H --> I[长上下文 + 多模态]
+</div></code></pre>
+<p><strong>学习建议</strong>：</p>
+<ul>
+<li>这些改进<strong>不是推翻基础架构</strong>，而是在原版基础上<strong>逐点替换零件</strong>。掌握了第 1~16 节的基础，每个改进只看一篇论文 + 一段代码就能搞懂。</li>
+<li>看 <strong>LLaMA 的 modeling_llama.py 源码</strong>（Hugging Face Transformers 库里），是把这些&quot;现代零件&quot;组合起来的最佳样板：RoPE + RMSNorm + SwiGLU + GQA 一应俱全，代码不到 1000 行。</li>
+<li>推荐阅读：
+<ul>
+<li><a href="https://arxiv.org/abs/2302.13971">LLaMA 论文</a></li>
+<li><a href="https://arxiv.org/abs/2307.09288">LLaMA-2 论文</a></li>
+<li><a href="https://arxiv.org/abs/2205.14135">FlashAttention</a></li>
+<li><a href="https://arxiv.org/abs/2104.09864">RoFormer（RoPE 原论文）</a></li>
+<li><a href="https://arxiv.org/abs/2401.04088">Mixtral of Experts</a></li>
+<li><a href="https://arxiv.org/abs/2412.19437">DeepSeek-V3 技术报告</a></li>
+</ul>
+</li>
+</ul>
+<h3 id="1811-一句话总结演进史">18.11 一句话总结演进史</h3>
+<blockquote>
+<p><strong>基础 Transformer 解决了&quot;能不能做&quot;，演进方向解决的是&quot;做得快不快、长不长、稳不稳、贵不贵、像不像人&quot;。</strong></p>
+</blockquote>
+<p>抓住&quot;<strong>注意力是加权平均</strong>&quot;这一条主线，再去看任何新论文，你都能在脑子里把它对应到上面 8 个演进方向中的某一个，不会迷路。</p>
+<hr>
+<h2 id="19-写在最后">19. 写在最后</h2>
+<ul>
+<li>Transformer <strong>不难</strong>，难的是数学符号让人望而却步。<strong>抓住&quot;注意力 = 加权平均，权重靠相似度&quot;这一条主线</strong>，其它都是工程包装。</li>
+<li>一定要<strong>自己敲一遍</strong>最小代码，跑通比看 100 篇博客都顶用。</li>
+<li>看懂原版后，再去看 RoPE、ALiBi、GQA、MoE、FlashAttention、长上下文等现代演进，会非常顺。</li>
+</ul>
+<blockquote>
+<p>学懂这一篇，你已经具备阅读 90% 大模型论文的基础。下一步，去玩 nanoGPT 吧！🚀</p>
+</blockquote>
+<hr>
+<h2 id="附录-a代码常用-api-速查表">附录 A：代码常用 API 速查表</h2>
+<p>本文代码以 <code>PyTorch</code> 为主。下面把代码段里反复出现、对理解 Transformer 很关键的 API 集中整理，方便你在阅读代码时随时查询。</p>
+<h3 id="a1-张量创建与基础数学">A.1 张量创建与基础数学</h3>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>定义 / 作用</th>
+<th>在本文中的典型用途</th>
+<th>小白理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>torch.tensor(data)</code></td>
+<td>把 Python 列表、数字等转换成 PyTorch 张量</td>
+<td>把 token id 列表变成模型可计算的输入</td>
+<td>把普通数据装进“可计算容器”</td>
+</tr>
+<tr>
+<td><code>torch.zeros(shape)</code></td>
+<td>创建指定形状的全 0 张量</td>
+<td>初始化位置编码表 <code>pe</code></td>
+<td>先铺一张空白表格</td>
+</tr>
+<tr>
+<td><code>torch.ones(shape)</code></td>
+<td>创建指定形状的全 1 张量</td>
+<td>构造 mask 的基础矩阵</td>
+<td>先生成一张全是“允许”的表</td>
+</tr>
+<tr>
+<td><code>torch.arange(start, end, step)</code></td>
+<td>创建等差整数序列</td>
+<td>生成位置下标、偶数维下标</td>
+<td>给每个位置编号</td>
+</tr>
+<tr>
+<td><code>torch.randint(low, high, shape)</code></td>
+<td>随机生成整数张量，范围是 <code>[low, high)</code></td>
+<td>模拟一批 token id 输入</td>
+<td>随机造一批练习题</td>
+</tr>
+<tr>
+<td><code>torch.sin(x)</code> / <code>torch.cos(x)</code></td>
+<td>对张量逐元素计算正弦 / 余弦</td>
+<td>构造原版正弦位置编码</td>
+<td>给位置生成周期性“指纹”</td>
+</tr>
+<tr>
+<td><code>torch.exp(x)</code></td>
+<td>对张量逐元素计算指数函数</td>
+<td>计算位置编码中的频率系数</td>
+<td>生成不同速度的“波”</td>
+</tr>
+<tr>
+<td><code>math.log(x)</code></td>
+<td>计算自然对数</td>
+<td>配合 <code>torch.exp</code> 生成频率系数</td>
+<td>用数学变形稳定计算比例</td>
+</tr>
+<tr>
+<td><code>math.sqrt(x)</code></td>
+<td>计算平方根</td>
+<td>Attention 中除以 <code>sqrt(d_k)</code></td>
+<td>防止分数过大，稳定 softmax</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a2-张量形状与维度操作">A.2 张量形状与维度操作</h3>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>定义 / 作用</th>
+<th>在本文中的典型用途</th>
+<th>小白理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.shape</code></td>
+<td>查看张量整体形状</td>
+<td>查看 <code>tokens</code>、<code>embedding</code>、<code>out</code> 的维度</td>
+<td>看盒子有几层、几行、几列</td>
+</tr>
+<tr>
+<td><code>.size(dim)</code></td>
+<td>查看某一维长度；不传参数时等价于 shape</td>
+<td><code>x.size(1)</code> 取序列长度，<code>Q.size(-1)</code> 取 <code>d_k</code></td>
+<td>用尺子量某一边有多长</td>
+</tr>
+<tr>
+<td><code>.unsqueeze(dim)</code></td>
+<td>在指定位置插入一个长度为 1 的维度</td>
+<td>把位置编码补 batch 维，方便广播相加</td>
+<td>给数组外面套一层薄壳</td>
+</tr>
+<tr>
+<td><code>.float()</code></td>
+<td>把张量转成浮点类型</td>
+<td>位置编码中需要小数运算</td>
+<td>把 <code>5</code> 变成 <code>5.0</code></td>
+</tr>
+<tr>
+<td><code>.view(new_shape)</code></td>
+<td>在不复制数据的前提下重排张量形状</td>
+<td>把 <code>(B,L,d_model)</code> 拆成多头 <code>(B,L,H,d_k)</code></td>
+<td>同一摞卡片重新分组</td>
+</tr>
+<tr>
+<td><code>.reshape(new_shape)</code></td>
+<td>重排张量形状，必要时会复制数据</td>
+<td>训练时把 logits 拉平成二维做交叉熵</td>
+<td>把多页表格摊平成一张大表</td>
+</tr>
+<tr>
+<td><code>.transpose(dim1, dim2)</code></td>
+<td>交换两个维度</td>
+<td>把 K 转置，或把 head 维提前</td>
+<td>把行和列、或两层顺序调换</td>
+</tr>
+<tr>
+<td><code>.contiguous()</code></td>
+<td>让张量在内存中连续排列</td>
+<td><code>transpose</code> 后再 <code>view</code> 前常用</td>
+<td>把打乱的卡片重新码整齐</td>
+</tr>
+<tr>
+<td><code>torch.cat(tensors, dim)</code></td>
+<td>沿指定维度拼接多个张量</td>
+<td>生成阶段把新 token 接到已有序列后面</td>
+<td>把几段纸条接成长纸条</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a3-nnmodule-与模型层">A.3 <code>nn.Module</code> 与模型层</h3>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>定义 / 作用</th>
+<th>在本文中的典型用途</th>
+<th>小白理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>nn.Module</code></td>
+<td>PyTorch 中所有神经网络模块的基类</td>
+<td>自定义 <code>MultiHeadAttention</code>、<code>EncoderLayer</code>、<code>TransformerEncoder</code></td>
+<td>搭积木前的标准底座</td>
+</tr>
+<tr>
+<td><code>super().__init__()</code></td>
+<td>调用父类 <code>nn.Module</code> 的初始化逻辑</td>
+<td>每个自定义模型类的 <code>__init__</code> 中都要写</td>
+<td>先办理“模型身份证”</td>
+</tr>
+<tr>
+<td><code>def forward(...)</code></td>
+<td>定义模块前向计算过程</td>
+<td>描述输入如何一步步变成输出</td>
+<td>告诉积木“数据来了怎么走”</td>
+</tr>
+<tr>
+<td><code>nn.Embedding(vocab_size, d_model)</code></td>
+<td>创建可学习的词向量查表矩阵</td>
+<td>把 token id 转成向量</td>
+<td>查字典：编号 → 向量</td>
+</tr>
+<tr>
+<td><code>nn.Embedding.from_pretrained(weights, freeze=...)</code></td>
+<td>用已有权重初始化 Embedding</td>
+<td>加载预训练词向量</td>
+<td>把别人训练好的字典拿来用</td>
+</tr>
+<tr>
+<td><code>nn.Linear(in_features, out_features)</code></td>
+<td>全连接线性层，执行 <code>y = xW + b</code></td>
+<td>生成 Q/K/V、FFN 升维降维、LM Head 输出词表分数</td>
+<td>一个可学习的“变换器”</td>
+</tr>
+<tr>
+<td><code>nn.LayerNorm(d_model)</code></td>
+<td>对每个 token 的向量做层归一化</td>
+<td>Add &amp; Norm 中稳定训练</td>
+<td>把每个向量的数值拉回稳定范围</td>
+</tr>
+<tr>
+<td><code>nn.Dropout(p)</code></td>
+<td>训练时随机把部分元素置 0</td>
+<td>Attention、FFN 后防止过拟合</td>
+<td>训练时故意遮住一部分提示，防止死记硬背</td>
+</tr>
+<tr>
+<td><code>nn.ModuleList([...])</code></td>
+<td>保存一组子模块，并让 PyTorch 正确注册参数</td>
+<td>堆叠多层 <code>EncoderLayer</code></td>
+<td>一个能被模型识别的“模块列表”</td>
+</tr>
+<tr>
+<td><code>self.register_buffer(name, tensor)</code></td>
+<td>注册不参与训练、但跟随模型保存和迁移设备的张量</td>
+<td>保存位置编码 <code>pe</code></td>
+<td>行李里的固定配件，跟着模型走但不训练</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a4-attention-与-mask-相关-api">A.4 Attention 与 Mask 相关 API</h3>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>定义 / 作用</th>
+<th>在本文中的典型用途</th>
+<th>小白理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>torch.matmul(A, B)</code></td>
+<td>矩阵乘法 / 批量矩阵乘法</td>
+<td>计算 <code>QKᵀ</code> 和注意力加权求和</td>
+<td>让每个 Q 和所有 K 对暗号</td>
+</tr>
+<tr>
+<td><code>F.softmax(x, dim=-1)</code></td>
+<td>沿指定维度把分数归一化成概率分布</td>
+<td>把 attention scores 变成权重</td>
+<td>把一堆分数变成“注意力百分比”</td>
+</tr>
+<tr>
+<td><code>.masked_fill(condition, value)</code></td>
+<td>满足条件的位置替换为指定值</td>
+<td>把不能看的 attention 位置设为 <code>-inf</code></td>
+<td>给禁区打码，让 softmax 后权重为 0</td>
+</tr>
+<tr>
+<td><code>torch.tril(x)</code></td>
+<td>取下三角矩阵，其余置 0</td>
+<td>构造 causal mask</td>
+<td>只允许看自己和过去</td>
+</tr>
+<tr>
+<td><code>torch.triu(x)</code></td>
+<td>取上三角矩阵，其余置 0</td>
+<td>解释 mask 时作为对照</td>
+<td>和下三角相反的方向</td>
+</tr>
+<tr>
+<td><code>float('-inf')</code></td>
+<td>Python 的负无穷大</td>
+<td>mask 中屏蔽非法位置</td>
+<td>分数低到永远不会被选中</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a5-激活函数损失函数与训练循环">A.5 激活函数、损失函数与训练循环</h3>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>定义 / 作用</th>
+<th>在本文中的典型用途</th>
+<th>小白理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>F.relu(x)</code></td>
+<td>ReLU 激活函数，负数变 0，正数保留</td>
+<td>早期 FFN 示例中的非线性</td>
+<td>只让正信号通过</td>
+</tr>
+<tr>
+<td><code>F.cross_entropy(logits, targets)</code></td>
+<td>交叉熵损失，内部包含 <code>log_softmax + NLLLoss</code></td>
+<td>语言模型预测下一个 token 时计算 loss</td>
+<td>看模型给正确答案打了多少分</td>
+</tr>
+<tr>
+<td><code>loss.backward()</code></td>
+<td>自动反向传播，计算参数梯度</td>
+<td>训练循环中的反向阶段</td>
+<td>根据错误追查每个参数该怎么改</td>
+</tr>
+<tr>
+<td><code>optimizer.step()</code></td>
+<td>根据梯度更新参数</td>
+<td>训练循环中的更新阶段</td>
+<td>按老师批改意见改答案</td>
+</tr>
+<tr>
+<td><code>optimizer.zero_grad()</code></td>
+<td>清空上一轮梯度</td>
+<td>标准训练循环每步开始前使用</td>
+<td>擦掉上一题的草稿，避免混在一起</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a6-推理与结果读取">A.6 推理与结果读取</h3>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>定义 / 作用</th>
+<th>在本文中的典型用途</th>
+<th>小白理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>logits[:, -1]</code></td>
+<td>取每个序列最后一个位置的词表分数</td>
+<td>自回归生成时预测下一个 token</td>
+<td>只看当前最后一步的排行榜</td>
+</tr>
+<tr>
+<td><code>.argmax(dim, keepdim=True)</code></td>
+<td>沿指定维度取最大值下标，可保留维度</td>
+<td>贪心解码选择最高分 token</td>
+<td>选排行榜第一名</td>
+</tr>
+<tr>
+<td><code>.item()</code></td>
+<td>把只含一个元素的张量转成 Python 数值</td>
+<td>判断是否生成了 <code>END_TOKEN</code></td>
+<td>从盒子里取出唯一那颗糖</td>
+</tr>
+<tr>
+<td><code>.eval()</code></td>
+<td>切换到推理模式，关闭 Dropout 等训练行为</td>
+<td>正式推理 / 验证前使用</td>
+<td>考试模式，不再随机遮挡</td>
+</tr>
+<tr>
+<td><code>.train()</code></td>
+<td>切换到训练模式，启用 Dropout 等训练行为</td>
+<td>训练阶段使用</td>
+<td>练习模式，允许随机扰动</td>
+</tr>
+</tbody>
+</table>
+<h3 id="a7-hugging-face-预训练模型相关-api">A.7 Hugging Face 预训练模型相关 API</h3>
+<table>
+<thead>
+<tr>
+<th>API</th>
+<th>定义 / 作用</th>
+<th>在本文中的典型用途</th>
+<th>小白理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>BertTokenizer.from_pretrained(name)</code> / <code>AutoTokenizer.from_pretrained(name)</code></td>
+<td>加载指定模型配套的 tokenizer</td>
+<td>使用 BERT 中文分词器</td>
+<td>拿到和模型训练时一致的“切词规则”</td>
+</tr>
+<tr>
+<td><code>BertModel.from_pretrained(name)</code> / <code>AutoModel.from_pretrained(name)</code></td>
+<td>加载指定预训练模型权重</td>
+<td>获取 BERT 的 Embedding 层</td>
+<td>把别人训练好的大模型下载来用</td>
+</tr>
+<tr>
+<td><code>model.embeddings.word_embeddings</code></td>
+<td>BERT 中词嵌入层的位置</td>
+<td>查看或迁移 BERT 的 Embedding 权重</td>
+<td>打开 BERT 的“词向量字典”</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>💡 <strong>查阅建议</strong>：遇到不熟悉的 API，先看它属于哪一类：是“造张量”、是“改形状”、是“网络层”、是“注意力计算”，还是“训练更新”。先判断类别，再看输入输出 shape，代码就会顺很多。</p>
+</blockquote>
+<hr>
+<h2 id="参考资料">参考资料</h2>
+<ol>
+<li><a href="https://arxiv.org/abs/1706.03762"><strong>论文原文</strong>：《Attention Is All You Need》（Vaswani et al., 2017）</a></li>
+<li><a href="https://jalammar.github.io/illustrated-transformer/"><strong>图解经典博客</strong>：The Illustrated Transformer (Jay Alammar)</a></li>
+<li><a href="http://nlp.seas.harvard.edu/annotated-transformer/"><strong>逐行注释代码</strong>：The Annotated Transformer (Harvard NLP)</a></li>
+<li><a href="https://yeasy.gitbook.io/llm_internals/di-yi-bu-fen-ji-chu-pian/01_introduction"><strong>中文详细解析</strong>：LLM Internals 中文解析</a></li>
+<li><a href="https://github.com/karpathy/nanoGPT"><strong>nanoGPT 项目</strong></a></li>
+<li><a href="https://github.com/huggingface/transformers"><strong>Hugging Face Transformers 库</strong></a></li>
+<li><a href="https://arxiv.org/abs/2302.13971"><strong>LLaMA 论文</strong></a></li>
+<li><a href="https://arxiv.org/abs/2205.14135"><strong>FlashAttention 论文</strong></a></li>
+<li><a href="https://arxiv.org/abs/2104.09864"><strong>RoPE 论文</strong></a></li>
+<li><a href="https://arxiv.org/abs/2401.04088"><strong>Mixtral of Experts 论文</strong></a></li>
+</ol>
+
+</body>
+</html>
