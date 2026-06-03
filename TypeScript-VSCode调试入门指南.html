@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TypeScript-VSCode调试入门指南.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> or <div class="page"></div> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="typescript-vscode-调试环境入门指南">TypeScript VSCode 调试环境入门指南</h1>
+<blockquote>
+<p>本文档基于 <code>typescript</code> 工作区下的两个示例工程，帮助初学者快速搭建并理解 TypeScript 在 VSCode 中的调试环境。</p>
+</blockquote>
+<hr>
+<h2 id="目录">目录</h2>
+<ul>
+<li><a href="#%E5%B7%A5%E7%A8%8B%E6%A6%82%E8%A7%88">工程概览</a></li>
+<li><a href="#%E5%89%8D%E7%BD%AE%E5%87%86%E5%A4%87">前置准备</a></li>
+<li><a href="#%E5%B7%A5%E7%A8%8B%E4%B8%80prj_1--nodejs-%E5%91%BD%E4%BB%A4%E8%A1%8C%E8%BE%93%E5%87%BA">工程一：prj_1 — Node.js 命令行输出</a></li>
+<li><a href="#%E5%B7%A5%E7%A8%8B%E4%BA%8Cprj_2--%E6%B5%8F%E8%A7%88%E5%99%A8%E7%BD%91%E9%A1%B5%E8%BE%93%E5%87%BA">工程二：prj_2 — 浏览器网页输出</a></li>
+<li><a href="#vscode-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3">VSCode 配置文件详解</a></li>
+<li><a href="#%E4%B8%A4%E7%A7%8D%E6%A8%A1%E5%BC%8F%E6%A0%B8%E5%BF%83%E5%8C%BA%E5%88%AB%E5%AF%B9%E6%AF%94">两种模式核心区别对比</a></li>
+<li><a href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98">常见问题</a></li>
+</ul>
+<hr>
+<h2 id="工程概览">工程概览</h2>
+<pre class="hljs"><code><div>typescript/                        ← VSCode 工作区根目录
+├── .vscode/
+│   ├── launch.json                ← 调试启动配置（F5 的行为）
+│   └── tasks.json                 ← 构建任务配置（编译/服务器）
+├── prj_1/                         ← 工程一：Node.js 命令行程序
+│   ├── src/
+│   │   ├── index.ts               ← 主入口
+│   │   └── utils/helper.ts        ← 工具函数
+│   ├── dist/                      ← 编译输出目录（自动生成）
+│   ├── tsconfig.json
+│   └── package.json
+└── prj_2/                         ← 工程二：浏览器网页程序
+    ├── src/
+    │   ├── index.ts               ← 主入口
+    │   └── utils/helper.ts        ← 工具函数
+    ├── dist/
+    │   └── index.html             ← 浏览器入口页面
+    ├── tsconfig.json
+    └── package.json
+</div></code></pre>
+<hr>
+<h2 id="前置准备">前置准备</h2>
+<h3 id="1-安装必要软件">1. 安装必要软件</h3>
+<table>
+<thead>
+<tr>
+<th>软件</th>
+<th>用途</th>
+<th>下载地址</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node.js (v18+)</td>
+<td>运行 JS / 执行 tsc 编译器</td>
+<td>https://nodejs.org</td>
+</tr>
+<tr>
+<td>VSCode</td>
+<td>编辑器 + 调试环境</td>
+<td>https://code.visualstudio.com</td>
+</tr>
+<tr>
+<td>VSCode 插件：Debugger for Chrome</td>
+<td>Chrome 调试支持（prj_2 需要）</td>
+<td>VSCode 扩展市场搜索</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-安装项目依赖">2. 安装项目依赖</h3>
+<p>在 VSCode 终端中分别执行（<strong>注意：PowerShell 不支持 <code>&amp;&amp;</code>，需分两次执行</strong>）：</p>
+<pre class="hljs"><code><div><span class="hljs-comment"># 安装 prj_1 依赖</span>
+npm install
+<span class="hljs-comment"># （先 cd 到 prj_1 目录）</span>
+
+<span class="hljs-comment"># 安装 prj_2 依赖</span>
+npm install
+<span class="hljs-comment"># （先 cd 到 prj_2 目录）</span>
+</div></code></pre>
+<hr>
+<h2 id="工程一prj_1--nodejs-命令行输出">工程一：prj_1 — Node.js 命令行输出</h2>
+<h3 id="功能说明">功能说明</h3>
+<p>TypeScript 源码 → 编译为 JavaScript → Node.js 执行 → 输出字符串到 VSCode 调试控制台。</p>
+<h3 id="完整执行流程">完整执行流程</h3>
+<pre class="hljs"><code><div>src/index.ts          ← 你编写的 TypeScript 源码
+      │
+      │  tsc 编译（根据 tsconfig.json）
+      ▼
+dist/index.js         ← 编译生成的 JavaScript 文件
+      │
+      │  Node.js 执行
+      ▼
+console.log(...)      ← 输出字符串
+      │
+      ▼
+VSCode 调试控制台      ← 你看到结果的地方
+</div></code></pre>
+<h3 id="源码文件">源码文件</h3>
+<p><strong><code>src/utils/helper.ts</code></strong> — 工具函数模块：</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">greet</span>(<span class="hljs-params"><span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-built_in">string</span> {
+  <span class="hljs-keyword">return</span> <span class="hljs-string">`Hello, <span class="hljs-subst">${name}</span>!`</span>;
+}
+
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">PI</span>: <span class="hljs-built_in">number</span> = <span class="hljs-number">3.14159</span>;
+</div></code></pre>
+<p><strong><code>src/index.ts</code></strong> — 主入口文件：</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// 导入其他模块（注意：编译后需要 .js 扩展名）</span>
+<span class="hljs-keyword">import</span> { greet } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./utils/helper.js&#x27;</span>;
+
+<span class="hljs-comment">// 定义接口（TypeScript 特有的类型系统）</span>
+<span class="hljs-keyword">interface</span> <span class="hljs-title class_">User</span> {
+  <span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span>;
+  <span class="hljs-attr">age</span>: <span class="hljs-built_in">number</span>;
+}
+
+<span class="hljs-comment">// 使用类型</span>
+<span class="hljs-keyword">const</span> <span class="hljs-attr">user</span>: <span class="hljs-title class_">User</span> = {
+  <span class="hljs-attr">name</span>: <span class="hljs-string">&#x27;张三&#x27;</span>,
+  <span class="hljs-attr">age</span>: <span class="hljs-number">25</span>
+};
+
+<span class="hljs-comment">// 调用函数，console.log 输出到终端</span>
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-title function_">greet</span>(user.<span class="hljs-property">name</span>));
+
+<span class="hljs-comment">// 类定义</span>
+<span class="hljs-keyword">class</span> <span class="hljs-title class_">Calculator</span> {
+  <span class="hljs-title function_">add</span>(<span class="hljs-attr">a</span>: <span class="hljs-built_in">number</span>, <span class="hljs-attr">b</span>: <span class="hljs-built_in">number</span>): <span class="hljs-built_in">number</span> {
+    <span class="hljs-keyword">return</span> a + b;
+  }
+}
+
+<span class="hljs-keyword">const</span> calc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Calculator</span>();
+<span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(calc.<span class="hljs-title function_">add</span>(<span class="hljs-number">5</span>, <span class="hljs-number">3</span>));
+</div></code></pre>
+<h3 id="配置文件">配置文件</h3>
+<p><strong><code>tsconfig.json</code></strong> — TypeScript 编译配置：</p>
+<pre class="hljs"><code><div><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;compilerOptions&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;rootDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./src&quot;</span><span class="hljs-punctuation">,</span>      <span class="hljs-comment">// 源码根目录</span>
+    <span class="hljs-attr">&quot;outDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist&quot;</span><span class="hljs-punctuation">,</span>      <span class="hljs-comment">// 编译输出目录</span>
+    <span class="hljs-attr">&quot;module&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;nodenext&quot;</span><span class="hljs-punctuation">,</span>    <span class="hljs-comment">// 模块系统：Node.js ESM</span>
+    <span class="hljs-attr">&quot;target&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;esnext&quot;</span><span class="hljs-punctuation">,</span>      <span class="hljs-comment">// 编译目标：现代 JS</span>
+    <span class="hljs-attr">&quot;sourceMap&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>       <span class="hljs-comment">// 生成 sourceMap（支持断点调试）</span>
+    <span class="hljs-attr">&quot;strict&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span>           <span class="hljs-comment">// 开启严格类型检查</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;include&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;src/**/*&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;exclude&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;node_modules&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;dist&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</div></code></pre>
+<p><strong><code>package.json</code></strong> — 项目配置：</p>
+<pre class="hljs"><code><div><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;module&quot;</span><span class="hljs-punctuation">,</span>          <span class="hljs-comment">// 使用 ES Module</span>
+  <span class="hljs-attr">&quot;devDependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;@types/node&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^25.9.1&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;typescript&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^6.0.3&quot;</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</div></code></pre>
+<h3 id="调试步骤逐步说明">调试步骤（逐步说明）</h3>
+<p><strong>步骤 1</strong>：按 <code>Ctrl+Shift+D</code> 打开调试面板</p>
+<p><strong>步骤 2</strong>：在顶部下拉框中选择 <strong>&quot;运行 TypeScript (Node.js) - prj_1&quot;</strong></p>
+<pre class="hljs"><code><div>▶ 运行 TypeScript (Node.js) - prj_1   ← 选择这个
+  运行 TypeScript (Chrome) - prj_2
+</div></code></pre>
+<p><strong>步骤 3</strong>：按 <code>F5</code> 启动调试</p>
+<p><strong>步骤 4</strong>：VSCode 自动执行以下操作：</p>
+<ol>
+<li>触发 <code>preLaunchTask</code>：运行 <code>npx tsc -p tsconfig.json</code> 编译 TypeScript</li>
+<li>编译成功后，Node.js 执行 <code>dist/index.js</code></li>
+</ol>
+<p><strong>步骤 5</strong>：点击底部 <strong>&quot;调试控制台&quot;</strong> 标签页查看输出：</p>
+<pre class="hljs"><code><div>Hello, 张三!
+8
+</div></code></pre>
+<p><strong>步骤 6</strong>：在 <code>.ts</code> 文件中设置断点（点击行号左侧），再次 F5 即可命中断点调试。</p>
+<hr>
+<h2 id="工程二prj_2--浏览器网页输出">工程二：prj_2 — 浏览器网页输出</h2>
+<h3 id="功能说明-1">功能说明</h3>
+<p>TypeScript 源码 → 编译为 JavaScript → http-server 托管 → 浏览器加载 → 网页显示输出内容。</p>
+<hr>
+<h3 id="-与-prj_1-的核心区别谁来运行-js">⚡ 与 prj_1 的核心区别：谁来&quot;运行&quot; JS？</h3>
+<p>这是理解两个工程最关键的问题。</p>
+<h4 id="prj_1nodejs-直接运行-js">prj_1：Node.js 直接运行 JS</h4>
+<pre class="hljs"><code><div>dist/index.js
+      │
+      │  Node.js 进程直接执行（就像运行一个程序）
+      ▼
+console.log() 输出到终端
+      │
+      ▼
+程序执行完毕，进程退出
+</div></code></pre>
+<ul>
+<li><strong>Node.js</strong> 是一个 <strong>JS 运行时</strong>，可以直接在操作系统上执行 <code>.js</code> 文件，就像 Python 执行 <code>.py</code> 文件一样。</li>
+<li>程序运行一次就结束，没有持续监听。</li>
+<li>输出目标是<strong>终端（标准输出 stdout）</strong>。</li>
+</ul>
+<h4 id="prj_2http-server-提供文件浏览器运行-js">prj_2：http-server 提供文件，浏览器运行 JS</h4>
+<pre class="hljs"><code><div>dist/index.js
+dist/index.html
+      │
+      │  http-server 进程持续运行，监听 8080 端口
+      │  （http-server 本身是 Node.js 写的，但它的职责只是&quot;传文件&quot;）
+      ▼
+浏览器发起 HTTP 请求：GET http://localhost:8080/index.html
+      │
+      ▼
+http-server 把 index.html 文件内容原样返回给浏览器
+      │
+      ▼
+浏览器解析 HTML，遇到 &lt;script src=&quot;./index.js&quot;&gt;
+      │
+      ▼
+浏览器再次发起请求：GET http://localhost:8080/index.js
+      │
+      ▼
+http-server 把 index.js 文件内容原样返回给浏览器
+      │
+      ▼
+浏览器内置的 JS 引擎（V8）执行 index.js
+      │
+      ▼
+操作 DOM，网页显示内容
+</div></code></pre>
+<ul>
+<li><strong>http-server</strong> 本质上只是一个<strong>文件传输工具</strong>，它把 <code>dist/</code> 目录下的文件通过 HTTP 协议&quot;送&quot;给浏览器，自己并不执行 JS。</li>
+<li><strong>真正执行 JS 的是浏览器</strong>（Chrome 内置的 V8 引擎），不是 Node.js。</li>
+<li>http-server 持续运行，每次浏览器请求都响应，不会自动退出。</li>
+<li>输出目标是<strong>浏览器页面（DOM）</strong>。</li>
+</ul>
+<h4 id="关键对比表">关键对比表</h4>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>prj_1</th>
+<th>prj_2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>谁执行 JS</strong></td>
+<td>Node.js 直接执行</td>
+<td>浏览器（V8 引擎）执行</td>
+</tr>
+<tr>
+<td><strong>Node.js 的角色</strong></td>
+<td>JS 运行时，直接运行程序</td>
+<td>运行 http-server 工具（间接参与）</td>
+</tr>
+<tr>
+<td><strong>http-server 的角色</strong></td>
+<td>不涉及</td>
+<td>文件传输工具，把 JS/HTML 文件送给浏览器</td>
+</tr>
+<tr>
+<td><strong>JS 可用的 API</strong></td>
+<td>Node.js API（fs、path、http 等）</td>
+<td>浏览器 API（document、window、fetch 等）</td>
+</tr>
+<tr>
+<td><strong>输出方式</strong></td>
+<td><code>console.log()</code> → 终端</td>
+<td><code>DOM 操作</code> → 网页</td>
+</tr>
+<tr>
+<td><strong>进程生命周期</strong></td>
+<td>运行完毕自动退出</td>
+<td>http-server 持续监听，不退出</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>一句话总结</strong>：</p>
+<ul>
+<li>prj_1：<strong>Node.js 是演员</strong>，直接上台表演（执行 JS）。</li>
+<li>prj_2：<strong>http-server 是快递员</strong>（送文件），<strong>浏览器才是演员</strong>（执行 JS）。
+http-server 虽然底层也是 Node.js 写的，但在 prj_2 中它只负责传文件，不负责运行你的业务代码。</li>
+</ul>
+</blockquote>
+<hr>
+<h3 id="完整执行流程-1">完整执行流程</h3>
+<pre class="hljs"><code><div>src/index.ts          ← 你编写的 TypeScript 源码
+      │
+      │  tsc 编译（根据 tsconfig.json）
+      ▼
+dist/index.js         ← 编译生成的 JavaScript 文件
+      │
+dist/index.html       ← HTML 页面（手动创建，引用 index.js）
+      │
+      │  http-server 托管 dist/ 目录
+      ▼
+http://localhost:8080  ← 本地 HTTP 服务
+      │
+      │  Chrome 访问
+      ▼
+浏览器加载 index.html
+      │
+      │  &lt;script type=&quot;module&quot; src=&quot;./index.js&quot;&gt; 加载 JS
+      ▼
+JS 执行：调用 TS 函数，操作 DOM
+      │
+      ▼
+网页显示输出内容        ← 你在 Chrome 中看到的结果
+</div></code></pre>
+<blockquote>
+<p><strong>关键说明</strong>：为什么需要 http-server？</p>
+<p>浏览器的安全策略（CORS）禁止通过 <code>file://</code> 协议加载 ES6 模块（<code>&lt;script type=&quot;module&quot;&gt;</code>）。
+必须通过 <code>http://</code> 协议访问，所以需要 http-server 提供本地 HTTP 服务。</p>
+</blockquote>
+<h3 id="源码文件-1">源码文件</h3>
+<p><strong><code>src/utils/helper.ts</code></strong> — 工具函数模块：</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// 问候函数：接收名字，返回问候语</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">greet</span>(<span class="hljs-params"><span class="hljs-attr">name</span>: <span class="hljs-built_in">string</span></span>): <span class="hljs-built_in">string</span> {
+    <span class="hljs-keyword">return</span> <span class="hljs-string">`你好，<span class="hljs-subst">${name}</span>！欢迎使用 TypeScript！`</span>;
+}
+
+<span class="hljs-comment">// 计算两数之和</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">add</span>(<span class="hljs-params"><span class="hljs-attr">a</span>: <span class="hljs-built_in">number</span>, <span class="hljs-attr">b</span>: <span class="hljs-built_in">number</span></span>): <span class="hljs-built_in">number</span> {
+    <span class="hljs-keyword">return</span> a + b;
+}
+
+<span class="hljs-comment">// 获取当前时间字符串</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">function</span> <span class="hljs-title function_">getCurrentTime</span>(<span class="hljs-params"></span>): <span class="hljs-built_in">string</span> {
+    <span class="hljs-keyword">const</span> now = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>();
+    <span class="hljs-keyword">return</span> now.<span class="hljs-title function_">toLocaleString</span>(<span class="hljs-string">&quot;zh-CN&quot;</span>);
+}
+</div></code></pre>
+<p><strong><code>src/index.ts</code></strong> — 主入口文件：</p>
+<pre class="hljs"><code><div><span class="hljs-keyword">import</span> { greet, add, getCurrentTime } <span class="hljs-keyword">from</span> <span class="hljs-string">&quot;./utils/helper.js&quot;</span>;
+
+<span class="hljs-comment">// 将内容渲染到页面上</span>
+<span class="hljs-keyword">function</span> <span class="hljs-title function_">renderToPage</span>(<span class="hljs-params"></span>): <span class="hljs-built_in">void</span> {
+    <span class="hljs-keyword">const</span> app = <span class="hljs-variable language_">document</span>.<span class="hljs-title function_">getElementById</span>(<span class="hljs-string">&quot;app&quot;</span>);
+    <span class="hljs-keyword">if</span> (!app) <span class="hljs-keyword">return</span>;
+
+    <span class="hljs-comment">// 调用 TypeScript 函数，获取输出结果</span>
+    <span class="hljs-keyword">const</span> greeting = <span class="hljs-title function_">greet</span>(<span class="hljs-string">&quot;World&quot;</span>);
+    <span class="hljs-keyword">const</span> sum = <span class="hljs-title function_">add</span>(<span class="hljs-number">3</span>, <span class="hljs-number">5</span>);
+    <span class="hljs-keyword">const</span> time = <span class="hljs-title function_">getCurrentTime</span>();
+
+    <span class="hljs-comment">// 通过 DOM 操作将结果写入 HTML 页面</span>
+    app.<span class="hljs-property">innerHTML</span> = <span class="hljs-string">`
+        &lt;h1&gt;🎉 TypeScript → Chrome 输出 Demo&lt;/h1&gt;
+        &lt;div class=&quot;card&quot;&gt;
+            &lt;h2&gt;📢 问候语&lt;/h2&gt;
+            &lt;p&gt;<span class="hljs-subst">${greeting}</span>&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;card&quot;&gt;
+            &lt;h2&gt;🔢 计算结果&lt;/h2&gt;
+            &lt;p&gt;3 + 5 = &lt;strong&gt;<span class="hljs-subst">${sum}</span>&lt;/strong&gt;&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;card&quot;&gt;
+            &lt;h2&gt;🕐 当前时间&lt;/h2&gt;
+            &lt;p&gt;<span class="hljs-subst">${time}</span>&lt;/p&gt;
+        &lt;/div&gt;
+    `</span>;
+}
+
+<span class="hljs-comment">// 页面加载完成后执行</span>
+<span class="hljs-variable language_">window</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&quot;DOMContentLoaded&quot;</span>, renderToPage);
+</div></code></pre>
+<p><strong><code>dist/index.html</code></strong> — 浏览器入口页面（放在 dist 目录）：</p>
+<pre class="hljs"><code><div><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">&quot;zh-CN&quot;</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">&quot;UTF-8&quot;</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>TypeScript Demo - prj_2<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">&quot;app&quot;</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>加载中...<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+    <span class="hljs-comment">&lt;!-- type=&quot;module&quot; 支持 ES6 模块导入 --&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;module&quot;</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;./index.js&quot;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</div></code></pre>
+<h3 id="配置文件-1">配置文件</h3>
+<p><strong><code>tsconfig.json</code></strong> — TypeScript 编译配置（浏览器版）：</p>
+<pre class="hljs"><code><div><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;compilerOptions&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;rootDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./src&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;outDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;target&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;es6&quot;</span><span class="hljs-punctuation">,</span>           <span class="hljs-comment">// 编译目标：ES6（浏览器兼容）</span>
+    <span class="hljs-attr">&quot;module&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;es6&quot;</span><span class="hljs-punctuation">,</span>           <span class="hljs-comment">// 模块系统：ES6 模块（浏览器原生支持）</span>
+    <span class="hljs-attr">&quot;moduleResolution&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;bundler&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;sourceMap&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;strict&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;skipLibCheck&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;include&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;src/**/*&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;exclude&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;node_modules&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;dist&quot;</span><span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</div></code></pre>
+<p><strong><code>package.json</code></strong> — 项目配置：</p>
+<pre class="hljs"><code><div><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;devDependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;typescript&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^6.0.3&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;http-server&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^14.1.1&quot;</span>   <span class="hljs-comment">// 本地静态文件服务器</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</div></code></pre>
+<h3 id="调试步骤逐步说明-1">调试步骤（逐步说明）</h3>
+<p><strong>步骤 1</strong>：按 <code>Ctrl+Shift+D</code> 打开调试面板</p>
+<p><strong>步骤 2</strong>：在顶部下拉框中选择 <strong>&quot;运行 TypeScript (Chrome) - prj_2&quot;</strong></p>
+<pre class="hljs"><code><div>▶ 运行 TypeScript (Chrome) - prj_2    ← 选择这个
+  运行 TypeScript (Node.js) - prj_1
+</div></code></pre>
+<p><strong>步骤 3</strong>：按 <code>F5</code> 启动调试</p>
+<p><strong>步骤 4</strong>：VSCode 自动按顺序执行以下操作：</p>
+<ol>
+<li>触发 <code>preLaunchTask</code>：运行复合任务 <strong>&quot;启动 prj_2&quot;</strong></li>
+<li><strong>第一步</strong>：<code>npx tsc -p tsconfig.json</code> 编译 TypeScript → 生成 <code>dist/index.js</code></li>
+<li><strong>第二步</strong>：<code>npx http-server ./dist -p 8080 -c-1</code> 启动本地 HTTP 服务器</li>
+<li>服务器就绪后，Chrome 自动打开 <code>http://localhost:8080</code></li>
+</ol>
+<p><strong>步骤 5</strong>：Chrome 页面显示 TypeScript 函数的输出结果。</p>
+<p><strong>步骤 6</strong>：调试结束后，在终端面板找到 http-server 进程，按 <code>Ctrl+C</code> 停止服务器。</p>
+<blockquote>
+<p>⚠️ <strong>注意</strong>：如果下次 F5 提示端口被占用，说明上次的 http-server 没有关闭。
+在终端执行 <code>npx kill-port 8080</code> 释放端口后再重试。</p>
+</blockquote>
+<hr>
+<h2 id="vscode-配置文件详解">VSCode 配置文件详解</h2>
+<h3 id="vscodelaunchjson--调试启动配置"><code>.vscode/launch.json</code> — 调试启动配置</h3>
+<blockquote>
+<p><strong>作用</strong>：定义按下 F5 后的调试行为。</p>
+</blockquote>
+<pre class="hljs"><code><div><span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;0.2.0&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;configurations&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+        <span class="hljs-punctuation">{</span>
+            <span class="hljs-comment">// ── prj_2：Chrome 调试配置 ──</span>
+            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;chrome&quot;</span><span class="hljs-punctuation">,</span>                          <span class="hljs-comment">// 调试器类型：Chrome 浏览器</span>
+            <span class="hljs-attr">&quot;request&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;launch&quot;</span><span class="hljs-punctuation">,</span>                       <span class="hljs-comment">// 启动模式</span>
+            <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;运行 TypeScript (Chrome) - prj_2&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-comment">// 显示在下拉框中的名称</span>
+            <span class="hljs-attr">&quot;preLaunchTask&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;启动 prj_2&quot;</span><span class="hljs-punctuation">,</span>             <span class="hljs-comment">// F5 前先执行的任务（编译+启动服务器）</span>
+            <span class="hljs-attr">&quot;url&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http://localhost:8080&quot;</span><span class="hljs-punctuation">,</span>            <span class="hljs-comment">// Chrome 打开的地址</span>
+            <span class="hljs-attr">&quot;webRoot&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;${workspaceFolder}/prj_2/dist&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-comment">// 网页根目录（用于 sourceMap 映射）</span>
+            <span class="hljs-attr">&quot;sourceMaps&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>                        <span class="hljs-comment">// 开启 sourceMap（支持在 .ts 文件打断点）</span>
+            <span class="hljs-attr">&quot;sourceMapPathOverrides&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">&quot;../src/*&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;${workspaceFolder}/prj_2/src/*&quot;</span>
+            <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-punctuation">{</span>
+            <span class="hljs-comment">// ── prj_1：Node.js 调试配置 ──</span>
+            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;node&quot;</span><span class="hljs-punctuation">,</span>                            <span class="hljs-comment">// 调试器类型：Node.js</span>
+            <span class="hljs-attr">&quot;request&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;launch&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;运行 TypeScript (Node.js) - prj_1&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;preLaunchTask&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tsc: build - prj_1/tsconfig.json&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// F5 前先编译</span>
+            <span class="hljs-attr">&quot;program&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;${workspaceFolder}/prj_1/dist/index.js&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// 运行的 JS 文件</span>
+            <span class="hljs-attr">&quot;outFiles&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;${workspaceFolder}/prj_1/dist/**/*.js&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;sourceMaps&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;skipFiles&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;&lt;node_internals&gt;/**&quot;</span><span class="hljs-punctuation">]</span>
+        <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</div></code></pre>
+<p><strong>重要规则</strong>：</p>
+<ul>
+<li><code>configurations</code> 数组中<strong>第一个</strong>配置是 F5 的默认配置</li>
+<li>切换工程时，必须在调试面板顶部下拉框手动选择，VSCode 会记住上次选择</li>
+</ul>
+<h3 id="vscodetasksjson--构建任务配置"><code>.vscode/tasks.json</code> — 构建任务配置</h3>
+<blockquote>
+<p><strong>作用</strong>：定义可执行的构建任务，被 <code>launch.json</code> 的 <code>preLaunchTask</code> 引用。</p>
+</blockquote>
+<pre class="hljs"><code><div><span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2.0.0&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">&quot;tasks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+        <span class="hljs-punctuation">{</span>
+            <span class="hljs-comment">// ── prj_1 编译任务 ──</span>
+            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;shell&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npx tsc -p tsconfig.json&quot;</span><span class="hljs-punctuation">,</span>     <span class="hljs-comment">// 执行的命令</span>
+            <span class="hljs-attr">&quot;options&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">&quot;cwd&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;${workspaceFolder}/prj_1&quot;</span>      <span class="hljs-comment">// 在 prj_1 目录下执行</span>
+            <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;label&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tsc: build - prj_1/tsconfig.json&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-comment">// 任务名（供 launch.json 引用）</span>
+            <span class="hljs-attr">&quot;problemMatcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;$tsc&quot;</span><span class="hljs-punctuation">]</span>                 <span class="hljs-comment">// 识别 tsc 的错误输出</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-punctuation">{</span>
+            <span class="hljs-comment">// ── prj_2 编译任务 ──</span>
+            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;shell&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npx tsc -p tsconfig.json&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;options&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">&quot;cwd&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;${workspaceFolder}/prj_2&quot;</span>
+            <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;label&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tsc: build - prj_2/tsconfig.json&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;problemMatcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;$tsc&quot;</span><span class="hljs-punctuation">]</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-punctuation">{</span>
+            <span class="hljs-comment">// ── prj_2 启动 http-server 任务 ──</span>
+            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;shell&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npx http-server ./dist -p 8080 -c-1&quot;</span><span class="hljs-punctuation">,</span>  <span class="hljs-comment">// -c-1 禁用缓存</span>
+            <span class="hljs-attr">&quot;options&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">&quot;cwd&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;${workspaceFolder}/prj_2&quot;</span>
+            <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;label&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http-server: prj_2&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;isBackground&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>                      <span class="hljs-comment">// 后台持续运行</span>
+            <span class="hljs-attr">&quot;problemMatcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">&quot;pattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;regexp&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^$&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+                <span class="hljs-attr">&quot;background&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                    <span class="hljs-attr">&quot;activeOnStart&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+                    <span class="hljs-attr">&quot;beginsPattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Starting up http-server&quot;</span><span class="hljs-punctuation">,</span>
+                    <span class="hljs-attr">&quot;endsPattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Hit CTRL-C to stop the server&quot;</span>  <span class="hljs-comment">// 检测到此输出则认为服务器就绪</span>
+                <span class="hljs-punctuation">}</span>
+            <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-punctuation">{</span>
+            <span class="hljs-comment">// ── prj_2 复合任务：先编译，再启动服务器 ──</span>
+            <span class="hljs-attr">&quot;label&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;启动 prj_2&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;dependsOrder&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;sequence&quot;</span><span class="hljs-punctuation">,</span>                <span class="hljs-comment">// 按顺序执行</span>
+            <span class="hljs-attr">&quot;dependsOn&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+                <span class="hljs-string">&quot;tsc: build - prj_2/tsconfig.json&quot;</span><span class="hljs-punctuation">,</span>    <span class="hljs-comment">// 第一步：编译</span>
+                <span class="hljs-string">&quot;http-server: prj_2&quot;</span>                   <span class="hljs-comment">// 第二步：启动服务器</span>
+            <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;group&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">&quot;kind&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;build&quot;</span><span class="hljs-punctuation">,</span>
+                <span class="hljs-attr">&quot;isDefault&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span>                      <span class="hljs-comment">// 设为默认构建任务</span>
+            <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</div></code></pre>
+<p><strong>重要规则</strong>：</p>
+<ul>
+<li>PowerShell 不支持 <code>&amp;&amp;</code> 语法，多步骤操作必须用 <code>dependsOn</code> 组合任务，或用 <code>options.cwd</code> 指定工作目录</li>
+<li><code>isBackground: true</code> 用于持续运行的任务（如服务器），需配合 <code>problemMatcher.background</code> 告知 VSCode 何时&quot;就绪&quot;</li>
+</ul>
+<hr>
+<h2 id="两种模式核心区别对比">两种模式核心区别对比</h2>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>prj_1（Node.js 模式）</th>
+<th>prj_2（浏览器模式）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>运行环境</strong></td>
+<td>Node.js</td>
+<td>Chrome 浏览器</td>
+</tr>
+<tr>
+<td><strong>输出位置</strong></td>
+<td>VSCode 调试控制台</td>
+<td>Chrome 网页</td>
+</tr>
+<tr>
+<td><strong>输出方式</strong></td>
+<td><code>console.log()</code></td>
+<td><code>DOM 操作</code>（innerHTML）</td>
+</tr>
+<tr>
+<td><strong>需要服务器</strong></td>
+<td>❌ 不需要</td>
+<td>✅ 需要 http-server</td>
+</tr>
+<tr>
+<td><strong>tsconfig module</strong></td>
+<td><code>nodenext</code></td>
+<td><code>es6</code></td>
+</tr>
+<tr>
+<td><strong>launch.json type</strong></td>
+<td><code>&quot;node&quot;</code></td>
+<td><code>&quot;chrome&quot;</code></td>
+</tr>
+<tr>
+<td><strong>访问协议</strong></td>
+<td>无（直接运行）</td>
+<td><code>http://localhost:8080</code></td>
+</tr>
+<tr>
+<td><strong>HTML 文件</strong></td>
+<td>❌ 不需要</td>
+<td>✅ 需要 index.html</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>命令行工具、后端服务</td>
+<td>网页前端、可视化展示</td>
+</tr>
+</tbody>
+</table>
+<h3 id="数据流对比图">数据流对比图</h3>
+<p><strong>prj_1 数据流：</strong></p>
+<pre class="hljs"><code><div>TypeScript 函数返回值
+        │
+   console.log()
+        │
+   Node.js 标准输出
+        │
+   VSCode 调试控制台
+</div></code></pre>
+<p><strong>prj_2 数据流：</strong></p>
+<pre class="hljs"><code><div>TypeScript 函数返回值
+        │
+   赋值给 JS 变量
+        │
+   document.getElementById(&quot;app&quot;).innerHTML = 变量
+        │
+   浏览器渲染 DOM
+        │
+   Chrome 页面显示
+</div></code></pre>
+<hr>
+<h2 id="常见问题">常见问题</h2>
+<h3 id="q1powershell-报错--不是有效语句分隔符">Q1：PowerShell 报错 <code>&amp;&amp;</code> 不是有效语句分隔符</h3>
+<p><strong>原因</strong>：PowerShell 不支持 <code>&amp;&amp;</code> 语法（这是 bash/cmd 的语法）。</p>
+<p><strong>解决</strong>：在 <code>tasks.json</code> 中使用 <code>options.cwd</code> 指定工作目录，而不是用 <code>cd xxx &amp;&amp; command</code>：</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// ❌ 错误写法</span>
+<span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;cd prj_1 &amp;&amp; npx tsc&quot;</span>
+
+<span class="hljs-comment">// ✅ 正确写法</span>
+<span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npx tsc -p tsconfig.json&quot;</span><span class="hljs-punctuation">,</span>
+<span class="hljs-attr">&quot;options&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;cwd&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;${workspaceFolder}/prj_1&quot;</span> <span class="hljs-punctuation">}</span>
+</div></code></pre>
+<h3 id="q2prj_2-页面显示加载中不更新">Q2：prj_2 页面显示&quot;加载中...&quot;不更新</h3>
+<p><strong>原因</strong>：通过 <code>file://</code> 协议直接打开 HTML 文件时，浏览器 CORS 策略阻止 ES6 模块加载。</p>
+<p><strong>解决</strong>：必须通过 <code>http://</code> 协议访问，即使用 http-server 托管后再访问 <code>http://localhost:8080</code>。</p>
+<h3 id="q3f5-总是运行错误的工程">Q3：F5 总是运行错误的工程</h3>
+<p><strong>原因</strong>：VSCode 记住了上次选择的调试配置。</p>
+<p><strong>解决</strong>：按 <code>Ctrl+Shift+D</code> 打开调试面板，在顶部下拉框手动切换到目标工程的配置，再按 F5。</p>
+<h3 id="q4http-server-端口被占用">Q4：http-server 端口被占用</h3>
+<p><strong>原因</strong>：上次调试结束后 http-server 进程没有关闭。</p>
+<p><strong>解决</strong>：在终端执行以下命令释放端口：</p>
+<pre class="hljs"><code><div>npx <span class="hljs-built_in">kill</span><span class="hljs-literal">-port</span> <span class="hljs-number">8080</span>
+</div></code></pre>
+<h3 id="q5import-路径报错提示需要-js-扩展名">Q5：import 路径报错，提示需要 <code>.js</code> 扩展名</h3>
+<p><strong>原因</strong>：<code>tsconfig.json</code> 中 <code>module</code> 设置为 <code>nodenext</code> 时，ESM 规范要求显式写出文件扩展名。</p>
+<p><strong>解决</strong>：导入时写 <code>.js</code> 扩展名（即使源文件是 <code>.ts</code>，编译后是 <code>.js</code>）：</p>
+<pre class="hljs"><code><div><span class="hljs-comment">// ❌ 错误</span>
+<span class="hljs-keyword">import</span> { greet } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./utils/helper&#x27;</span>;
+
+<span class="hljs-comment">// ✅ 正确</span>
+<span class="hljs-keyword">import</span> { greet } <span class="hljs-keyword">from</span> <span class="hljs-string">&#x27;./utils/helper.js&#x27;</span>;
+</div></code></pre>
+<hr>
+<h2 id="附录">附录</h2>
+<h3 id="a-vscode-目录的作用">A. <code>.vscode</code> 目录的作用</h3>
+<p><code>.vscode</code> 目录是 <strong>VSCode 专属的工作区配置目录</strong>，由 VSCode 自动识别和读取，与项目代码本身无关。</p>
+<pre class="hljs"><code><div>typescript/
+└── .vscode/           ← VSCode 读取此目录下的所有配置文件
+    ├── launch.json    ← 调试配置
+    └── tasks.json     ← 任务配置
+</div></code></pre>
+<p><strong>谁来使用它？</strong></p>
+<table>
+<thead>
+<tr>
+<th>使用者</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>VSCode 编辑器</strong></td>
+<td>打开工作区时自动加载，控制调试、任务、代码风格等行为</td>
+</tr>
+<tr>
+<td><strong>团队协作</strong></td>
+<td>可以提交到 Git，让团队成员共享同一套调试配置</td>
+</tr>
+<tr>
+<td><strong>CI/CD 流程</strong></td>
+<td>不会被 Node.js、tsc、浏览器等读取，仅 VSCode 使用</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ <code>.vscode</code> 目录对 Node.js 运行时、TypeScript 编译器、浏览器<strong>完全透明</strong>，它们不会读取这里的任何内容。</p>
+</blockquote>
+<hr>
+<h3 id="b-launchjson-与-tasksjson-官方参考">B. <code>launch.json</code> 与 <code>tasks.json</code> 官方参考</h3>
+<h4 id="launchjson--调试启动配置"><code>launch.json</code> — 调试启动配置</h4>
+<p><strong>官方文档</strong>：https://code.visualstudio.com/docs/editor/debugging</p>
+<p><strong>本工程中启用的字段含义：</strong></p>
+<pre class="hljs"><code><div><span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;0.2.0&quot;</span><span class="hljs-punctuation">,</span>          <span class="hljs-comment">// launch.json 的格式版本，固定写 &quot;0.2.0&quot;</span>
+    <span class="hljs-attr">&quot;configurations&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>          <span class="hljs-comment">// 调试配置数组，可定义多个，F5 下拉框中逐一显示</span>
+        <span class="hljs-punctuation">{</span>
+            <span class="hljs-comment">// ── Chrome 调试配置（prj_2）──</span>
+            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;chrome&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 调试器类型。&quot;chrome&quot; 表示启动 Chrome 浏览器调试；</span>
+            <span class="hljs-comment">// &quot;node&quot; 表示用 Node.js 运行；&quot;msedge&quot; 表示 Edge 浏览器。</span>
+            <span class="hljs-comment">// VSCode 根据此字段加载对应的调试扩展插件。</span>
+
+            <span class="hljs-attr">&quot;request&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;launch&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 调试请求类型：</span>
+            <span class="hljs-comment">//   &quot;launch&quot;  → VSCode 主动启动目标程序（本工程使用此方式）</span>
+            <span class="hljs-comment">//   &quot;attach&quot;  → VSCode 附加到已经运行中的程序进行调试</span>
+
+            <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;运行 TypeScript (Chrome) - prj_2&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 显示在调试面板下拉框中的名称，可自由命名</span>
+
+            <span class="hljs-attr">&quot;preLaunchTask&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;启动 prj_2&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// F5 按下后，先执行 tasks.json 中 label 为 &quot;启动 prj_2&quot; 的任务，</span>
+            <span class="hljs-comment">// 任务完成后再启动调试器。用于在调试前自动完成编译、启动服务器等准备工作。</span>
+
+            <span class="hljs-attr">&quot;url&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http://localhost:8080&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// Chrome 调试时自动打开的网址</span>
+
+            <span class="hljs-attr">&quot;webRoot&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;${workspaceFolder}/prj_2/dist&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 网页文件的本地根目录。VSCode 用此路径将浏览器中的文件路径</span>
+            <span class="hljs-comment">// 映射回本地文件，从而支持在 .ts 源文件中设置断点。</span>
+
+            <span class="hljs-attr">&quot;sourceMaps&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 开启 Source Map 支持。</span>
+            <span class="hljs-comment">// Source Map 是编译器生成的映射文件（.js.map），记录了</span>
+            <span class="hljs-comment">// 编译后的 .js 代码与原始 .ts 代码之间的行号对应关系。</span>
+            <span class="hljs-comment">// 开启后，即使浏览器运行的是 .js，断点仍可打在 .ts 文件上。</span>
+
+            <span class="hljs-attr">&quot;sourceMapPathOverrides&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">&quot;../src/*&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;${workspaceFolder}/prj_2/src/*&quot;</span>
+            <span class="hljs-punctuation">}</span>
+            <span class="hljs-comment">// Source Map 路径修正规则。</span>
+            <span class="hljs-comment">// 编译器在 .map 文件中记录的源码路径有时是相对路径，</span>
+            <span class="hljs-comment">// 与 VSCode 工作区的实际路径不符，需要用此规则手动纠正映射关系。</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-punctuation">{</span>
+            <span class="hljs-comment">// ── Node.js 调试配置（prj_1）──</span>
+            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;node&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;request&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;launch&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;运行 TypeScript (Node.js) - prj_1&quot;</span><span class="hljs-punctuation">,</span>
+
+            <span class="hljs-attr">&quot;preLaunchTask&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tsc: build - prj_1/tsconfig.json&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// F5 前先执行编译任务</span>
+
+            <span class="hljs-attr">&quot;program&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;${workspaceFolder}/prj_1/dist/index.js&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// Node.js 要执行的入口 JS 文件路径</span>
+
+            <span class="hljs-attr">&quot;outFiles&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;${workspaceFolder}/prj_1/dist/**/*.js&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 告诉调试器编译输出的 JS 文件在哪里，用于 Source Map 查找</span>
+
+            <span class="hljs-attr">&quot;sourceMaps&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 同上，开启 Source Map 支持</span>
+
+            <span class="hljs-attr">&quot;skipFiles&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;&lt;node_internals&gt;/**&quot;</span><span class="hljs-punctuation">]</span>
+            <span class="hljs-comment">// 调试时跳过 Node.js 内部模块的代码（如 fs、path 等），</span>
+            <span class="hljs-comment">// 避免单步调试时误入 Node.js 源码内部</span>
+        <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</div></code></pre>
+<hr>
+<h4 id="tasksjson--构建任务配置"><code>tasks.json</code> — 构建任务配置</h4>
+<p><strong>官方文档</strong>：https://code.visualstudio.com/docs/editor/tasks</p>
+<p><strong>本工程中启用的字段含义：</strong></p>
+<pre class="hljs"><code><div><span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;2.0.0&quot;</span><span class="hljs-punctuation">,</span>          <span class="hljs-comment">// tasks.json 的格式版本，固定写 &quot;2.0.0&quot;</span>
+    <span class="hljs-attr">&quot;tasks&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>                   <span class="hljs-comment">// 任务数组，可定义多个任务</span>
+        <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">&quot;type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;shell&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 任务类型：</span>
+            <span class="hljs-comment">//   &quot;shell&quot;   → 在系统 Shell（PowerShell/bash）中执行命令</span>
+            <span class="hljs-comment">//   &quot;process&quot; → 直接启动一个进程，不经过 Shell</span>
+
+            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npx tsc -p tsconfig.json&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 实际执行的 Shell 命令。</span>
+            <span class="hljs-comment">// npx：临时下载并运行 npm 包中的命令行工具</span>
+            <span class="hljs-comment">// tsc：TypeScript 编译器</span>
+            <span class="hljs-comment">// -p tsconfig.json：指定使用当前目录下的 tsconfig.json 配置文件</span>
+
+            <span class="hljs-attr">&quot;options&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">&quot;cwd&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;${workspaceFolder}/prj_1&quot;</span>
+                <span class="hljs-comment">// cwd = Current Working Directory（当前工作目录）</span>
+                <span class="hljs-comment">// 命令在此目录下执行，等效于先 cd 到该目录再运行命令。</span>
+                <span class="hljs-comment">// PowerShell 不支持 &amp;&amp; 语法，所以用 cwd 代替 &quot;cd xxx &amp;&amp; command&quot;</span>
+            <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+
+            <span class="hljs-attr">&quot;label&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tsc: build - prj_1/tsconfig.json&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 任务的唯一标识名称，launch.json 的 preLaunchTask 通过此名称引用任务</span>
+
+            <span class="hljs-attr">&quot;problemMatcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;$tsc&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 问题匹配器：解析命令输出中的错误信息，并显示在 VSCode 的&quot;问题&quot;面板中。</span>
+            <span class="hljs-comment">// &quot;$tsc&quot; 是 VSCode 内置的 TypeScript 错误格式解析器。</span>
+
+            <span class="hljs-attr">&quot;group&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;build&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 任务分组：</span>
+            <span class="hljs-comment">//   &quot;build&quot; → 构建任务，可通过 Ctrl+Shift+B 触发</span>
+            <span class="hljs-comment">//   &quot;test&quot;  → 测试任务</span>
+
+            <span class="hljs-attr">&quot;presentation&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">&quot;reveal&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;silent&quot;</span><span class="hljs-punctuation">,</span>
+                <span class="hljs-comment">// 终端显示策略：</span>
+                <span class="hljs-comment">//   &quot;always&quot;  → 每次运行都显示终端</span>
+                <span class="hljs-comment">//   &quot;silent&quot;  → 有输出时才显示</span>
+                <span class="hljs-comment">//   &quot;never&quot;   → 从不显示终端</span>
+                <span class="hljs-attr">&quot;close&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span>
+                <span class="hljs-comment">// 任务完成后自动关闭终端面板</span>
+            <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">&quot;command&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;npx http-server ./dist -p 8080 -c-1&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// http-server：轻量级静态文件 HTTP 服务器</span>
+            <span class="hljs-comment">// ./dist：托管 dist 目录下的文件</span>
+            <span class="hljs-comment">// -p 8080：监听 8080 端口</span>
+            <span class="hljs-comment">// -c-1：禁用缓存（-1 表示 Cache-Control: no-cache），</span>
+            <span class="hljs-comment">//        开发时禁用缓存可确保每次刷新都加载最新文件</span>
+
+            <span class="hljs-attr">&quot;isBackground&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 标记为后台任务：任务启动后持续运行，不会阻塞后续步骤。</span>
+            <span class="hljs-comment">// 适用于服务器类任务（一直监听，不会自动退出）。</span>
+
+            <span class="hljs-attr">&quot;problemMatcher&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">&quot;pattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> <span class="hljs-attr">&quot;regexp&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^$&quot;</span> <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+                <span class="hljs-attr">&quot;background&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                    <span class="hljs-attr">&quot;activeOnStart&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+                    <span class="hljs-attr">&quot;beginsPattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Starting up http-server&quot;</span><span class="hljs-punctuation">,</span>
+                    <span class="hljs-comment">// 检测到此输出时，认为后台任务&quot;开始启动&quot;</span>
+                    <span class="hljs-attr">&quot;endsPattern&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Hit CTRL-C to stop the server&quot;</span>
+                    <span class="hljs-comment">// 检测到此输出时，认为后台任务&quot;已就绪&quot;，</span>
+                    <span class="hljs-comment">// VSCode 随即继续执行下一步（启动 Chrome 调试器）</span>
+                <span class="hljs-punctuation">}</span>
+            <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+        <span class="hljs-punctuation">{</span>
+            <span class="hljs-attr">&quot;label&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;启动 prj_2&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-attr">&quot;dependsOrder&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;sequence&quot;</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 依赖任务的执行顺序：</span>
+            <span class="hljs-comment">//   &quot;sequence&quot; → 按 dependsOn 数组顺序，逐个执行</span>
+            <span class="hljs-comment">//   &quot;parallel&quot; → 所有依赖任务同时并行执行</span>
+
+            <span class="hljs-attr">&quot;dependsOn&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span>
+                <span class="hljs-string">&quot;tsc: build - prj_2/tsconfig.json&quot;</span><span class="hljs-punctuation">,</span>  <span class="hljs-comment">// 第一步：编译</span>
+                <span class="hljs-string">&quot;http-server: prj_2&quot;</span>                  <span class="hljs-comment">// 第二步：启动服务器</span>
+            <span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>
+            <span class="hljs-comment">// 此任务本身不执行命令，只是将多个任务组合成一个复合任务，</span>
+            <span class="hljs-comment">// 供 launch.json 的 preLaunchTask 一次性引用。</span>
+
+            <span class="hljs-attr">&quot;group&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+                <span class="hljs-attr">&quot;kind&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;build&quot;</span><span class="hljs-punctuation">,</span>
+                <span class="hljs-attr">&quot;isDefault&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span>
+                <span class="hljs-comment">// 设为默认构建任务，按 Ctrl+Shift+B 时直接执行此任务</span>
+            <span class="hljs-punctuation">}</span>
+        <span class="hljs-punctuation">}</span>
+    <span class="hljs-punctuation">]</span>
+<span class="hljs-punctuation">}</span>
+</div></code></pre>
+<hr>
+<h3 id="c-prj_2-工程配置文件详解">C. <code>prj_2</code> 工程配置文件详解</h3>
+<h4 id="tsconfigjson--typescript-编译器配置"><code>tsconfig.json</code> — TypeScript 编译器配置</h4>
+<p><strong>官方文档</strong>：https://www.typescriptlang.org/tsconfig</p>
+<p><strong>官方字段速查</strong>：https://aka.ms/tsconfig</p>
+<pre class="hljs"><code><div><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;compilerOptions&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;rootDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./src&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-comment">// 源码根目录。tsc 从此目录开始扫描 .ts 文件。</span>
+    <span class="hljs-comment">// 同时影响 outDir 中的目录结构：src/utils/helper.ts → dist/utils/helper.js</span>
+
+    <span class="hljs-attr">&quot;outDir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;./dist&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-comment">// 编译输出目录。所有 .ts 编译生成的 .js 文件都放在这里。</span>
+    <span class="hljs-comment">// dist 目录通常加入 .gitignore，不提交到版本控制。</span>
+
+    <span class="hljs-attr">&quot;target&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;es6&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-comment">// 编译目标版本。tsc 将 TypeScript 代码转换为此版本的 JavaScript。</span>
+    <span class="hljs-comment">// 常用值：</span>
+    <span class="hljs-comment">//   &quot;es5&quot;     → 兼容旧浏览器（IE11）</span>
+    <span class="hljs-comment">//   &quot;es6&quot;     → 现代浏览器（Chrome/Firefox/Safari）← prj_2 使用</span>
+    <span class="hljs-comment">//   &quot;esnext&quot;  → 最新 JS 特性 ← prj_1 使用</span>
+
+    <span class="hljs-attr">&quot;module&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;es6&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-comment">// 模块系统格式。编译后的 JS 使用哪种模块语法。</span>
+    <span class="hljs-comment">// 常用值：</span>
+    <span class="hljs-comment">//   &quot;commonjs&quot;  → Node.js 传统模块（require/module.exports）</span>
+    <span class="hljs-comment">//   &quot;es6&quot;       → ES Module（import/export）← 浏览器原生支持，prj_2 使用</span>
+    <span class="hljs-comment">//   &quot;nodenext&quot;  → Node.js ESM 模式 ← prj_1 使用</span>
+
+    <span class="hljs-attr">&quot;moduleResolution&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;bundler&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-comment">// 模块解析策略。tsc 如何查找 import 的模块文件。</span>
+    <span class="hljs-comment">// 常用值：</span>
+    <span class="hljs-comment">//   &quot;node&quot;     → 模拟 Node.js require() 的查找规则</span>
+    <span class="hljs-comment">//   &quot;bundler&quot;  → 模拟 Webpack/Vite 等打包工具的查找规则（允许省略扩展名）</span>
+    <span class="hljs-comment">//   &quot;nodenext&quot; → Node.js ESM 严格模式（必须写 .js 扩展名）</span>
+
+    <span class="hljs-attr">&quot;sourceMap&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+    <span class="hljs-comment">// 生成 Source Map 文件（.js.map）。</span>
+    <span class="hljs-comment">// Source Map 记录了编译后 JS 代码与原始 TS 代码的行号映射关系，</span>
+    <span class="hljs-comment">// 是 VSCode 断点调试能定位到 .ts 文件的关键。</span>
+
+    <span class="hljs-attr">&quot;strict&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+    <span class="hljs-comment">// 开启所有严格类型检查选项（相当于同时开启以下多个选项）：</span>
+    <span class="hljs-comment">//   strictNullChecks       → 不允许 null/undefined 赋值给其他类型</span>
+    <span class="hljs-comment">//   strictFunctionTypes    → 严格检查函数参数类型</span>
+    <span class="hljs-comment">//   noImplicitAny          → 禁止隐式 any 类型</span>
+    <span class="hljs-comment">//   strictPropertyInitialization → 类属性必须初始化</span>
+    <span class="hljs-comment">// 建议所有新项目都开启。</span>
+
+    <span class="hljs-attr">&quot;skipLibCheck&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span>
+    <span class="hljs-comment">// 跳过对 node_modules 中 .d.ts 声明文件的类型检查。</span>
+    <span class="hljs-comment">// 可以显著加快编译速度，避免因第三方库的类型定义问题导致编译失败。</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;include&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;src/**/*&quot;</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">,</span>    <span class="hljs-comment">// 只编译 src 目录下的文件（** 匹配任意子目录）</span>
+  <span class="hljs-attr">&quot;exclude&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;node_modules&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-string">&quot;dist&quot;</span><span class="hljs-punctuation">]</span>  <span class="hljs-comment">// 排除这两个目录，避免重复编译</span>
+<span class="hljs-punctuation">}</span>
+</div></code></pre>
+<hr>
+<h4 id="packagejson--nodejs-项目清单"><code>package.json</code> — Node.js 项目清单</h4>
+<p><strong>官方文档</strong>：https://docs.npmjs.com/cli/v10/configuring-npm/package-json</p>
+<pre class="hljs"><code><div><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;prj_2&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-comment">// 项目名称。发布到 npm 时作为包名，本地开发时仅作标识。</span>
+
+  <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1.0.0&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-comment">// 项目版本号，遵循语义化版本规范（SemVer）：主版本.次版本.修订号</span>
+  <span class="hljs-comment">// 参考：https://semver.org/lang/zh-CN/</span>
+
+  <span class="hljs-attr">&quot;description&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;TypeScript 输出显示在 Chrome 网页上的 demo&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-comment">// 项目描述，发布到 npm 时显示在包页面上</span>
+
+  <span class="hljs-attr">&quot;scripts&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-comment">// npm 脚本快捷命令，通过 npm run &lt;名称&gt; 执行</span>
+    <span class="hljs-attr">&quot;build&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tsc&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-comment">// npm run build → 执行 tsc 编译</span>
+
+    <span class="hljs-attr">&quot;serve&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;http-server ./dist -p 8080 -o&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-comment">// npm run serve → 启动 http-server，-o 表示自动打开浏览器</span>
+
+    <span class="hljs-attr">&quot;dev&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tsc &amp;&amp; http-server ./dist -p 8080 -o&quot;</span>
+    <span class="hljs-comment">// npm run dev → 编译后立即启动服务器（注意：此处 &amp;&amp; 在 bash 下有效，</span>
+    <span class="hljs-comment">//               PowerShell 中需改用其他方式）</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+
+  <span class="hljs-attr">&quot;devDependencies&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-comment">// 开发依赖：只在开发/编译阶段使用，不会打包进最终产物。</span>
+    <span class="hljs-comment">// 通过 npm install 安装到 node_modules 目录。</span>
+    <span class="hljs-attr">&quot;typescript&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^6.0.3&quot;</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-comment">// TypeScript 编译器（tsc 命令来自此包）</span>
+    <span class="hljs-comment">// ^ 表示兼容版本：允许安装 &gt;=6.0.3 且 &lt;7.0.0 的版本</span>
+
+    <span class="hljs-attr">&quot;http-server&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;^14.1.1&quot;</span>
+    <span class="hljs-comment">// 轻量级静态文件 HTTP 服务器</span>
+  <span class="hljs-punctuation">}</span>
+
+  <span class="hljs-comment">// 注意：prj_2 没有 &quot;dependencies&quot;（运行时依赖），</span>
+  <span class="hljs-comment">// 因为编译后的 JS 直接在浏览器运行，不依赖任何 npm 包。</span>
+<span class="hljs-punctuation">}</span>
+</div></code></pre>
+<blockquote>
+<p><strong><code>dependencies</code> vs <code>devDependencies</code> 区别：</strong></p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>安装时机</th>
+<th>典型内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dependencies</code></td>
+<td>生产环境也需要</td>
+<td>Express、React 等运行时框架</td>
+</tr>
+<tr>
+<td><code>devDependencies</code></td>
+<td>仅开发时需要</td>
+<td>TypeScript、ESLint、测试框架等工具</td>
+</tr>
+</tbody>
+</table>
+</blockquote>
+<hr>
+<h4 id="package-lockjson--依赖版本锁定文件"><code>package-lock.json</code> — 依赖版本锁定文件</h4>
+<p><strong>官方文档</strong>：https://docs.npmjs.com/cli/v10/configuring-npm/package-lock-json</p>
+<pre class="hljs"><code><div><span class="hljs-punctuation">{</span>
+  <span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;prj_2&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;1.0.0&quot;</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;lockfileVersion&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">3</span><span class="hljs-punctuation">,</span>
+  <span class="hljs-comment">// lock 文件格式版本（npm v7+ 使用版本 3）</span>
+
+  <span class="hljs-attr">&quot;requires&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span>
+  <span class="hljs-attr">&quot;packages&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">&quot;&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span> ... <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-comment">// 根项目自身的信息</span>
+
+    <span class="hljs-attr">&quot;node_modules/typescript&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">{</span>
+      <span class="hljs-attr">&quot;version&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;6.0.3&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-comment">// 精确锁定的版本号（不再是 ^6.0.3，而是确切的 6.0.3）</span>
+
+      <span class="hljs-attr">&quot;resolved&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;https://registry.npmjs.org/typescript/-/typescript-6.0.3.tgz&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-comment">// 下载地址（npm 仓库 URL）</span>
+
+      <span class="hljs-attr">&quot;integrity&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;sha512-...&quot;</span><span class="hljs-punctuation">,</span>
+      <span class="hljs-comment">// 文件完整性校验哈希（SHA-512），确保下载的文件未被篡改</span>
+    <span class="hljs-punctuation">}</span>
+  <span class="hljs-punctuation">}</span>
+<span class="hljs-punctuation">}</span>
+</div></code></pre>
+<p><strong>为什么需要 <code>package-lock.json</code>？</strong></p>
+<p><code>package.json</code> 中写的是版本范围（如 <code>^6.0.3</code>），不同时间 <code>npm install</code> 可能安装不同的小版本。<code>package-lock.json</code> 精确记录了<strong>实际安装的每个包的确切版本</strong>，确保团队所有成员、CI 服务器安装的依赖完全一致。</p>
+<blockquote>
+<p>✅ <strong>建议</strong>：<code>package-lock.json</code> 应提交到 Git 版本控制。</p>
+</blockquote>
+<hr>
+<h3 id="d-目录结构含义">D. 目录结构含义</h3>
+<h4 id="node_modules--第三方依赖包目录"><code>node_modules/</code> — 第三方依赖包目录</h4>
+<pre class="hljs"><code><div>prj_2/
+└── node_modules/          ← npm install 后自动生成
+    ├── typescript/        ← TypeScript 编译器本体
+    ├── http-server/       ← http-server 工具
+    └── ...（数十个间接依赖包）
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>生成方式</strong></td>
+<td>执行 <code>npm install</code> 后自动创建</td>
+</tr>
+<tr>
+<td><strong>内容来源</strong></td>
+<td>根据 <code>package.json</code> 中的依赖声明从 npm 仓库下载</td>
+</tr>
+<tr>
+<td><strong>是否提交 Git</strong></td>
+<td>❌ <strong>不提交</strong>，加入 <code>.gitignore</code>。体积庞大（可达数百 MB），其他人 clone 后执行 <code>npm install</code> 重新生成即可</td>
+</tr>
+<tr>
+<td><strong>npx 命令</strong></td>
+<td><code>npx tsc</code> 实际执行的是 <code>node_modules/.bin/tsc</code>，即本地安装的 tsc</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h4 id="src--typescript-源码目录"><code>src/</code> — TypeScript 源码目录</h4>
+<pre class="hljs"><code><div>prj_2/
+└── src/
+    ├── index.ts           ← 主入口文件（你编写和修改的地方）
+    └── utils/
+        └── helper.ts      ← 工具函数模块
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>内容</strong></td>
+<td>你手写的 <code>.ts</code> 源码文件</td>
+</tr>
+<tr>
+<td><strong>是否提交 Git</strong></td>
+<td>✅ <strong>提交</strong>，这是项目的核心代码</td>
+</tr>
+<tr>
+<td><strong>编译关系</strong></td>
+<td><code>tsconfig.json</code> 的 <code>rootDir</code> 指向此目录，tsc 从这里读取源码</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h4 id="dist--编译输出目录"><code>dist/</code> — 编译输出目录</h4>
+<pre class="hljs"><code><div>prj_2/
+└── dist/
+    ├── index.html         ← 手动创建的 HTML 入口（prj_2 特有）
+    ├── index.js           ← 由 src/index.ts 编译生成
+    ├── index.js.map       ← Source Map 文件（用于断点调试）
+    └── utils/
+        ├── helper.js      ← 由 src/utils/helper.ts 编译生成
+        └── helper.js.map
+</div></code></pre>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>内容</strong></td>
+<td>tsc 编译生成的 <code>.js</code> 和 <code>.js.map</code> 文件</td>
+</tr>
+<tr>
+<td><strong>是否提交 Git</strong></td>
+<td>❌ <strong>通常不提交</strong>，加入 <code>.gitignore</code>。可随时通过 <code>npm run build</code> 重新生成</td>
+</tr>
+<tr>
+<td><strong>http-server 托管</strong></td>
+<td>prj_2 中，http-server 托管的正是此目录</td>
+</tr>
+<tr>
+<td><strong>Node.js 执行</strong></td>
+<td>prj_1 中，Node.js 执行的是 <code>dist/index.js</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="e-其他重要配置说明">E. 其他重要配置说明</h3>
+<h4 id="1-workspacefolder-变量">1. <code>${workspaceFolder}</code> 变量</h4>
+<p>VSCode 内置变量，代表当前工作区根目录的绝对路径。</p>
+<pre class="hljs"><code><div>${workspaceFolder} = C:\Users\bertonwang\cocosProjects\typescript
+</div></code></pre>
+<p>在 <code>launch.json</code> 和 <code>tasks.json</code> 中大量使用，避免硬编码绝对路径，使配置可跨机器复用。</p>
+<p><strong>常用 VSCode 内置变量：</strong></p>
+<table>
+<thead>
+<tr>
+<th>变量</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>${workspaceFolder}</code></td>
+<td>工作区根目录</td>
+</tr>
+<tr>
+<td><code>${file}</code></td>
+<td>当前打开的文件路径</td>
+</tr>
+<tr>
+<td><code>${fileBasename}</code></td>
+<td>当前文件名（含扩展名）</td>
+</tr>
+<tr>
+<td><code>${fileDirname}</code></td>
+<td>当前文件所在目录</td>
+</tr>
+<tr>
+<td><code>${env:PATH}</code></td>
+<td>读取系统环境变量</td>
+</tr>
+</tbody>
+</table>
+<p>完整列表：https://code.visualstudio.com/docs/editor/variables-reference</p>
+<hr>
+<h4 id="2-source-map源码映射工作原理">2. Source Map（源码映射）工作原理</h4>
+<pre class="hljs"><code><div>编译过程：
+  src/index.ts  ──tsc──►  dist/index.js
+                           dist/index.js.map   ← 记录行号映射关系
+
+调试过程：
+  浏览器/Node.js 执行 dist/index.js
+        │
+        │ 遇到断点或错误
+        ▼
+  读取 dist/index.js.map
+        │
+        │ 反向映射
+        ▼
+  VSCode 定位到 src/index.ts 的对应行
+</div></code></pre>
+<p><strong>涉及的配置项：</strong></p>
+<ul>
+<li><code>tsconfig.json</code> → <code>&quot;sourceMap&quot;: true</code>：让 tsc 生成 <code>.map</code> 文件</li>
+<li><code>launch.json</code> → <code>&quot;sourceMaps&quot;: true</code>：让调试器使用 <code>.map</code> 文件</li>
+<li><code>launch.json</code> → <code>&quot;sourceMapPathOverrides&quot;</code>：修正路径映射偏差</li>
+</ul>
+<hr>
+<h4 id="3-npx-与-npm-的区别">3. <code>npx</code> 与 <code>npm</code> 的区别</h4>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>npm install</code></td>
+<td>下载依赖包到 <code>node_modules</code></td>
+</tr>
+<tr>
+<td><code>npm run build</code></td>
+<td>执行 <code>package.json</code> 中 <code>scripts.build</code> 定义的命令</td>
+</tr>
+<tr>
+<td><code>npx tsc</code></td>
+<td>直接运行 <code>node_modules/.bin/tsc</code>，无需全局安装 TypeScript</td>
+</tr>
+<tr>
+<td><code>npx http-server</code></td>
+<td>直接运行本地安装的 http-server</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><code>npx</code> 的优势：每个项目可以使用自己版本的工具，不同项目之间互不干扰。</p>
+</blockquote>
+<hr>
+<h4 id="4-gitignore-推荐配置">4. <code>.gitignore</code> 推荐配置</h4>
+<pre class="hljs"><code><div># 依赖包（体积大，可重新生成）
+node_modules/
+
+# 编译输出（可重新生成）
+dist/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+</div></code></pre>
+<blockquote>
+<p><code>.vscode/</code> 目录<strong>建议提交</strong>到 Git，这样团队成员 clone 项目后可以直接使用相同的调试配置。</p>
+</blockquote>
+<hr>
+<p><em>文档生成时间：2026-06-03</em></p>
+
+</body>
+</html>
