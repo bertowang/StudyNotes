@@ -3792,3 +3792,1070 @@ flowchart TD
 ---
 
 > 📖 **总结**：µC/OS-III 是一个设计精良的教学级RTOS。它的代码风格统一、注释详尽、结构清晰，非常适合学习操作系统原理。通过阅读源码，你可以真正理解"调度器如何选择任务"、"上下文切换如何保存/恢复现场"、"同步原语如何实现阻塞与唤醒"这些核心问题。掌握了这些原理，无论将来使用 FreeRTOS、RT-Thread 还是其他 RTOS，都能快速上手。
+
+---
+
+## 十七、调试环境搭建与调试方法
+
+学习 µC/OS-III 源码，光看代码是不够的，**动手跑起来、单步调试**才能真正理解调度器的行为。本章介绍从零搭建调试环境的完整方案。
+
+> 🎯 **好消息**：本工程在 `Ports/` 目录下**自带了 POSIX（Linux/macOS）和 Win32（Windows）两套移植**，可以直接在你的 PC 上用 GCC/MSVC 编译运行，**无需任何嵌入式工具链、无需 QEMU、无需开发板**，这是最简单的入门方式！
+
+---
+
+### 17.1 调试路线总览
+
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                           调试路线选择（由简到难）                              │
+├─────────────────────┬──────────────────────┬──────────────────────────────── ┤
+│  路线A：PC 原生调试  │  路线B：QEMU 模拟器   │  路线C：真实开发板               │
+│  ⭐⭐⭐ 最推荐       │  ⭐⭐ 进阶            │  ⭐ 工程实战                     │
+├─────────────────────┼──────────────────────┼──────────────────────────────── ┤
+│ ✅ 零依赖，直接编译  │ ✅ 无需购买硬件       │ ✅ 真实中断、真实时序             │
+│ ✅ 用 GDB/VS 调试   │ ✅ 模拟 Cortex-M3/M4  │ ✅ 可用 JTAG/SWD 硬件断点        │
+│ ✅ 工程自带移植文件  │ ✅ 支持 GDB 远程调试  │ ✅ 可观察真实 GPIO/外设           │
+│ ✅ Linux/Windows均可 │ ❌ 需安装交叉工具链   │ ❌ 需要购买开发板（50~200元）     │
+│ ❌ 非真实嵌入式环境  │ ❌ 时序与真实硬件有差异│ ❌ 需要调试器（J-Link/ST-Link）   │
+└─────────────────────┴──────────────────────┴──────────────────────────────── ┘
+```
+
+> 💡 **建议**：初学者先走路线A（PC 原生），理解 RTOS 原理后再转路线B/C。
+
+---
+
+### 17.2 路线A：PC 原生调试（最简单，强烈推荐）
+
+#### 17.2.1 核心原理：POSIX/Win32 移植是怎么工作的？
+
+µC/OS-III 的任务切换在嵌入式上依赖 **PendSV 异常 + 汇编代码**，但在 PC 上没有这些硬件。工程提供的 POSIX/Win32 移植用了一个非常聪明的方法：
+
+**用操作系统的线程（Thread）来模拟 RTOS 的任务（Task）**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   POSIX 移植的核心思路                            │
+│                                                                  │
+│  µC/OS-III 任务          ←→         Linux pthread               │
+│  ─────────────────────────────────────────────────────────────  │
+│  每个 Task               ←→         一个 pthread 线程            │
+│  任务"运行"              ←→         线程持有信号量（sem_wait 返回）│
+│  任务"阻塞/切换"         ←→         线程等待信号量（sem_wait 阻塞）│
+│  OSSched() 切换任务      ←→         sem_post 唤醒新线程           │
+│                                     sem_wait 挂起旧线程           │
+│  SysTick 中断            ←→         POSIX timer（定时发信号）     │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+查看 `Ports/POSIX/GNU/os_cpu_c.c` 中的 `OSCtxSw()` 函数，这就是上下文切换的实现：
+
+```c
+// 文件：Ports/POSIX/GNU/os_cpu_c.c
+void  OSCtxSw (void)
+{
+    OS_TCB_EXT_POSIX  *p_tcb_ext_new;   // 即将运行的任务（新任务）的扩展块
+    OS_TCB_EXT_POSIX  *p_tcb_ext_old;   // 即将挂起的任务（旧任务）的扩展块
+
+    OSTaskSwHook();                      // 调用任务切换钩子（可用于统计）
+
+    // 获取新旧任务各自的 POSIX 扩展信息（里面有 pthread 和 sem_t）
+    p_tcb_ext_new = (OS_TCB_EXT_POSIX *)OSTCBHighRdyPtr->ExtPtr;
+    p_tcb_ext_old = (OS_TCB_EXT_POSIX *)OSTCBCurPtr->ExtPtr;
+
+    // 更新当前任务指针（逻辑上完成切换）
+    OSTCBCurPtr = OSTCBHighRdyPtr;
+    OSPrioCur   = OSPrioHighRdy;
+
+    // ① 唤醒新任务对应的线程（sem_post → 新线程从 sem_wait 返回，开始运行）
+    sem_post(&p_tcb_ext_new->Sem);
+
+    // ② 挂起旧任务对应的线程（sem_wait → 旧线程阻塞，让出 CPU）
+    sem_wait(&p_tcb_ext_old->Sem);
+}
+```
+
+**解释**：每个 µC/OS-III 任务背后都有一个 Linux 线程，该线程平时阻塞在 `sem_wait()` 上。当调度器决定切换到某个任务时，就 `sem_post()` 唤醒对应的线程，同时让当前线程 `sem_wait()` 阻塞。这样就用信号量实现了"只有一个任务在运行"的 RTOS 语义。
+
+Win32 移植（`Ports/Win32/Visual_Studio/os_cpu_c.c`）原理完全相同，只是把 `pthread` 换成了 `Windows HANDLE`，把 `sem_t` 换成了 `HANDLE`（Win32 Event 对象）。
+
+---
+
+#### 17.2.2 方案A-1：Linux / macOS + GCC + GDB
+
+**第一步：安装工具（仅需标准 GCC）**
+
+```bash
+# Ubuntu / Debian
+sudo apt install -y gcc gdb make
+
+# macOS（使用 Homebrew）
+brew install gcc gdb
+
+# 验证
+gcc --version   # 应输出 GCC 版本
+gdb --version   # 应输出 GDB 版本
+```
+
+---
+
+**第二步：准备工程文件**
+
+创建如下目录结构（从本工程复制所需文件）：
+
+```
+ucosiii_posix/
+├── Makefile
+├── app/
+│   ├── main.c          ← 应用入口（自己编写）
+│   ├── os_cfg.h        ← 从工程 cfg/ 目录复制并修改
+│   └── os_cfg_app.h    ← 从工程 cfg/ 目录复制并修改
+├── ucos3/              ← 从工程 Source/ 目录复制
+│   ├── os_core.c
+│   ├── os_task.c
+│   ├── os_sem.c
+│   ├── os_mutex.c
+│   ├── os_time.c
+│   ├── os_tick.c
+│   ├── os_prio.c
+│   ├── os_mem.c
+│   ├── os_flag.c
+│   ├── os_q.c
+│   ├── os_tmr.c
+│   ├── os_stat.c
+│   ├── os_dbg.c
+│   └── os.h
+└── port/               ← 从工程 Ports/POSIX/GNU/ 目录复制
+    ├── os_cpu.h
+    └── os_cpu_c.c
+```
+
+---
+
+**第三步：编写 `main.c`（双任务示例）**
+
+```c
+// app/main.c
+#include "os.h"
+#include <stdio.h>
+
+// 任务栈（POSIX 移植下栈大小不重要，但必须提供）
+static CPU_STK  Task1Stk[512];
+static CPU_STK  Task2Stk[512];
+static OS_TCB   Task1TCB;
+static OS_TCB   Task2TCB;
+
+// 信号量，用于任务间同步
+static OS_SEM   MySem;
+
+// ─── 任务1：每隔1秒发送一次信号量 ───
+void Task1(void *p_arg)
+{
+    OS_ERR err;
+    (void)p_arg;
+
+    while (1) {
+        printf("[Task1] 发送信号量...\n");
+        OSSemPost(&MySem, OS_OPT_POST_1, &err);
+
+        OSTimeDlyHMSM(0, 0, 1, 0,          // 延时 1 秒
+                      OS_OPT_TIME_HMSM_STRICT, &err);
+    }
+}
+
+// ─── 任务2：等待信号量，收到后打印 ───
+void Task2(void *p_arg)
+{
+    OS_ERR err;
+    (void)p_arg;
+
+    while (1) {
+        printf("[Task2] 等待信号量...\n");
+        OSSemPend(&MySem, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+        printf("[Task2] 收到信号量！\n");
+    }
+}
+
+int main(void)
+{
+    OS_ERR err;
+
+    // ① 初始化 µC/OS-III 内核
+    OSInit(&err);
+    if (err != OS_ERR_NONE) {
+        printf("OSInit 失败: %d\n", err);
+        return -1;
+    }
+
+    // ② 创建信号量（初始计数为0）
+    OSSemCreate(&MySem, "MySem", 0, &err);
+
+    // ③ 创建任务1（优先级5）
+    OSTaskCreate(&Task1TCB, "Task1", Task1, NULL,
+                 5,                         // 优先级（数字越小优先级越高）
+                 Task1Stk, 64, 512,
+                 0, 0, NULL,
+                 OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR,
+                 &err);
+
+    // ④ 创建任务2（优先级6）
+    OSTaskCreate(&Task2TCB, "Task2", Task2, NULL,
+                 6,
+                 Task2Stk, 64, 512,
+                 0, 0, NULL,
+                 OS_OPT_TASK_STK_CHK | OS_OPT_TASK_STK_CLR,
+                 &err);
+
+    // ⑤ 启动调度器（不会返回）
+    OSStart(&err);
+
+    return 0;
+}
+```
+
+---
+
+**第四步：编写 `Makefile`**
+
+```makefile
+CC      = gcc
+CFLAGS  = -g3 -O0 -Wall \
+           -I app/ \
+           -I ucos3/ \
+           -I port/ \
+           -D_GNU_SOURCE
+
+SRCS    = app/main.c \
+          port/os_cpu_c.c \
+          ucos3/os_core.c \
+          ucos3/os_task.c \
+          ucos3/os_sem.c \
+          ucos3/os_mutex.c \
+          ucos3/os_time.c \
+          ucos3/os_tick.c \
+          ucos3/os_prio.c \
+          ucos3/os_mem.c \
+          ucos3/os_flag.c \
+          ucos3/os_q.c \
+          ucos3/os_tmr.c \
+          ucos3/os_stat.c \
+          ucos3/os_dbg.c
+
+LIBS    = -lpthread -lrt
+
+TARGET  = ucosiii_demo
+
+all:
+	$(CC) $(CFLAGS) $(SRCS) $(LIBS) -o $(TARGET)
+
+clean:
+	rm -f $(TARGET)
+```
+
+---
+
+**第五步：编译并运行**
+
+```bash
+# 编译
+make
+
+# 运行（需要 root 权限，因为 POSIX 移植使用了实时线程优先级）
+sudo ./ucosiii_demo
+
+# 预期输出：
+# [Task2] 等待信号量...
+# [Task1] 发送信号量...
+# [Task2] 收到信号量！
+# [Task2] 等待信号量...
+# [Task1] 发送信号量...
+# [Task2] 收到信号量！
+# ...
+```
+
+> ⚠️ **注意**：POSIX 移植使用了 `SCHED_RR` 实时调度策略，需要 root 权限或设置 `ulimit -r unlimited`。
+
+---
+
+**第六步：用 GDB 调试**
+
+```bash
+# 启动 GDB
+sudo gdb ./ucosiii_demo
+
+# ─── 在关键函数打断点 ───
+(gdb) break OSSched          # 调度器
+(gdb) break OSCtxSw          # 上下文切换（POSIX 版本，纯 C 实现！）
+(gdb) break OSSemPost        # 信号量发送
+(gdb) break OSSemPend        # 信号量等待
+(gdb) break Task1            # 任务1入口
+(gdb) break Task2            # 任务2入口
+
+# 运行
+(gdb) run
+
+# 触发断点后，查看当前任务
+(gdb) print OSTCBCurPtr->NamePtr        # 当前运行的任务名
+(gdb) print OSTCBHighRdyPtr->NamePtr    # 即将切换到的任务名
+(gdb) print OSPrioCur                   # 当前优先级
+
+# 查看就绪列表（优先级5和6的任务）
+(gdb) print OSRdyList[5]
+(gdb) print OSRdyList[6]
+
+# 查看信号量状态
+(gdb) print MySem.Ctr        # 信号量计数值
+(gdb) print MySem.PendList   # 等待该信号量的任务列表
+
+# 单步执行
+(gdb) next    # 下一行
+(gdb) step    # 进入函数
+(gdb) finish  # 执行到函数返回
+
+# 继续运行到下一个断点
+(gdb) continue
+```
+
+---
+
+#### 17.2.3 方案A-2：Windows + VS Code + GCC（MinGW）
+
+**第一步：安装工具**
+
+1. 下载安装 [MSYS2](https://www.msys2.org/)（包含 MinGW-w64 GCC 工具链）
+2. 在 MSYS2 终端中安装工具：
+
+```bash
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-gdb make
+```
+
+3. 安装 VS Code，并安装扩展：
+   - **C/C++**（Microsoft 官方）
+   - **C/C++ Extension Pack**
+
+---
+
+**第二步：使用 Win32 移植文件**
+
+Windows 下使用 `Ports/Win32/Visual_Studio/` 目录的移植文件（不用 POSIX 版本）：
+
+```
+ucosiii_win32/
+├── .vscode/
+│   ├── launch.json      ← 调试配置
+│   └── tasks.json       ← 编译任务配置
+├── app/
+│   └── main.c
+├── ucos3/               ← 同 Linux 版本
+└── port/                ← 使用 Win32 移植
+    ├── os_cpu.h         ← 来自 Ports/Win32/Visual_Studio/
+    └── os_cpu_c.c       ← 来自 Ports/Win32/Visual_Studio/
+```
+
+---
+
+**第三步：配置 VS Code 调试（`.vscode/launch.json`）**
+
+```json
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "调试 µC/OS-III",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/ucosiii_demo.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "C:/msys64/mingw64/bin/gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "编译"
+        }
+    ]
+}
+```
+
+---
+
+**第四步：配置编译任务（`.vscode/tasks.json`）**
+
+```json
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "编译",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "-g3", "-O0",
+                "-I", "app/",
+                "-I", "ucos3/",
+                "-I", "port/",
+                "app/main.c",
+                "port/os_cpu_c.c",
+                "ucos3/os_core.c",
+                "ucos3/os_task.c",
+                "ucos3/os_sem.c",
+                "ucos3/os_mutex.c",
+                "ucos3/os_time.c",
+                "ucos3/os_tick.c",
+                "ucos3/os_prio.c",
+                "ucos3/os_mem.c",
+                "ucos3/os_flag.c",
+                "ucos3/os_q.c",
+                "ucos3/os_tmr.c",
+                "ucos3/os_stat.c",
+                "ucos3/os_dbg.c",
+                "-lwinmm",
+                "-o", "ucosiii_demo.exe"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
+```
+
+---
+
+**第五步：在 VS Code 中调试**
+
+1. 按 `F5` 启动调试
+2. 在源码行号左侧点击设置断点（红点）
+3. 调试工具栏：`F10` 单步跳过，`F11` 单步进入，`F5` 继续运行
+4. 在左侧"变量"面板直接查看 `OSTCBCurPtr`、`OSRdyList` 等内核变量
+
+```
+VS Code 调试界面示意：
+┌─────────────────────────────────────────────────────────────────┐
+│  变量面板                    │  源码编辑区                        │
+│  ─────────────────────────  │  ─────────────────────────────── │
+│  ▼ 局部变量                  │  void OSSched(void)               │
+│    err = OS_ERR_NONE         │  {                                │
+│  ▼ 全局变量                  │      ...                          │
+│    OSTCBCurPtr = 0x...       │  ●   OSTCBHighRdyPtr = ...  ← 断点│
+│      NamePtr = "Task1"       │      if (OSTCBCurPtr !=           │
+│    OSTCBHighRdyPtr = 0x...   │          OSTCBHighRdyPtr) {       │
+│      NamePtr = "Task2"       │          OS_TASK_SW();            │
+│    OSPrioCur = 5             │      }                            │
+│                              │  }                                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+#### 17.2.4 方案A-3：Windows + Visual Studio（最图形化）
+
+如果你已经安装了 Visual Studio（Community 版免费），这是 Windows 上最方便的方案：
+
+**步骤**：
+
+1. 新建"空项目"（C++ 空项目）
+2. 将所有 `.c` 文件添加到项目（包括 `Ports/Win32/Visual_Studio/os_cpu_c.c`）
+3. 在项目属性中添加头文件搜索路径
+4. 直接按 `F5` 编译并调试
+
+**Visual Studio 调试优势**：
+
+```
+✅ 内存窗口：直接查看任意内存地址的内容
+✅ 监视窗口：实时监视 OSTCBCurPtr、OSRdyList 等变量
+✅ 调用堆栈：清晰看到函数调用链
+✅ 条件断点：如"当 OSTCBCurPtr->Prio == 5 时才停下"
+✅ 数据断点：当某个变量的值改变时自动停下（非常强大！）
+```
+
+**数据断点示例**（Visual Studio 独有）：
+
+```
+调试 → 新建断点 → 数据断点
+地址：&OSTCBCurPtr
+字节数：8（64位指针）
+
+效果：每次发生任务切换（OSTCBCurPtr 改变），调试器自动暂停
+      这样你可以精确捕捉每一次任务切换！
+```
+
+---
+
+#### 17.2.5 PC 调试 vs 嵌入式调试的差异说明
+
+在 PC 上调试 µC/OS-III 时，有几点与真实嵌入式环境不同，需要了解：
+
+| 对比项 | PC 原生调试 | 真实嵌入式 |
+|--------|------------|-----------|
+| 上下文切换实现 | `sem_post/sem_wait`（纯C） | PendSV 汇编 |
+| Tick 中断来源 | POSIX timer / Win32 MM Timer | SysTick 硬件定时器 |
+| 任务栈 | 实际上不使用（线程有自己的栈） | 真实使用，栈溢出会崩溃 |
+| 中断嵌套 | 用互斥锁模拟 | 真实硬件中断优先级 |
+| 时序精度 | 受 OS 调度影响，不精确 | 精确到微秒级 |
+| 调试便利性 | ⭐⭐⭐⭐⭐ 极方便 | ⭐⭐⭐ 需要调试器 |
+
+> 💡 **结论**：PC 调试非常适合学习 µC/OS-III 的**逻辑和原理**（调度、同步、通信），但不能替代嵌入式调试来学习**硬件相关**的内容（上下文切换汇编、中断延迟等）。两者结合是最佳学习路径。
+
+---
+
+---
+
+### 17.3 路线B：QEMU + GDB 模拟调试（进阶）
+
+#### 17.3.1 为什么选 QEMU？
+
+本工程的 `Ports/ARM-Cortex-M/ARMv7-M/GNU/` 目录提供了 **GNU 工具链（GCC + GAS）** 的移植文件，这正是 QEMU 所需要的。QEMU 可以完整模拟 ARM Cortex-M3/M4 处理器，包括：
+
+- **SysTick 定时器**（µC/OS-III 的 Tick 中断来源）
+- **PendSV 异常**（上下文切换的触发机制）
+- **SVC 异常**（启动第一个任务）
+- **NVIC 中断控制器**
+
+这三个硬件特性是 µC/OS-III 在 Cortex-M 上运行的核心依赖，QEMU 均能完整模拟。
+
+#### 17.3.2 工具链安装
+
+**Windows 环境（推荐使用 WSL2 或直接 Linux）：**
+
+```bash
+# Ubuntu / Debian
+sudo apt update
+sudo apt install -y gcc-arm-none-eabi gdb-multiarch qemu-system-arm make
+
+# 验证安装
+arm-none-eabi-gcc --version   # 应输出 GCC 版本信息
+qemu-system-arm --version     # 应输出 QEMU 版本信息
+```
+
+---
+
+**工具说明**：
+
+| 工具 | 作用 |
+|------|------|
+| `gcc-arm-none-eabi` | ARM 裸机交叉编译器（将 C 代码编译为 ARM 机器码） |
+| `gdb-multiarch` | 支持多架构的 GDB 调试器 |
+| `qemu-system-arm` | ARM 系统级模拟器（模拟整个 Cortex-M 芯片） |
+| `make` | 构建工具 |
+
+#### 17.3.3 目标板选择：QEMU 的 `mps2-an385`
+
+QEMU 内置了多种 ARM 开发板模型，最适合 µC/OS-III 的是 **`mps2-an385`**（ARM MPS2 评估板，搭载 Cortex-M3）：
+
+```bash
+# 查看 QEMU 支持的所有 ARM 板型
+qemu-system-arm -machine help | grep -i cortex
+
+# 常用板型说明：
+# mps2-an385   → Cortex-M3，128KB SRAM，适合 µC/OS-III
+# mps2-an386   → Cortex-M4（带FPU）
+# lm3s6965evb  → Cortex-M3，TI Stellaris（FreeRTOS 官方示例常用）
+```
+
+---
+
+#### 17.3.4 最小工程结构
+
+要在 QEMU 上跑 µC/OS-III，需要以下文件：
+
+```
+my_ucosiii_demo/
+├── Makefile                    ← 构建脚本
+├── linker.ld                   ← 链接脚本（定义内存布局）
+├── startup.s                   ← 启动文件（向量表 + Reset_Handler）
+├── main.c                      ← 应用入口
+├── os_cfg.h                    ← µC/OS-III 配置
+├── os_cfg_app.h                ← 系统任务配置
+│
+├── uCOS-III/Source/            ← µC/OS-III 内核源码（从本工程复制）
+│   ├── os_core.c
+│   ├── os_task.c
+│   ├── os_sem.c
+│   └── ...（其他 os_*.c）
+│
+└── Ports/ARM-Cortex-M/ARMv7-M/GNU/   ← 移植文件（从本工程复制）
+    ├── os_cpu.h
+    └── os_cpu_a.S
+    （os_cpu_c.c 在 ARMv7-M/ 目录下）
+```
+
+---
+
+#### 17.3.5 关键文件：链接脚本 `linker.ld`
+
+链接脚本告诉编译器如何将代码放入内存，这是嵌入式开发的基础：
+
+```ld
+/* mps2-an385 内存布局：
+   Flash: 0x00000000 起，4MB
+   SRAM:  0x20000000 起，4MB  */
+
+MEMORY
+{
+    FLASH (rx)  : ORIGIN = 0x00000000, LENGTH = 4M
+    SRAM  (rwx) : ORIGIN = 0x20000000, LENGTH = 4M
+}
+
+SECTIONS
+{
+    /* 代码段：放入 Flash */
+    .text :
+    {
+        KEEP(*(.vectors))   /* 向量表必须在最前面！ */
+        *(.text*)           /* 所有代码 */
+        *(.rodata*)         /* 只读数据（字符串常量等） */
+    } > FLASH
+
+    /* 数据段：初始值在 Flash，运行时复制到 SRAM */
+    .data :
+    {
+        _sdata = .;
+        *(.data*)
+        _edata = .;
+    } > SRAM AT > FLASH
+
+    /* BSS 段：未初始化全局变量，放入 SRAM，启动时清零 */
+    .bss :
+    {
+        _sbss = .;
+        *(.bss*)
+        *(COMMON)
+        _ebss = .;
+    } > SRAM
+
+    /* 堆栈顶（用于 MSP 初始化） */
+    _estack = ORIGIN(SRAM) + LENGTH(SRAM);
+}
+```
+
+---
+
+**链接脚本解释**：
+
+- **`MEMORY`**：声明芯片的物理内存区域（Flash 和 SRAM 的起始地址和大小）
+- **`.vectors`**：ARM Cortex-M 的中断向量表，**必须放在 Flash 最开头**（地址 0x00000000），因为复位后 CPU 从这里读取初始 SP 和 PC
+- **`.data AT > FLASH`**：初始化数据的"初始值"存在 Flash 里，但运行时地址在 SRAM，启动代码负责复制
+- **`_estack`**：栈顶地址，放在 SRAM 末尾（ARM 使用满递减栈）
+
+#### 17.3.6 启动文件 `startup.s`
+
+启动文件是芯片上电后执行的第一段代码，负责初始化 C 运行环境：
+
+```asm
+/* startup.s - Cortex-M3 最小启动文件 */
+    .syntax unified
+    .cpu cortex-m3
+    .thumb
+
+/* ========== 中断向量表 ========== */
+    .section .vectors, "a"
+    .word  _estack              /* 0x00: 初始栈顶指针（MSP） */
+    .word  Reset_Handler        /* 0x04: 复位处理函数地址 */
+    .word  Default_Handler      /* 0x08: NMI */
+    .word  Default_Handler      /* 0x0C: HardFault */
+    .word  Default_Handler      /* 0x10: MemManage */
+    .word  Default_Handler      /* 0x14: BusFault */
+    .word  Default_Handler      /* 0x18: UsageFault */
+    .word  0                    /* 0x1C~0x28: 保留 */
+    .word  0
+    .word  0
+    .word  0
+    .word  Default_Handler      /* 0x2C: SVC ← µC/OS-III 用来启动第一个任务 */
+    .word  Default_Handler      /* 0x30: DebugMon */
+    .word  0
+    .word  OS_CPU_PendSVHandler /* 0x38: PendSV ← µC/OS-III 上下文切换！ */
+    .word  OS_CPU_SysTickHandler/* 0x3C: SysTick ← µC/OS-III Tick 中断！ */
+
+/* ========== 复位处理函数 ========== */
+    .section .text
+    .thumb_func
+    .global Reset_Handler
+Reset_Handler:
+    /* 第一步：复制 .data 段（从 Flash 到 SRAM） */
+    ldr  r0, =_sdata
+    ldr  r1, =_edata
+    ldr  r2, =_sidata       /* .data 在 Flash 中的起始地址 */
+copy_data:
+    cmp  r0, r1
+    bge  zero_bss
+    ldr  r3, [r2], #4
+    str  r3, [r0], #4
+    b    copy_data
+
+    /* 第二步：清零 .bss 段 */
+zero_bss:
+    ldr  r0, =_sbss
+    ldr  r1, =_ebss
+    mov  r2, #0
+clear_bss:
+    cmp  r0, r1
+    bge  call_main
+    str  r2, [r0], #4
+    b    clear_bss
+
+    /* 第三步：跳转到 main() */
+call_main:
+    bl   main
+    b    .              /* main() 不应该返回，死循环 */
+
+Default_Handler:
+    b    .              /* 未处理的中断，死循环（方便调试定位） */
+```
+
+---
+
+**启动文件解释**：
+
+- **向量表**：Cortex-M 上电后，硬件自动从地址 0x00000000 读取初始 MSP（主栈指针），从 0x00000004 读取 Reset_Handler 地址并跳转执行
+- **`OS_CPU_PendSVHandler`**：这是 µC/OS-III 的上下文切换入口，在 `os_cpu_a.S` 中实现
+- **`OS_CPU_SysTickHandler`**：这是 µC/OS-III 的 Tick 中断入口，每 1ms 触发一次，驱动整个时间管理系统
+- **复制 `.data`**：全局变量的初始值存在 Flash 里，但运行时需要在 SRAM 中，所以启动时要复制一遍
+- **清零 `.bss`**：未初始化的全局变量（如 `int x;`）C 标准规定初始值为 0，启动代码负责清零
+
+#### 17.3.7 编译与运行
+
+```bash
+# 编译（生成 ELF 文件）
+arm-none-eabi-gcc \
+    -mcpu=cortex-m3 -mthumb \
+    -O0 -g3 \                          # -O0 不优化，-g3 最详细调试信息
+    -T linker.ld \                     # 使用链接脚本
+    startup.s main.c \
+    uCOS-III/Source/*.c \
+    Ports/ARM-Cortex-M/ARMv7-M/GNU/os_cpu_a.S \
+    Ports/ARM-Cortex-M/ARMv7-M/os_cpu_c.c \
+    -I . -I uCOS-III/Source \
+    -o ucosiii_demo.elf
+
+# 启动 QEMU（后台运行，等待 GDB 连接）
+qemu-system-arm \
+    -machine mps2-an385 \              # 选择 Cortex-M3 板型
+    -cpu cortex-m3 \
+    -kernel ucosiii_demo.elf \         # 加载 ELF 文件
+    -nographic \                       # 无图形界面
+    -serial stdio \                    # 串口输出到终端
+    -S \                               # 启动后暂停，等待 GDB 连接
+    -gdb tcp::1234 &                   # 在 1234 端口开启 GDB 服务器
+
+# 启动 GDB 连接调试
+gdb-multiarch ucosiii_demo.elf
+```
+
+---
+
+在 GDB 中执行以下命令连接并开始调试：
+
+```gdb
+# 连接到 QEMU GDB 服务器
+(gdb) target remote :1234
+
+# 加载符号（如果还没加载）
+(gdb) file ucosiii_demo.elf
+
+# 在关键函数设置断点
+(gdb) break OSSched          # 调度器入口
+(gdb) break OSTaskSwHook     # 任务切换钩子
+(gdb) break OS_CPU_PendSVHandler  # 上下文切换汇编入口
+
+# 开始运行
+(gdb) continue
+
+# 触发断点后，查看当前任务
+(gdb) print OSTCBCurPtr->NamePtr   # 当前任务名称
+(gdb) print OSTCBHighRdyPtr->NamePtr  # 即将切换到的任务名称
+
+# 查看就绪列表
+(gdb) print OSRdyList[0]    # 优先级0的就绪列表
+
+# 单步执行
+(gdb) step    # 进入函数内部
+(gdb) next    # 执行下一行（不进入函数）
+(gdb) stepi   # 执行一条汇编指令（调试上下文切换时很有用）
+```
+
+---
+
+#### 17.3.8 调试技巧：观察任务切换
+
+上下文切换是 RTOS 最核心的机制，以下是如何用 GDB 观察它：
+
+```gdb
+# 在 PendSV 处理函数入口打断点（上下文切换的汇编代码）
+(gdb) break OS_CPU_PendSVHandler
+
+# 运行到断点
+(gdb) continue
+
+# 查看切换前的任务
+(gdb) print OSTCBCurPtr->NamePtr
+
+# 查看寄存器（切换前的 CPU 状态）
+(gdb) info registers
+
+# 单步执行汇编，观察栈的变化
+(gdb) stepi
+(gdb) stepi
+# ... 每步执行后查看 SP 寄存器的变化
+
+# 查看栈内容（当前 SP 指向的内存）
+(gdb) x/16xw $sp    # 以16进制显示 SP 处的16个字
+
+# 执行完切换后，查看新任务
+(gdb) print OSTCBCurPtr->NamePtr
+```
+
+---
+
+> 💡 **关键观察点**：在 `OS_CPU_PendSVHandler` 中，你可以看到：
+> 1. 先将 R4-R11 压栈（保存当前任务的寄存器）
+> 2. 将新的 SP 保存到 `OSTCBCurPtr->StkPtr`
+> 3. 调用 `OSTaskSwHook()`（任务切换钩子）
+> 4. 更新 `OSTCBCurPtr = OSTCBHighRdyPtr`
+> 5. 从新任务的 TCB 中恢复 SP
+> 6. 从栈中弹出 R4-R11（恢复新任务的寄存器）
+> 7. 返回（硬件自动弹出 R0-R3, R12, LR, PC, xPSR）
+
+---
+
+### 17.4 路线C：真实开发板调试
+
+#### 17.4.1 推荐开发板
+
+| 开发板 | 芯片 | 调试接口 | 价格 | 推荐理由 |
+|--------|------|----------|------|----------|
+| **STM32F103C8T6（蓝色小板）** | Cortex-M3 | SWD | ~15元 | 最便宜，资料最多 |
+| **STM32F407 Discovery** | Cortex-M4 | SWD（板载ST-Link） | ~80元 | 官方板，无需额外调试器 |
+| **NUCLEO-F401RE** | Cortex-M4 | SWD（板载ST-Link） | ~100元 | 官方板，Arduino接口 |
+| **STM32F429I-DISC1** | Cortex-M4 | SWD（板载ST-Link） | ~150元 | 带LCD，适合做演示 |
+
+> 💡 **最推荐**：STM32F407 Discovery 或 NUCLEO 系列，因为**板载了 ST-Link 调试器**，不需要额外购买调试器，插上 USB 就能调试。
+
+#### 17.4.2 调试器选择
+
+```
+调试器（硬件）
+├── ST-Link V2（约30元）
+│   ├── 支持 STM32 全系列
+│   ├── 支持 SWD 和 JTAG 接口
+│   └── 配合 STM32CubeIDE / OpenOCD 使用
+│
+├── J-Link（正版约2000元，国产兼容版约50元）
+│   ├── 支持几乎所有 ARM 芯片
+│   ├── 速度最快，功能最强
+│   └── 配合 Segger Ozone / J-Link GDB Server 使用
+│
+└── CMSIS-DAP / DAPLink（约20~50元）
+    ├── 开源调试器标准
+    ├── 支持所有 Cortex-M 芯片
+    └── 配合 OpenOCD 使用
+```
+
+#### 17.4.3 IDE 选择
+
+**方案一：STM32CubeIDE（推荐初学者）**
+
+```
+STM32CubeIDE = Eclipse + GCC + ST-Link GDB Server
+优点：免费，一键安装，图形化调试界面
+缺点：只支持 STM32 系列
+
+使用步骤：
+1. 下载安装 STM32CubeIDE（https://www.st.com/stm32cubeide）
+2. 新建工程，选择目标芯片（如 STM32F407VG）
+3. 将 µC/OS-III 源码添加到工程
+4. 选择对应的移植文件：
+   Ports/ARM-Cortex-M/ARMv7-M/GNU/  （GCC 工具链）
+5. 点击 Debug 按钮，自动编译、烧录、启动调试
+```
+
+---
+
+**方案二：Keil MDK（工业界最常用）**
+
+```
+Keil MDK = ARM Compiler + J-Link/ST-Link + µVision IDE
+优点：工业界标准，支持最广泛
+缺点：商业软件（32KB 代码限制的免费版）
+
+移植文件选择：
+Ports/ARM-Cortex-M/ARMv7-M/ARM/   （ARM Compiler 工具链）
+或
+Ports/ARM-Cortex-M/ARMv7-M/IAR/   （IAR 工具链，需要 IAR EWARM）
+```
+
+---
+
+**方案三：VS Code + OpenOCD + GDB（灵活，适合进阶）**
+
+```bash
+# 安装工具
+sudo apt install openocd gdb-multiarch
+
+# 启动 OpenOCD（连接 ST-Link 和目标板）
+openocd -f interface/stlink.cfg \
+        -f target/stm32f4x.cfg
+
+# 另开终端，启动 GDB
+gdb-multiarch ucosiii_demo.elf
+(gdb) target remote :3333    # OpenOCD 默认端口
+(gdb) monitor reset halt     # 复位并暂停
+(gdb) load                   # 烧录程序
+(gdb) continue               # 开始运行
+```
+
+---
+
+### 17.5 Segger SystemView：可视化任务调度
+
+**SystemView** 是 Segger 提供的免费工具，可以**实时录制并可视化 RTOS 的任务调度过程**，是学习 RTOS 最直观的工具之一。
+
+```
+SystemView 能显示什么？
+┌────────────────────────────────────────────────────────────┐
+│  时间轴  │  Task1  ████████░░░░████████░░░░████████        │
+│          │  Task2  ░░░░████░░░░░░░░████░░░░░░░░████        │
+│          │  ISR    ▲        ▲        ▲        ▲            │
+│          │         ↑        ↑        ↑        ↑            │
+│          │       Tick中断  Tick中断  Tick中断  Tick中断      │
+└────────────────────────────────────────────────────────────┘
+可以看到：
+- 每个任务的运行时间和切换时机
+- 中断的触发时刻
+- 任务等待信号量/消息队列的时间
+- CPU 使用率
+```
+
+**集成 SystemView 的步骤**：
+
+```c
+// 1. 下载 SystemView 目标端库（免费）
+//    https://www.segger.com/products/development-tools/systemview/
+
+// 2. 在 os_app_hooks.c 中添加钩子函数
+void  OSTaskSwHook (void)
+{
+    // 通知 SystemView 发生了任务切换
+    SEGGER_SYSVIEW_OnTaskSwitchIn(OSTCBHighRdyPtr->StkPtr);
+}
+
+// 3. 在 main() 中初始化
+int main(void)
+{
+    SEGGER_SYSVIEW_Conf();   // 初始化 SystemView
+    SEGGER_SYSVIEW_Start();  // 开始录制
+    
+    OSInit(&err);
+    // ... 创建任务 ...
+    OSStart(&err);
+}
+```
+
+---
+
+### 17.6 printf 调试：辅助调试方法
+
+对于初学者，最简单的调试方法是**通过串口输出调试信息**：
+
+```c
+// 在任务中打印调试信息
+void  Task1 (void *p_arg)
+{
+    OS_ERR  err;
+    
+    while (DEF_TRUE) {
+        printf("[Task1] 运行中，Tick=%lu\r\n", OSTickCtr);
+        
+        OSSemPost(&MySem, OS_OPT_POST_1, &err);
+        printf("[Task1] 已发送信号量\r\n");
+        
+        OSTimeDlyHMSM(0, 0, 1, 0, OS_OPT_TIME_HMSM_STRICT, &err);
+    }
+}
+
+void  Task2 (void *p_arg)
+{
+    OS_ERR  err;
+    
+    while (DEF_TRUE) {
+        printf("[Task2] 等待信号量...\r\n");
+        OSSemPend(&MySem, 0, OS_OPT_PEND_BLOCKING, NULL, &err);
+        printf("[Task2] 收到信号量！\r\n");
+    }
+}
+```
+
+---
+
+**在 QEMU 中查看串口输出**：
+
+```bash
+# 启动 QEMU 时加上 -serial stdio，串口输出会直接显示在终端
+qemu-system-arm \
+    -machine mps2-an385 \
+    -kernel ucosiii_demo.elf \
+    -nographic \
+    -serial stdio      # ← 串口输出到标准输出
+```
+
+---
+
+**在真实开发板上查看串口输出**：
+
+```bash
+# Linux：使用 minicom 或 screen
+minicom -D /dev/ttyUSB0 -b 115200
+
+# Windows：使用 PuTTY 或 串口助手
+# 波特率：115200，数据位：8，停止位：1，无校验
+```
+
+---
+
+### 17.7 调试 µC/OS-III 的关键断点清单
+
+以下是学习 µC/OS-III 时最有价值的断点位置：
+
+| 断点位置 | 文件 | 观察目的 |
+|----------|------|----------|
+| `OSInit()` | `os_core.c` | 观察内核初始化过程 |
+| `OSStart()` | `os_core.c` | 观察如何启动第一个任务 |
+| `OSSched()` | `os_core.c` | 观察调度器如何选择下一个任务 |
+| `OS_CPU_PendSVHandler` | `os_cpu_a.S` | 观察上下文切换的汇编实现 |
+| `OSTaskCreate()` | `os_task.c` | 观察任务创建时栈的初始化 |
+| `OSTimeDly()` | `os_time.c` | 观察任务如何进入延时等待 |
+| `OSTimeTick()` | `os_time.c` | 观察 Tick 中断如何唤醒任务 |
+| `OSSemPend()` | `os_sem.c` | 观察任务如何阻塞等待信号量 |
+| `OSSemPost()` | `os_sem.c` | 观察信号量如何唤醒等待任务 |
+| `OS_Pend()` | `os_pend_multi.c` | 观察通用阻塞机制 |
+| `OS_Post()` | `os_pend_multi.c` | 观察通用唤醒机制 |
+
+---
+
+### 17.8 常见调试问题与解决
+
+| 问题 | 原因 | 解决方法 |
+|------|------|----------|
+| QEMU 启动后立即崩溃 | 向量表地址错误 | 检查链接脚本，确保 `.vectors` 在 0x00000000 |
+| 程序卡在 `Default_Handler` | 发生了未处理的异常 | 在 `Default_Handler` 打断点，查看 LR 寄存器定位异常类型 |
+| 任务永远不切换 | SysTick 未初始化 | 检查 `OS_CPU_SysTickInit()` 是否被调用 |
+| GDB 无法连接 QEMU | QEMU 未启动或端口冲突 | 确认 QEMU 已启动，检查 1234 端口是否被占用 |
+| 编译报错找不到 `os_cpu.h` | 移植文件路径未添加 | 在 Makefile 中添加 `-I Ports/ARM-Cortex-M/ARMv7-M/GNU` |
+| 栈溢出导致死机 | 任务栈太小 | 增大 `OS_CFG_IDLE_TASK_STK_SIZE`，启用 Redzone 检测 |
+| `printf` 无输出 | 未实现 `_write` 系统调用 | 添加 `write()` 的 newlib 桩函数，将输出重定向到 UART |
+
+---
+
+> 📖 **调试总结**：
+> - **入门首选（路线A）**：直接用 PC 原生调试（Linux GDB 或 Windows VS Code/VS），工程自带 POSIX/Win32 移植，零依赖，5分钟跑起来
+> - **进阶（路线B）**：QEMU + GDB，无需硬件即可模拟真实 Cortex-M3 环境，观察汇编级上下文切换
+> - **实战（路线C）**：真实开发板 + Segger SystemView，可视化观察任务调度时序，最接近工程实际
+> - **最重要的断点**：`OSSched()`（调度决策）和 `OSCtxSw()`（上下文切换），这两个函数是理解 RTOS 调度的核心
