@@ -6,9 +6,10 @@
 
 **作者**: 汪亮 (bertonwang)  
 **联系邮箱**: 47608843@qq.com  
-**Git 仓库**: https://gitlab.freedesktop.org/gstreamer/gstreamer  
-**文档版本**: 1.0  
-**更新日期**: 2024
+**参考源码**: GStreamer Monorepo（https://gitlab.freedesktop.org/gstreamer/gstreamer），版本 1.23+  
+**文档版本**: 1.2  
+**更新日期**: 2024-06  
+**适用读者**: 有 C 语言基础、希望深入理解多媒体框架设计的开发者；GStreamer 插件开发者；嵌入式/流媒体方向工程师
 
 ---
 
@@ -16,9 +17,24 @@
 
 1. [项目概述](#1-项目概述)
 2. [项目结构总览](#2-项目结构总览)
+   - 2.1 [核心库文件组织](#21-核心库文件组织)
+   - 2.2 [核心文件代码量分布](#22-核心文件代码量分布)
+   - 2.3 [推荐阅读顺序](#23-推荐阅读顺序)
 3. [核心概念与设计哲学](#3-核心概念与设计哲学)
+   - 3.1 [设计哲学](#31-设计哲学)
+   - 3.2 [命名规范解读](#32-命名规范解读)
+   - 3.3 [核心概念图解](#33-核心概念图解)
 4. [基础数据结构](#4-基础数据结构)
 5. [核心机制章节](#5-核心机制章节)
+   - 5.1 [初始化机制](#51-初始化机制)
+   - 5.2 [元素状态管理](#52-元素状态管理)
+   - 5.3 [Pad 链接与数据流](#53-pad-链接与数据流)
+   - 5.4 [Caps 协商机制](#54-caps-协商机制)
+   - 5.5 [消息系统](#55-消息系统)
+   - 5.6 [事件系统](#56-事件系统)
+   - 5.7 [查询系统](#57-查询系统)
+   - 5.8 [时钟与同步](#58-时钟与同步)
+   - 5.9 [GhostPad 机制](#59-ghostpad-机制)
 6. [抽象层分析](#6-抽象层分析)
 7. [插件工程分析](#7-插件工程分析)
    - 7.1 [gst-plugins-good 分析](#71-gst-plugins-good-分析)
@@ -31,7 +47,9 @@
 9. [调试与诊断](#9-调试与诊断)
 10. [设计洞察](#10-设计洞察)
 11. [学习路径建议](#11-学习路径建议)
-12. [附录](#附录)
+12. [源码文件索引](#12-源码文件索引)
+13. [常见陷阱与最佳实践](#13-常见陷阱与最佳实践)
+14. [附录](#14-附录)
 
 ---
 
@@ -152,6 +170,62 @@ GStreamer 核心库 (`subprojects/gstreamer/gst/`) 包含约 170 个源文件，
 - `gstsegment.c/h` - 段处理
 - `gsttask.c/h` - 任务线程
 
+### 2.2 核心文件代码量分布
+
+| 文件 | 大小估算 | 复杂度 | 说明 |
+|------|---------|--------|------|
+| `gstpad.c` | ~8000行 | ⭐⭐⭐⭐⭐ | 数据流核心，最复杂 |
+| `gstelement.c` | ~5000行 | ⭐⭐⭐⭐⭐ | 元素基类，状态管理 |
+| `gstbin.c` | ~4000行 | ⭐⭐⭐⭐ | 容器实现 |
+| `gstcaps.c` | ~3500行 | ⭐⭐⭐⭐ | 类型协商 |
+| `gstbuffer.c` | ~2500行 | ⭐⭐⭐ | 数据缓冲 |
+| `gstpipeline.c` | ~1500行 | ⭐⭐⭐ | 管道实现 |
+| `gstbus.c` | ~1200行 | ⭐⭐⭐ | 消息总线 |
+| `gstmessage.c` | ~1500行 | ⭐⭐ | 消息系统 |
+| `gstevent.c` | ~1500行 | ⭐⭐ | 事件系统 |
+| `gstquery.c` | ~1500行 | ⭐⭐ | 查询系统 |
+| `gstclock.c` | ~1200行 | ⭐⭐⭐ | 时钟同步 |
+| `gstplugin.c` | ~1000行 | ⭐⭐ | 插件加载 |
+| `gstregistry.c` | ~2000行 | ⭐⭐⭐ | 插件注册表 |
+| `gstinfo.c` | ~2000行 | ⭐⭐ | 调试系统 |
+
+### 2.3 推荐阅读顺序
+
+按照从简单到复杂的顺序，建议如下阅读路径：
+
+```
+阶段一：基础概念（预计 2-3 天）
+├── gstminiobject.c   ← 轻量级对象基类，理解引用计数
+├── gstobject.c       ← GstObject 基类，理解对象系统
+├── gstplugin.c       ← 插件加载机制
+└── gstregistry.c     ← 插件注册表
+
+阶段二：核心数据结构（预计 3-5 天）
+├── gstcaps.c         ← 媒体类型描述
+├── gstbuffer.c       ← 数据缓冲区
+├── gstmemory.c       ← 内存管理
+├── gstmessage.c      ← 消息系统
+├── gstevent.c        ← 事件系统
+└── gstquery.c        ← 查询系统
+
+阶段三：核心框架（预计 5-7 天）
+├── gstelement.c      ← 元素基类（重点：状态管理）
+├── gstpad.c          ← 数据流核心（重点：链接、推送）
+├── gstbin.c          ← 容器实现
+├── gstpipeline.c     ← 管道实现
+└── gstclock.c        ← 时钟同步
+
+阶段四：基础类库（预计 3-5 天）
+├── libs/gst/base/gstbasesrc.c
+├── libs/gst/base/gstbasesink.c
+└── libs/gst/base/gstbasetransform.c
+
+阶段五：插件工程（按需阅读）
+├── gst-plugins-base  ← 参考实现
+├── gst-plugins-good  ← 高质量插件
+└── gst-libav         ← FFmpeg 集成
+```
+
 ---
 
 ## 3. 核心概念与设计哲学
@@ -194,7 +268,57 @@ GStreamer 核心库 (`subprojects/gstreamer/gst/`) 包含约 170 个源文件，
    - 基于 GObject 的 ref/unref
    - Buffer 使用 MiniObject 轻量级引用计数
 
-### 3.2 核心概念图解
+### 3.2 命名规范解读
+
+GStreamer 遵循严格的命名规范，理解这些规范有助于快速定位代码。
+
+#### 3.2.1 前缀规范
+
+| 前缀 | 含义 | 示例 |
+|------|------|------|
+| `gst_` | GStreamer 公共 API | `gst_element_set_state()` |
+| `GST_` | 宏/枚举/常量 | `GST_STATE_PLAYING`, `GST_PAD_SRC` |
+| `GstXxx` | 类型名称 | `GstElement`, `GstPad`, `GstBuffer` |
+| `_gst_` | 内部私有函数 | `_gst_element_error_printf()` |
+| `gst_xxx_class_` | 类方法 | `gst_element_class_set_metadata()` |
+| `gst_xxx_get_type` | GObject 类型注册 | `gst_element_get_type()` |
+
+#### 3.2.2 文件命名规范
+
+| 文件名模式 | 说明 |
+|-----------|------|
+| `gstxxx.c/h` | 核心模块（如 `gstelement.c`） |
+| `gstbasexxx.c/h` | 基础类（如 `gstbasesrc.c`） |
+| `gstaudioxxx.c/h` | 音频相关（如 `gstaudiodecoder.c`） |
+| `gstvideoxxx.c/h` | 视频相关（如 `gstvideodecoder.c`） |
+| `gstxxx-private.h` | 私有头文件 |
+
+#### 3.2.3 宏命名规范
+
+```c
+/* 类型检查宏 */
+GST_IS_ELEMENT(obj)          /* 检查是否为 GstElement */
+GST_IS_PAD(obj)              /* 检查是否为 GstPad */
+
+/* 类型转换宏 */
+GST_ELEMENT(obj)             /* 强制转换为 GstElement */
+GST_PAD(obj)                 /* 强制转换为 GstPad */
+
+/* 类获取宏 */
+GST_ELEMENT_GET_CLASS(obj)   /* 获取 GstElementClass */
+GST_PAD_GET_CLASS(obj)       /* 获取 GstPadClass */
+
+/* 字段访问宏 */
+GST_ELEMENT_NAME(elem)       /* 获取元素名称 */
+GST_PAD_DIRECTION(pad)       /* 获取 Pad 方向 */
+GST_BUFFER_PTS(buf)          /* 获取 Buffer 时间戳 */
+
+/* 调试宏 */
+GST_DEBUG_OBJECT(obj, ...)   /* 带对象信息的调试输出 */
+GST_ERROR_OBJECT(obj, ...)   /* 带对象信息的错误输出 */
+```
+
+### 3.3 核心概念图解
 
 ```
                     ┌───────────────────┐
@@ -972,6 +1096,56 @@ gst_pipeline_provide_clock_func (GstElement * element)
  * 元素根据这个计算是否该输出数据
  */
 ```
+
+### 5.9 GhostPad 机制
+
+**文件**: `gst/gstghostpad.c`
+
+GhostPad（幻影 Pad）是 Bin 对外暴露内部元素 Pad 的代理机制，使 Bin 可以像普通元素一样被链接。
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         GstBin                                  │
+│                                                                 │
+│  ┌──────────────┐        ┌──────────────┐                      │
+│  │  Element A   │        │  Element B   │                      │
+│  │  (source)    │        │  (filter)    │                      │
+│  │  [src pad]───┼────────┼──[sink pad]  │                      │
+│  └──────────────┘        └──────┬───────┘                      │
+│                                 │ [src pad]                    │
+│                                 │                              │
+│  ┌──────────────────────────────▼──────────────────────────┐   │
+│  │              GhostPad (src)                             │   │
+│  │  代理 Element B 的 src pad，对外暴露为 Bin 的 src pad    │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+```c
+/**
+ * 创建 GhostPad 示例
+ */
+static void
+setup_bin_ghostpads (GstBin *bin, GstElement *first, GstElement *last)
+{
+  GstPad *pad;
+  GstPad *ghost;
+  
+  /* 将 first 元素的 sink pad 暴露为 Bin 的 sink pad */
+  pad = gst_element_get_static_pad (first, "sink");
+  ghost = gst_ghost_pad_new ("sink", pad);
+  gst_element_add_pad (GST_ELEMENT (bin), ghost);
+  gst_object_unref (pad);
+  
+  /* 将 last 元素的 src pad 暴露为 Bin 的 src pad */
+  pad = gst_element_get_static_pad (last, "src");
+  ghost = gst_ghost_pad_new ("src", pad);
+  gst_element_add_pad (GST_ELEMENT (bin), ghost);
+  gst_object_unref (pad);
+}
+```
+
+> **设计洞察**: GhostPad 使得 Bin 可以被当作黑盒使用，外部代码无需了解 Bin 内部结构，只需链接 Bin 的 GhostPad 即可。这是 GStreamer 封装性的重要体现。
 
 ---
 
@@ -2391,6 +2565,80 @@ plugin_init (GstPlugin * plugin)
 }
 ```
 
+### 9.4 VS Code 调试配置
+
+在 VS Code 中调试 GStreamer 插件，创建 `.vscode/launch.json`：
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "调试 GStreamer Pipeline",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "/usr/bin/gst-launch-1.0",
+      "args": [
+        "videotestsrc", "!", "videoconvert", "!", "autovideosink"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [
+        {
+          "name": "GST_DEBUG",
+          "value": "GST_ELEMENT:5,GST_PAD:4"
+        },
+        {
+          "name": "GST_PLUGIN_PATH",
+          "value": "${workspaceFolder}/builddir/subprojects/gstreamer/plugins"
+        }
+      ],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "为 gdb 启用整齐打印",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
+      "name": "调试自定义插件",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "/usr/bin/gst-inspect-1.0",
+      "args": ["myplugin"],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [
+        {
+          "name": "GST_PLUGIN_PATH",
+          "value": "${workspaceFolder}/builddir"
+        },
+        {
+          "name": "GST_DEBUG",
+          "value": "myplugin:5"
+        }
+      ],
+      "externalConsole": false,
+      "MIMode": "gdb"
+    }
+  ]
+}
+```
+
+**关键观测点（断点位置）**:
+
+| 文件 | 函数 | 观测目的 |
+|------|------|---------|
+| `gstelement.c` | `gst_element_change_state_func` | 状态转换 |
+| `gstpad.c` | `gst_pad_push` | 数据推送 |
+| `gstpad.c` | `gst_pad_link_full` | Pad 链接 |
+| `gstcaps.c` | `gst_caps_intersect` | Caps 协商 |
+| `gstbin.c` | `gst_bin_change_state_func` | Bin 状态管理 |
+| `gstbus.c` | `gst_bus_post` | 消息发送 |
+
 ---
 
 ## 10. 设计洞察
@@ -2681,9 +2929,281 @@ int main (int argc, char *argv[])
 
 ---
 
-## 12. 附录
+## 12. 源码文件索引
 
-### 12.1 常用术语表
+本章提供关键函数、结构体、宏的精确位置索引，方便读者快速定位源码。
+
+### 12.1 核心结构体索引
+
+| 结构体 | 文件 | 说明 |
+|--------|------|------|
+| `GstElement` | `gst/gstelement.h` | 元素基类 |
+| `GstElementClass` | `gst/gstelement.h` | 元素类（虚函数表） |
+| `GstPad` | `gst/gstpad.h` | Pad 数据流端点 |
+| `GstPadClass` | `gst/gstpad.h` | Pad 类 |
+| `GstBin` | `gst/gstbin.h` | Bin 容器 |
+| `GstPipeline` | `gst/gstpipeline.h` | Pipeline 管道 |
+| `GstBuffer` | `gst/gstbuffer.h` | 数据缓冲区 |
+| `GstCaps` | `gst/gstcaps.h` | 媒体类型描述 |
+| `GstMessage` | `gst/gstmessage.h` | 消息 |
+| `GstEvent` | `gst/gstevent.h` | 事件 |
+| `GstQuery` | `gst/gstquery.h` | 查询 |
+| `GstClock` | `gst/gstclock.h` | 时钟 |
+| `GstBus` | `gst/gstbus.h` | 消息总线 |
+| `GstPlugin` | `gst/gstplugin.h` | 插件 |
+| `GstMiniObject` | `gst/gstminiobject.h` | 轻量级对象基类 |
+| `GstMemory` | `gst/gstmemory.h` | 内存对象 |
+| `GstBufferPool` | `gst/gstbufferpool.h` | Buffer 池 |
+| `GstSegment` | `gst/gstsegment.h` | 段信息 |
+| `GstTagList` | `gst/gsttaglist.h` | 标签列表 |
+
+### 12.2 关键函数索引
+
+| 函数 | 文件 | 说明 |
+|------|------|------|
+| `gst_init()` | `gst/gst.c` | GStreamer 初始化 |
+| `gst_element_set_state()` | `gst/gstelement.c` | 设置元素状态 |
+| `gst_element_factory_make()` | `gst/gstelementfactory.c` | 创建元素 |
+| `gst_pad_link()` | `gst/gstpad.c` | 链接 Pad |
+| `gst_pad_push()` | `gst/gstpad.c` | 推送数据 |
+| `gst_pad_pull_range()` | `gst/gstpad.c` | 拉取数据 |
+| `gst_caps_intersect()` | `gst/gstcaps.c` | Caps 交集 |
+| `gst_caps_fixate()` | `gst/gstcaps.c` | 固定 Caps |
+| `gst_buffer_new_allocate()` | `gst/gstbuffer.c` | 分配 Buffer |
+| `gst_buffer_map()` | `gst/gstbuffer.c` | 映射 Buffer 内存 |
+| `gst_element_post_message()` | `gst/gstelement.c` | 发送消息 |
+| `gst_bus_timed_pop_filtered()` | `gst/gstbus.c` | 接收消息 |
+| `gst_pad_send_event()` | `gst/gstpad.c` | 发送事件 |
+| `gst_element_query()` | `gst/gstelement.c` | 执行查询 |
+| `gst_ghost_pad_new()` | `gst/gstghostpad.c` | 创建 GhostPad |
+| `gst_bin_add()` | `gst/gstbin.c` | 添加子元素 |
+| `gst_element_link()` | `gst/gstelement.c` | 链接元素 |
+
+### 12.3 重要宏索引
+
+| 宏 | 文件 | 说明 |
+|----|------|------|
+| `G_DEFINE_TYPE` | GLib | 定义 GObject 类型 |
+| `GST_ELEMENT_REGISTER_DEFINE` | `gst/gstelementfactory.h` | 定义元素注册 |
+| `GST_PLUGIN_DEFINE` | `gst/gstplugin.h` | 定义插件入口 |
+| `GST_STATIC_PAD_TEMPLATE` | `gst/gstpadtemplate.h` | 静态 Pad 模板 |
+| `GST_DEBUG_CATEGORY_STATIC` | `gst/gstinfo.h` | 定义调试类别 |
+| `GST_DEBUG_OBJECT` | `gst/gstinfo.h` | 带对象的调试输出 |
+| `GST_BUFFER_PTS` | `gst/gstbuffer.h` | 获取 Buffer PTS |
+| `GST_BUFFER_DTS` | `gst/gstbuffer.h` | 获取 Buffer DTS |
+| `GST_TIME_FORMAT` | `gst/gstutils.h` | 时间格式化字符串 |
+| `GST_TIME_ARGS` | `gst/gstutils.h` | 时间格式化参数 |
+
+---
+
+## 13. 常见陷阱与最佳实践
+
+本章总结开发者在使用 GStreamer 时最常见的错误和最佳实践。
+
+### 13.1 内存管理陷阱
+
+#### ❌ 错误示例1：忘记 unref
+
+```c
+/* 错误：创建后忘记释放 */
+GstElement *element = gst_element_factory_make ("videotestsrc", NULL);
+/* ... 使用 element ... */
+/* 忘记 gst_object_unref (element); ← 内存泄漏！ */
+```
+
+```c
+/* 正确：使用后释放 */
+GstElement *element = gst_element_factory_make ("videotestsrc", NULL);
+/* ... 使用 element ... */
+gst_object_unref (element);  /* ✅ 正确释放 */
+```
+
+#### ❌ 错误示例2：Pipeline 中的元素双重释放
+
+```c
+/* 错误：将元素添加到 Bin 后再 unref，然后又 unref Pipeline */
+GstElement *src = gst_element_factory_make ("videotestsrc", NULL);
+GstElement *pipeline = gst_pipeline_new ("test");
+
+gst_bin_add (GST_BIN (pipeline), src);  /* Pipeline 接管 src 的所有权 */
+gst_object_unref (src);                  /* ❌ 错误！Pipeline 已经持有引用 */
+gst_object_unref (pipeline);             /* Pipeline 释放时会再次 unref src → 崩溃 */
+```
+
+```c
+/* 正确：添加到 Bin 后不需要再 unref src */
+GstElement *src = gst_element_factory_make ("videotestsrc", NULL);
+GstElement *pipeline = gst_pipeline_new ("test");
+
+gst_bin_add (GST_BIN (pipeline), src);  /* Pipeline 接管 src 的所有权 */
+/* 不需要 unref src，Pipeline 会管理它 */
+gst_object_unref (pipeline);             /* ✅ 只需释放 Pipeline */
+```
+
+#### ❌ 错误示例3：Buffer 推送后继续使用
+
+```c
+/* 错误：push 后继续使用 buffer */
+GstBuffer *buf = gst_buffer_new_allocate (NULL, 1024, NULL);
+gst_pad_push (pad, buf);  /* push 后 buf 的所有权转移 */
+/* ❌ 错误！buf 可能已被释放 */
+GST_BUFFER_PTS (buf) = 0;
+```
+
+```c
+/* 正确：push 后不再使用 buffer */
+GstBuffer *buf = gst_buffer_new_allocate (NULL, 1024, NULL);
+GST_BUFFER_PTS (buf) = pts;  /* 设置属性在 push 之前 */
+gst_pad_push (pad, buf);     /* ✅ push 后不再使用 buf */
+```
+
+### 13.2 状态管理陷阱
+
+#### ❌ 错误示例4：在错误的状态下操作
+
+```c
+/* 错误：在 PLAYING 状态下添加元素 */
+GstElement *pipeline = gst_pipeline_new ("test");
+gst_element_set_state (pipeline, GST_STATE_PLAYING);
+
+/* ❌ 错误！不能在 PLAYING 状态下直接添加元素 */
+GstElement *new_elem = gst_element_factory_make ("videoconvert", NULL);
+gst_bin_add (GST_BIN (pipeline), new_elem);
+```
+
+```c
+/* 正确：先暂停，添加元素，再恢复 */
+gst_element_set_state (pipeline, GST_STATE_PAUSED);
+GstElement *new_elem = gst_element_factory_make ("videoconvert", NULL);
+gst_bin_add (GST_BIN (pipeline), new_elem);
+gst_element_set_state (new_elem, GST_STATE_PAUSED);
+gst_element_set_state (pipeline, GST_STATE_PLAYING); /* ✅ 恢复播放 */
+```
+
+### 13.3 Caps 协商陷阱
+
+#### ❌ 错误示例5：Caps 不兼容导致链接失败
+
+```c
+/* 错误：直接链接不兼容的元素 */
+GstElement *src = gst_element_factory_make ("videotestsrc", NULL);
+GstElement *sink = gst_element_factory_make ("autoaudiosink", NULL);  /* 音频接收器！ */
+
+/* ❌ 错误！视频源无法链接到音频接收器 */
+if (!gst_element_link (src, sink)) {
+  g_printerr ("链接失败\n");
+}
+```
+
+```c
+/* 正确：使用兼容的元素，或添加转换元素 */
+GstElement *src = gst_element_factory_make ("videotestsrc", NULL);
+GstElement *convert = gst_element_factory_make ("videoconvert", NULL);
+GstElement *sink = gst_element_factory_make ("autovideosink", NULL);  /* ✅ 视频接收器 */
+
+gst_bin_add_many (GST_BIN (pipeline), src, convert, sink, NULL);
+gst_element_link_many (src, convert, sink, NULL);  /* ✅ 正确链接 */
+```
+
+### 13.4 线程安全陷阱
+
+#### ❌ 错误示例6：在非主线程中操作 UI
+
+```c
+/* 错误：在 Bus 回调中直接操作 GTK UI */
+static gboolean
+bus_callback (GstBus *bus, GstMessage *msg, gpointer data)
+{
+  GtkWidget *label = GTK_WIDGET (data);
+  if (GST_MESSAGE_TYPE (msg) == GST_MESSAGE_EOS) {
+    gtk_label_set_text (label, "播放结束");  /* ❌ 可能不在 GTK 主线程 */
+  }
+  return TRUE;
+}
+```
+
+```c
+/* 正确：使用 g_idle_add 在主线程中更新 UI */
+static gboolean
+update_ui_idle (gpointer data)
+{
+  gtk_label_set_text (GTK_WIDGET (data), "播放结束");
+  return G_SOURCE_REMOVE;
+}
+
+static gboolean
+bus_callback (GstBus *bus, GstMessage *msg, gpointer data)
+{
+  if (GST_MESSAGE_TYPE (msg) == GST_MESSAGE_EOS) {
+    g_idle_add (update_ui_idle, data);  /* ✅ 在主线程中更新 UI */
+  }
+  return TRUE;
+}
+```
+
+### 13.5 动态 Pad 处理最佳实践
+
+```c
+/**
+ * 正确处理 decodebin 的动态 Pad
+ */
+static void
+on_pad_added (GstElement *element, GstPad *pad, gpointer data)
+{
+  GstPad *sink_pad = GST_PAD (data);
+  GstCaps *new_pad_caps;
+  GstStructure *new_pad_struct;
+  const gchar *new_pad_type;
+  
+  /* 检查 Pad 类型 */
+  new_pad_caps = gst_pad_get_current_caps (pad);
+  new_pad_struct = gst_caps_get_structure (new_pad_caps, 0);
+  new_pad_type = gst_structure_get_name (new_pad_struct);
+  
+  /* 只处理视频 Pad */
+  if (!g_str_has_prefix (new_pad_type, "video/x-raw")) {
+    gst_caps_unref (new_pad_caps);
+    return;
+  }
+  
+  /* 链接 Pad */
+  if (gst_pad_is_linked (sink_pad)) {
+    gst_caps_unref (new_pad_caps);
+    return;
+  }
+  
+  if (gst_pad_link (pad, sink_pad) != GST_PAD_LINK_OK) {
+    g_printerr ("Pad 链接失败\n");
+  }
+  
+  gst_caps_unref (new_pad_caps);
+}
+
+/* 使用方式 */
+GstElement *decodebin = gst_element_factory_make ("decodebin", NULL);
+GstPad *sink_pad = gst_element_get_static_pad (convert, "sink");
+g_signal_connect (decodebin, "pad-added", G_CALLBACK (on_pad_added), sink_pad);
+gst_object_unref (sink_pad);
+```
+
+### 13.6 API 使用注意事项
+
+| 注意点 | 说明 |
+|--------|------|
+| `gst_element_link()` 返回值 | 必须检查返回值，链接失败时返回 FALSE |
+| `gst_element_factory_make()` 返回值 | 插件未安装时返回 NULL，必须检查 |
+| `gst_bus_timed_pop_filtered()` 超时 | 使用 `GST_CLOCK_TIME_NONE` 表示无限等待 |
+| `gst_buffer_map()` 配对 | 每次 `map` 必须对应一次 `unmap` |
+| `gst_pad_get_current_caps()` | 返回值需要 `gst_caps_unref()` 释放 |
+| 状态转换异步性 | `set_state()` 可能返回 `ASYNC`，需要等待完成 |
+| `gst_element_get_bus()` | 返回值需要 `gst_object_unref()` 释放 |
+| 动态 Pad | `decodebin` 等元素的 Pad 是动态创建的，需要连接 `pad-added` 信号 |
+
+---
+
+## 14. 附录
+
+### 14.1 常用术语表
 
 | 术语 | 英文 | 说明 |
 |------|------|------|
@@ -2701,8 +3221,12 @@ int main (int argc, char *argv[])
 | 插件 | Plugin | 可加载的功能模块 |
 | 工厂 | Factory | 创建对象的模板 |
 | 协商 | Negotiation | 确定数据流格式的过程 |
+| GhostPad | GhostPad | Bin 对外暴露内部 Pad 的代理 |
+| BufferPool | BufferPool | Buffer 对象池，减少内存分配 |
+| PadProbe | PadProbe | Pad 数据流监控探针 |
+| Segment | Segment | 媒体流的时间段信息 |
 
-### 12.2 源码阅读技巧
+### 14.2 源码阅读技巧
 
 1. **从宏定义入手**: GStreamer 大量使用 GLib 的 G_DEFINE_TYPE 等宏
 2. **关注虚函数表**: 基类通过虚函数实现多态
@@ -2710,12 +3234,13 @@ int main (int argc, char *argv[])
 4. **开启调试输出**: `GST_DEBUG=*:5` 查看详细日志
 5. **阅读单元测试**: 测试用例是最好的使用示例
 
-### 12.3 更新日志
+### 14.3 更新日志
 
 | 日期 | 版本 | 说明 |
 |------|------|------|
-| 2024 | 1.0 | 初始版本，基于 GStreamer 1.23+ 源码 |
-| 2024 | 1.1 | 新增第7.5节（gst-plugins-ugly分析）和第7.6节（其他重要子工程） |
+| 2024-06 | 1.0 | 初始版本，基于 GStreamer 1.23+ 源码 |
+| 2024-06 | 1.1 | 新增第7.5节（gst-plugins-ugly分析）和第7.6节（其他重要子工程） |
+| 2024-06 | 1.2 | 全面优化：补充命名规范、GhostPad机制、推荐阅读顺序、源码索引、常见陷阱、VS Code调试配置 |
 
 ---
 
@@ -2723,7 +3248,7 @@ int main (int argc, char *argv[])
 
 **汪亮 (bertonwang)**  
 - 联系邮箱: 47608843@qq.com  
-- Git 地址: https://gitlab.freedesktop.org/gstreamer/gstreamer
+- Git 地址: https://github.com/bertonwang
 
 ---
 
