@@ -366,6 +366,7 @@
 | 文档 | 简介 |
 | --- | --- |
 | [进程内事件总线-优秀开源库汇总](进程内事件总线-优秀开源库汇总.md) | 主流进程内 Event Bus / Pub-Sub 库横向对比（涵盖 C++/C#/Java/JS/Python/Go/Rust/Swift），含选型决策树与反模式警示 |
+| [eventpp学习指南-从入门到精通](eventpp学习指南-从入门到精通.md) | C++11 Header-Only 事件三件套（`CallbackList` / `EventDispatcher` / `EventQueue`）从零到源码级学习；末章给出**在 eventpp 之上自研 `TopicRouter` 薄总线**的完整设计与底层逻辑（Topic 命名 / 每 Topic 有界队列 / Owner Thread / Epoch 屏障 / 溢出策略），配 120 行最小可运行示例 |
 | [量化交易推荐书籍](量化交易推荐书籍.md) | 量化交易学习书单汇总，按入门→进阶→高阶→延伸分级推荐 |
 | [马蹄形3D 立体可视化.py](马蹄形3D%20立体可视化.py) | 3D 立体可视化脚本示例 |
 
