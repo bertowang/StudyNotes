@@ -85,6 +85,7 @@
 | --- | --- |
 | [GPU编程工具全景](GPU编程工具全景.md) | GPU 编程生态的全景介绍，适合入门 |
 | [M1_GPU编程入门_PyTorch_MPS](M1_GPU编程入门_PyTorch_MPS.md) | 苹果 M1 芯片 GPU 编程入门 |
+| [CUDA线程索引映射详解](CUDA线程索引映射详解.md) | 1D/2D/3D 索引映射推导，及 SIMT/SIMD 与合并访问的底层原理 |
 | [CUDA-AI编程学习指南](CUDA-AI编程学习指南.md) | 面向 AI 场景的 CUDA 编程指南 |
 | [PyTorch自定义CUDA算子学习指南](PyTorch自定义CUDA算子学习指南.md) | PyTorch 中编写自定义 CUDA 算子 |
 | [CUDA-Graphs学习指南](CUDA-Graphs学习指南.md) | CUDA Graphs 减少调度开销的高级特性 |
