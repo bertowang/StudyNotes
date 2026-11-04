@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudyNotes 学习地图 · 160 篇笔记的两种视角</title>
+<style>
+  :root{
+    --bg:#f6f4ef;
+    --surface:#ffffff;
+    --surface-2:#fbfaf6;
+    --ink:#1a1917;
+    --ink-2:#4d4b46;
+    --ink-3:#8a8680;
+    --line:#e7e3da;
+    --line-2:#d9d3c6;
+    --accent:#1f6f5c;
+    --l1:#2f7d5d; --l2:#2563a8; --l3:#a4622a; --l4:#6d4aa8;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%; scroll-behavior:smooth}
+  section[id]{scroll-margin-top:96px}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    font-size:15px; line-height:1.6;
+    background-image:radial-gradient(1200px 420px at 18% -8%, #fffdf8 0%, rgba(255,253,248,0) 60%);
+    background-repeat:no-repeat;
+  }
+  .page{max-width:1180px; margin:0 auto; padding:0 28px 80px}
+  a{color:inherit; text-decoration:none}
+
+  /* ---------- hero ---------- */
+  .hero{padding:58px 0 26px}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--accent); font-weight:600; margin-bottom:18px;
+  }
+  .eyebrow::before{content:""; width:22px; height:1px; background:var(--accent); opacity:.5}
+  h1{
+    margin:0 0 16px; font-size:clamp(30px,4.4vw,46px); line-height:1.18;
+    letter-spacing:-.025em; font-weight:680;
+  }
+  h1 em{font-style:normal; color:var(--accent)}
+  .lede{margin:0; max-width:660px; font-size:15px; line-height:1.9; color:var(--ink-2)}
+  .lede b{color:var(--ink); font-weight:600}
+
+  .stats{display:flex; flex-wrap:wrap; gap:38px; margin:30px 0 22px}
+  .stat .num{font-size:27px; font-weight:660; letter-spacing:-.02em; font-variant-numeric:tabular-nums; line-height:1.2}
+  .stat .num small{font-size:13px; font-weight:500; color:var(--ink-3); margin-left:3px; letter-spacing:0}
+  .stat .lb{font-size:12px; color:var(--ink-3); margin-top:3px}
+
+  .note{
+    margin:22px 0 0; padding:13px 16px; display:flex; gap:10px; align-items:flex-start;
+    background:#fffdf6; border:1px solid #ece4cf; border-left:2px solid #c9a227;
+    border-radius:8px; font-size:12.8px; line-height:1.75; color:#5d5647; max-width:780px;
+  }
+  .note b{color:#3f3a2e; font-weight:600}
+
+  /* ---------- toolbar ---------- */
+  .toolbar{
+    position:sticky; top:0; z-index:30; padding:12px 0 10px;
+    background:rgba(246,244,239,.9); backdrop-filter:saturate(1.6) blur(12px);
+    border-bottom:1px solid var(--line); margin-bottom:26px;
+  }
+  .tb-row{display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+  .tabs{display:inline-flex; background:#eae6dd; border-radius:10px; padding:3px; gap:2px}
+  .tabs button{
+    appearance:none; border:0; background:transparent; cursor:pointer;
+    font-family:inherit; font-size:13px; color:var(--ink-2); font-weight:500;
+    padding:7px 14px; border-radius:8px; transition:.18s; white-space:nowrap;
+  }
+  .tabs button:hover{color:var(--ink)}
+  .tabs button.on{background:#fff; color:var(--ink); box-shadow:0 1px 2px rgba(40,32,18,.1); font-weight:600}
+
+  .search{position:relative; margin-left:auto}
+  .search svg{position:absolute; left:11px; top:50%; transform:translateY(-50%); opacity:.4}
+  #q{
+    width:280px; max-width:46vw; font-family:inherit; font-size:13px; color:var(--ink);
+    padding:8px 32px 8px 32px; border:1px solid var(--line-2); border-radius:99px;
+    background:var(--surface); outline:none; transition:.18s;
+  }
+  #q:focus{border-color:#b9b1a0; box-shadow:0 0 0 3px rgba(31,111,92,.1)}
+  #q::placeholder{color:#a5a099}
+  .clr{
+    position:absolute; right:8px; top:50%; transform:translateY(-50%);
+    border:0; background:none; cursor:pointer; color:#a5a099; font-size:15px; line-height:1; padding:2px 4px;
+    display:none;
+  }
+  .clr.show{display:block}
+
+  .tb-row.second{margin-top:10px; gap:8px; align-items:center}
+  .lgd{display:flex; align-items:center; gap:15px; flex-wrap:wrap}
+  .lgd-lab{font-size:11px; color:#a8a49c}
+  .lgd-i{display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:var(--ink-2);
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace; letter-spacing:.01em}
+  .lgd-i i{width:9px; height:9px; border-radius:2px; flex:none}
+  .chip{
+    appearance:none; font-family:inherit; font-size:12px; cursor:pointer;
+    border:1px solid var(--line-2); background:transparent; color:var(--ink-2);
+    padding:4px 11px; border-radius:99px; transition:.15s; display:inline-flex; align-items:center; gap:5px;
+  }
+  .chip:hover{border-color:#b9b1a0; color:var(--ink)}
+  .chip.on{background:var(--ink); border-color:var(--ink); color:#fff}
+  .chip .d{width:6px; height:6px; border-radius:50%; background:currentColor; opacity:.55}
+  .chip.on .d{opacity:.9}
+  .res{margin-left:auto; font-size:12px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+  .res b{color:var(--ink-2); font-weight:600}
+
+  /* ---------- groups ---------- */
+  .grp{margin:0 0 42px}
+  .gh{display:flex; align-items:flex-start; gap:16px; padding:0 0 14px; border-bottom:1px solid var(--line); margin-bottom:18px}
+  .gnum{
+    font-size:34px; font-weight:700; line-height:1; letter-spacing:-.04em;
+    color:var(--c); opacity:.9; font-variant-numeric:tabular-nums; min-width:44px; padding-top:2px;
+  }
+  .gh h2{margin:0; font-size:19px; font-weight:650; letter-spacing:-.01em; display:flex; align-items:center; gap:9px}
+  .gh h2 .dot{width:9px; height:9px; border-radius:50%; background:var(--c,var(--accent))}
+  .gh p{margin:4px 0 0; font-size:12.6px; color:var(--ink-3); line-height:1.7}
+  .gcount{margin-left:auto; font-size:12px; color:var(--ink-3); white-space:nowrap; font-variant-numeric:tabular-nums; padding-top:6px}
+  .gcount b{color:var(--ink-2); font-weight:600; font-size:14px}
+  .gbar{display:flex; gap:2px; height:4px; width:96px; margin-top:8px; border-radius:99px; overflow:hidden; background:#eae5da}
+  .gbar span{display:block; height:100%}
+
+  .subhead{
+    display:flex; align-items:center; gap:10px; margin:26px 0 12px;
+    font-size:13px; font-weight:600; color:var(--ink-2); letter-spacing:.01em;
+  }
+  .subhead::after{content:""; flex:1; height:1px; background:var(--line)}
+  .subhead .sc{font-weight:400; color:var(--ink-3); font-size:11.5px; font-variant-numeric:tabular-nums}
+  .subhead .dot{width:8px; height:8px; border-radius:50%; flex:none}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(270px,1fr)); gap:13px}
+
+  /* ---------- card ---------- */
+  .card{
+    position:relative; background-color:var(--surface);
+    background-image:linear-gradient(90deg, color-mix(in srgb, var(--lc) 26%, transparent) 0, transparent 64px);
+    border:1px solid var(--line);
+    border-radius:11px; padding:13px 15px 11px; transition:transform .16s, box-shadow .16s, border-color .16s;
+  }
+  .card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:12px;
+    border-radius:11px 0 0 11px; background:var(--lc,#c9c4b9); transition:width .16s}
+  .card:hover::before{width:14px}
+  .card:hover{transform:translateY(-2px); box-shadow:0 8px 20px rgba(45,36,20,.07); border-color:var(--line-2)}
+  .ctop{display:flex; align-items:center; gap:8px; margin-bottom:7px}
+  .lv{
+    display:inline-flex; align-items:center; font-size:10.5px; font-weight:700; letter-spacing:.02em;
+    padding:2px 6px; border-radius:5px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; line-height:1.4;
+    border:1px solid transparent;
+  }
+  .lv .ld{width:6px; height:6px; border-radius:50%; background:currentColor; flex:none; margin-right:5px}
+  .lv1{color:var(--l1); background:rgba(47,125,93,.12); border-color:rgba(47,125,93,.28)}
+  .lv2{color:var(--l2); background:rgba(37,99,168,.12); border-color:rgba(37,99,168,.28)}
+  .lv3{color:var(--l3); background:rgba(164,98,42,.13); border-color:rgba(164,98,42,.3)}
+  .lv4{color:var(--l4); background:rgba(109,74,168,.12); border-color:rgba(109,74,168,.3)}
+  .dom{font-size:11px; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; gap:4px; min-width:0}
+  .dom b{color:var(--dc); font-weight:600; flex:none}
+  .nm{display:block; font-size:15px; font-weight:600; line-height:1.45; letter-spacing:-.01em; margin-bottom:4px}
+  .nm:hover{color:var(--accent)}
+  .ds{margin:0 0 10px; font-size:12.4px; line-height:1.68; color:#6d6a64;
+      display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:2.1em}
+  .cmeta{display:flex; align-items:center; gap:9px; font-size:11px; color:#a09c94; font-variant-numeric:tabular-nums}
+  .cmeta .sep{width:2px; height:2px; border-radius:50%; background:#c9c4b9}
+  .ob{
+    margin-left:auto; border:1px solid var(--line); background:var(--surface-2);
+    color:var(--ink-3); border-radius:5px; padding:1px 6px; font-size:10.5px; cursor:pointer;
+    font-family:inherit; transition:.15s; opacity:0;
+  }
+  .card:hover .ob{opacity:1}
+  .ob:hover{color:var(--accent); border-color:#bcd5cd; background:#f2f8f5}
+  .mk{
+    margin-left:auto; width:15px; height:15px; border-radius:50%; cursor:pointer;
+    border:1px solid var(--line-2); background:transparent; padding:0; transition:.15s; flex:none;
+  }
+  .mk:hover{border-color:var(--l1); background:rgba(47,125,93,.08)}
+  .card.read{background:var(--surface-2); border-color:#ece7dd}
+  .card.read .nm{color:#8d8a83; font-weight:500}
+  .card.read .ds{color:#a8a49c}
+  .card.read .mk{background:var(--l1); border-color:var(--l1); box-shadow:inset 0 0 0 2px #fff}
+  .card.read .mk::after{content:"✓"; display:block; color:#fff; font-size:9px; line-height:13px; text-align:center}
+
+  /* layer view */
+  .stack{position:relative; padding-left:0}
+  .layer-sec{display:grid; grid-template-columns:172px 1fr; gap:24px; padding:0 0 34px}
+  .lrail{position:relative; padding-top:2px}
+  .lrail-in{position:sticky; top:104px}
+  .lrail-in{position:sticky; top:104px}
+  .lrail::before{content:""; position:absolute; right:-11px; top:0; bottom:-34px; width:1px; background:var(--line)}
+  .layer-sec:last-child .lrail::before{bottom:0}
+  .ltag{display:flex; align-items:center; gap:8px; font-size:14px; font-weight:650; line-height:1.4}
+  .ltag .dot{width:8px; height:8px; border-radius:2px; background:var(--c); flex:none}
+  .lrail .lnum{font-family:ui-monospace,Menlo,monospace; font-size:10.5px; color:var(--ink-3); letter-spacing:.06em; margin-bottom:3px}
+  .lrail .ldesc{font-size:11.5px; color:var(--ink-3); line-height:1.7; margin-top:6px; padding-right:6px; overflow-wrap:anywhere}
+  .lrail .lcount{font-size:11px; color:var(--ink-3); margin-top:6px; font-variant-numeric:tabular-nums}
+  .lbody .grid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+
+  .jump{display:flex; flex-wrap:wrap; gap:6px; margin:-4px 0 26px; align-items:center}
+  .jump a{
+    font-size:11.5px; color:var(--ink-2); border:1px solid var(--line); background:var(--surface);
+    padding:3px 9px; border-radius:99px; display:inline-flex; align-items:center; gap:6px; transition:.15s;
+  }
+  .jump a:hover{border-color:var(--line-2); background:#fff; box-shadow:0 1px 3px rgba(40,32,18,.06)}
+  .jump a i{width:6px; height:6px; border-radius:50%; flex:none}
+  .jump a span{color:#a8a49c; font-variant-numeric:tabular-nums}
+  .jump .jlab{font-size:11px; color:#a8a49c; margin-right:2px}
+
+  .empty{text-align:center; padding:70px 20px; color:var(--ink-3); font-size:13.5px}
+  .empty b{display:block; font-size:16px; color:var(--ink-2); margin-bottom:6px; font-weight:600}
+
+  footer{border-top:1px solid var(--line); margin-top:20px; padding-top:20px; font-size:11.5px; color:#a09c94; line-height:1.9}
+  footer code{font-family:ui-monospace,Menlo,monospace; background:#eeeade; padding:1px 5px; border-radius:4px; font-size:10.5px; color:var(--ink-2)}
+
+  @media (max-width:760px){
+    .page{padding:0 16px 60px}
+    .hero{padding-top:36px}
+    .stats{gap:24px}
+    .toolbar .search{margin-left:0; width:100%}
+    #q{width:100%; max-width:none}
+    .layer-sec{grid-template-columns:1fr; gap:12px}
+    .lrail::before{display:none}
+    .lrail .ldesc{display:none}
+    .tabs{width:100%; overflow-x:auto}
+    .tabs button{flex:1; text-align:center}
+  }
+  /* ---------- in-page reader ---------- */
+  .reader{position:fixed; inset:0; z-index:60; visibility:hidden; pointer-events:none}
+  .reader.open{visibility:visible; pointer-events:auto}
+  .reader-backdrop{position:absolute; inset:0; background:rgba(28,24,16,.42); opacity:0; transition:opacity .22s}
+  .reader.open .reader-backdrop{opacity:1}
+  .reader-panel{
+    position:absolute; top:0; right:0; height:100%; width:min(780px,94vw);
+    background:#fff; box-shadow:-18px 0 50px rgba(40,30,12,.18);
+    transform:translateX(100%); transition:transform .26s cubic-bezier(.22,.61,.36,1);
+    display:flex; flex-direction:column;
+  }
+  .reader.open .reader-panel{transform:none}
+  .reader-head{flex:none; padding:16px 24px 12px; border-bottom:1px solid var(--line); background:linear-gradient(180deg,#fff,#fcfbf7)}
+  .reader-meta{display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--ink-3); margin-bottom:6px}
+  .reader-meta .r-dom{font-weight:600; color:var(--ink-2)}
+  .reader-meta .r-lv{padding:1px 6px; border-radius:4px; font-family:ui-monospace,Menlo,monospace; font-size:10.5px; font-weight:700}
+  .reader-title{margin:0; font-size:21px; font-weight:680; letter-spacing:-.01em; line-height:1.3}
+  .reader-actions{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap}
+  .r-btn{
+    appearance:none; font-family:inherit; font-size:12px; cursor:pointer;
+    border:1px solid var(--line-2); background:var(--surface); color:var(--ink-2);
+    padding:5px 11px; border-radius:7px; transition:.15s; text-decoration:none; line-height:1; white-space:nowrap;
+  }
+  .r-btn:hover{border-color:#b9b1a0; color:var(--ink)}
+  .r-btn#readerClose{margin-left:auto}
+  .reader-body{flex:1; overflow:auto; padding:22px 30px 90px; font-size:15px; line-height:1.85; color:#23211d}
+  .reader-body > :first-child{margin-top:0}
+  .reader-body h1,.reader-body h2,.reader-body h3,.reader-body h4{line-height:1.35; margin:26px 0 12px; letter-spacing:-.01em}
+  .reader-body h1{font-size:24px; border-bottom:1px solid var(--line); padding-bottom:8px}
+  .reader-body h2{font-size:20px}
+  .reader-body h3{font-size:17px}
+  .reader-body h4{font-size:15px; color:var(--ink-2)}
+  .reader-body p{margin:12px 0}
+  .reader-body ul,.reader-body ol{margin:12px 0; padding-left:24px}
+  .reader-body li{margin:5px 0}
+  .reader-body a{color:var(--accent); text-decoration:none; border-bottom:1px solid rgba(31,111,92,.3)}
+  .reader-body a:hover{border-bottom-color:var(--accent)}
+  .reader-body a.wl{color:#2563a8; border-bottom:1px dashed #9bb6df; cursor:pointer}
+  .reader-body a.wl:hover{background:#eef4fc}
+  .reader-body a.wl.broken{color:#b4452b; border-bottom-color:#e0a99a}
+  .reader-body a.wl-anchor{color:#6d4aa8; border-bottom:1px dashed #c3a9e0; cursor:pointer}
+  .reader-body code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px}
+  .reader-body :not(pre) > code{background:#f0ede6; padding:1.5px 5px; border-radius:4px; color:#b3452b}
+  .reader-body pre{background:#0f1115; color:#e6e6e6; padding:14px 16px; border-radius:9px; overflow:auto; margin:14px 0; line-height:1.6}
+  .reader-body pre code{color:#e6e6e6; background:none; padding:0}
+  .reader-body table{border-collapse:collapse; width:100%; margin:16px 0; font-size:13.5px; display:block; overflow:auto}
+  .reader-body th,.reader-body td{border:1px solid var(--line); padding:6px 11px; text-align:left}
+  .reader-body th{background:#f7f5ef; font-weight:650}
+  .reader-body blockquote{border-left:3px solid var(--line-2); margin:14px 0; padding:4px 14px; color:var(--ink-2); background:#faf8f3; border-radius:0 6px 6px 0}
+  .reader-body img{max-width:100%; border-radius:6px; margin:10px 0; box-shadow:0 1px 6px rgba(0,0,0,.08)}
+  .reader-body hr{border:none; border-top:1px solid var(--line); margin:22px 0}
+  .reader-body details{border:1px solid var(--line); border-radius:8px; padding:4px 14px; margin:14px 0}
+  .reader-body summary{cursor:pointer; font-weight:600; color:var(--ink-2)}
+
+  .rd-loading{padding:40px 10px; text-align:center; color:var(--ink-3); font-size:13px}
+
+  /* file:// 提示条 */
+  .servehint{
+    position:fixed; left:0; right:0; bottom:0; z-index:70;
+    background:#1f2937; color:#e5e7eb; font-size:12.5px; line-height:1.7;
+    padding:11px 18px; text-align:center; box-shadow:0 -3px 14px rgba(0,0,0,.18);
+  }
+  .servehint code{background:rgba(255,255,255,.12); padding:1px 6px; border-radius:4px; font-family:ui-monospace,Menlo,monospace; color:#fff}
+  .servehint b{color:#fff}
+
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="hero">
+  <div class="eyebrow">StudyNotes · 学习地图</div>
+  <h1><span id="h-n">160</span> 篇笔记，<em>两种看法</em></h1>
+  <p class="lede">同一份文档集合，按<b>知识领域</b>归成技术地图、按<b>技术栈分层</b>放回工程位置——两种视角交叉定位，任一视图都可叠加搜索，点击标题<b>在页内无缝阅读</b>（运行时读取并渲染 .md）。</p>
+
+  <div class="stats">
+    <div class="stat"><div class="num" id="s-docs">160<small>篇</small></div><div class="lb">独立文档</div></div>
+    <div class="stat"><div class="num" id="s-ch">0<small>万字</small></div><div class="lb">正文总量</div></div>
+    <div class="stat"><div class="num" id="s-req">0<small>小时</small></div><div class="lb">通读所需</div></div>
+    <div class="stat"><div class="num" id="s-read">0<small>/160</small></div><div class="lb">我已读完</div></div>
+  </div>
+
+  <div class="note">
+    <span>◈</span>
+    <div><b>本次分析发现：</b>README 索引未收录 11 篇文档，其中 10 篇是成体系的「游戏设计 / 数值设计」系列，1 篇是《游戏开发者数学 · 动态 BVH》。本页已为它们补上 <b>游戏设计与数值</b> 这一子类，并标出与 README 不同的几处归类调整。</div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="tb-row">
+    <div class="tabs" id="tabs">
+      <button data-view="domain" class="on">知识领域</button>
+      <button data-view="layer">技术栈分层</button>
+    </div>
+    <div class="search">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4 14 14"/></svg>
+      <input id="q" type="search" placeholder="搜索标题、摘要、关键词…  按 /" autocomplete="off">
+      <button class="clr" id="clr" aria-label="清除">×</button>
+    </div>
+  </div>
+  <div class="tb-row second" id="lvchips"></div>
+</div>
+
+<main id="view"></main>
+
+<div class="reader" id="reader" aria-hidden="true">
+  <div class="reader-backdrop" id="readerBackdrop"></div>
+  <aside class="reader-panel" role="dialog" aria-modal="true">
+    <header class="reader-head">
+      <div class="reader-meta"><span class="r-dom"></span><span class="r-lv"></span></div>
+      <h2 class="reader-title"></h2>
+      <div class="reader-actions">
+        <button class="r-btn" id="readerBack" title="返回上一篇">‹ 返回</button>
+        <button class="r-btn" id="readerObs" title="在 Obsidian 中打开">Obsidian</button>
+        <a class="r-btn" id="readerRaw" target="_blank" rel="noopener" title="打开原始 .md 文件">原始文件 ↗</a>
+        <button class="r-btn" id="readerClose" title="关闭（Esc）">✕</button>
+      </div>
+    </header>
+    <div class="reader-body" id="readerBody"></div>
+  </aside>
+</div>
+
+<footer>
+  分类口径：<b>分层</b>参照业界技术栈分层习惯（数学 → 硬件 → 系统 → 编译 → 运行时 → 框架 → 应用架构）；卡片左上角的 <b>L1–L4</b> 小标签仍按文档定位、前置门槛与篇幅标注入门到专业的难度，仅作参考。<br>
+  与 README 的差异：新增「游戏设计与数值」子类（10 篇）；「其他综合主题」升级为「架构 · 中间件 · 跨域」；Zabbix / SPDK 归入「存储与可观测」；Eigen 归入「代数、变换与数值」。<br>
+  数据来自目录实时扫描：<code>160</code> 篇 <code>.md</code>，另有 <code>assets/</code> <code>images/</code> <code>code/</code> 三个附属目录。已读状态保存在浏览器本地。<br>
+  页内阅读为<b>运行时</b>行为：通过本地服务器 <code>fetch</code> 对应的 <code>.md</code> 并用内嵌 Markdown 引擎当场渲染（含表格、代码块、<code>[[双链]]</code> 互链与 <code>![[图片]]</code>）。直接双击以 <code>file://</code> 打开时，浏览器禁止读取本地文件，会回退为打开 .md 原文。
+</footer>
+
+</div>
+
+<div class="servehint" id="servehint" hidden></div>
+
+<script>/**
+ * marked v12.0.2 - a markdown parser
+ * Copyright (c) 2011-2024, Christopher Jeffrey. (MIT Licensed)
+ * https://github.com/markedjs/marked
+ */
+!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?t(exports):"function"==typeof define&&define.amd?define(["exports"],t):t((e="undefined"!=typeof globalThis?globalThis:e||self).marked={})}(this,(function(e){"use strict";function t(){return{async:!1,breaks:!1,extensions:null,gfm:!0,hooks:null,pedantic:!1,renderer:null,silent:!1,tokenizer:null,walkTokens:null}}function n(t){e.defaults=t}e.defaults={async:!1,breaks:!1,extensions:null,gfm:!0,hooks:null,pedantic:!1,renderer:null,silent:!1,tokenizer:null,walkTokens:null};const s=/[&<>"']/,r=new RegExp(s.source,"g"),i=/[<>"']|&(?!(#\d{1,7}|#[Xx][a-fA-F0-9]{1,6}|\w+);)/,l=new RegExp(i.source,"g"),o={"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"},a=e=>o[e];function c(e,t){if(t){if(s.test(e))return e.replace(r,a)}else if(i.test(e))return e.replace(l,a);return e}const h=/&(#(?:\d+)|(?:#x[0-9A-Fa-f]+)|(?:\w+));?/gi;function p(e){return e.replace(h,((e,t)=>"colon"===(t=t.toLowerCase())?":":"#"===t.charAt(0)?"x"===t.charAt(1)?String.fromCharCode(parseInt(t.substring(2),16)):String.fromCharCode(+t.substring(1)):""))}const u=/(^|[^\[])\^/g;function k(e,t){let n="string"==typeof e?e:e.source;t=t||"";const s={replace:(e,t)=>{let r="string"==typeof t?t:t.source;return r=r.replace(u,"$1"),n=n.replace(e,r),s},getRegex:()=>new RegExp(n,t)};return s}function g(e){try{e=encodeURI(e).replace(/%25/g,"%")}catch(e){return null}return e}const f={exec:()=>null};function d(e,t){const n=e.replace(/\|/g,((e,t,n)=>{let s=!1,r=t;for(;--r>=0&&"\\"===n[r];)s=!s;return s?"|":" |"})).split(/ \|/);let s=0;if(n[0].trim()||n.shift(),n.length>0&&!n[n.length-1].trim()&&n.pop(),t)if(n.length>t)n.splice(t);else for(;n.length<t;)n.push("");for(;s<n.length;s++)n[s]=n[s].trim().replace(/\\\|/g,"|");return n}function x(e,t,n){const s=e.length;if(0===s)return"";let r=0;for(;r<s;){const i=e.charAt(s-r-1);if(i!==t||n){if(i===t||!n)break;r++}else r++}return e.slice(0,s-r)}function b(e,t,n,s){const r=t.href,i=t.title?c(t.title):null,l=e[1].replace(/\\([\[\]])/g,"$1");if("!"!==e[0].charAt(0)){s.state.inLink=!0;const e={type:"link",raw:n,href:r,title:i,text:l,tokens:s.inlineTokens(l)};return s.state.inLink=!1,e}return{type:"image",raw:n,href:r,title:i,text:c(l)}}class w{options;rules;lexer;constructor(t){this.options=t||e.defaults}space(e){const t=this.rules.block.newline.exec(e);if(t&&t[0].length>0)return{type:"space",raw:t[0]}}code(e){const t=this.rules.block.code.exec(e);if(t){const e=t[0].replace(/^ {1,4}/gm,"");return{type:"code",raw:t[0],codeBlockStyle:"indented",text:this.options.pedantic?e:x(e,"\n")}}}fences(e){const t=this.rules.block.fences.exec(e);if(t){const e=t[0],n=function(e,t){const n=e.match(/^(\s+)(?:```)/);if(null===n)return t;const s=n[1];return t.split("\n").map((e=>{const t=e.match(/^\s+/);if(null===t)return e;const[n]=t;return n.length>=s.length?e.slice(s.length):e})).join("\n")}(e,t[3]||"");return{type:"code",raw:e,lang:t[2]?t[2].trim().replace(this.rules.inline.anyPunctuation,"$1"):t[2],text:n}}}heading(e){const t=this.rules.block.heading.exec(e);if(t){let e=t[2].trim();if(/#$/.test(e)){const t=x(e,"#");this.options.pedantic?e=t.trim():t&&!/ $/.test(t)||(e=t.trim())}return{type:"heading",raw:t[0],depth:t[1].length,text:e,tokens:this.lexer.inline(e)}}}hr(e){const t=this.rules.block.hr.exec(e);if(t)return{type:"hr",raw:t[0]}}blockquote(e){const t=this.rules.block.blockquote.exec(e);if(t){let e=t[0].replace(/\n {0,3}((?:=+|-+) *)(?=\n|$)/g,"\n    $1");e=x(e.replace(/^ *>[ \t]?/gm,""),"\n");const n=this.lexer.state.top;this.lexer.state.top=!0;const s=this.lexer.blockTokens(e);return this.lexer.state.top=n,{type:"blockquote",raw:t[0],tokens:s,text:e}}}list(e){let t=this.rules.block.list.exec(e);if(t){let n=t[1].trim();const s=n.length>1,r={type:"list",raw:"",ordered:s,start:s?+n.slice(0,-1):"",loose:!1,items:[]};n=s?`\\d{1,9}\\${n.slice(-1)}`:`\\${n}`,this.options.pedantic&&(n=s?n:"[*+-]");const i=new RegExp(`^( {0,3}${n})((?:[\t ][^\\n]*)?(?:\\n|$))`);let l="",o="",a=!1;for(;e;){let n=!1;if(!(t=i.exec(e)))break;if(this.rules.block.hr.test(e))break;l=t[0],e=e.substring(l.length);let s=t[2].split("\n",1)[0].replace(/^\t+/,(e=>" ".repeat(3*e.length))),c=e.split("\n",1)[0],h=0;this.options.pedantic?(h=2,o=s.trimStart()):(h=t[2].search(/[^ ]/),h=h>4?1:h,o=s.slice(h),h+=t[1].length);let p=!1;if(!s&&/^ *$/.test(c)&&(l+=c+"\n",e=e.substring(c.length+1),n=!0),!n){const t=new RegExp(`^ {0,${Math.min(3,h-1)}}(?:[*+-]|\\d{1,9}[.)])((?:[ \t][^\\n]*)?(?:\\n|$))`),n=new RegExp(`^ {0,${Math.min(3,h-1)}}((?:- *){3,}|(?:_ *){3,}|(?:\\* *){3,})(?:\\n+|$)`),r=new RegExp(`^ {0,${Math.min(3,h-1)}}(?:\`\`\`|~~~)`),i=new RegExp(`^ {0,${Math.min(3,h-1)}}#`);for(;e;){const a=e.split("\n",1)[0];if(c=a,this.options.pedantic&&(c=c.replace(/^ {1,4}(?=( {4})*[^ ])/g,"  ")),r.test(c))break;if(i.test(c))break;if(t.test(c))break;if(n.test(e))break;if(c.search(/[^ ]/)>=h||!c.trim())o+="\n"+c.slice(h);else{if(p)break;if(s.search(/[^ ]/)>=4)break;if(r.test(s))break;if(i.test(s))break;if(n.test(s))break;o+="\n"+c}p||c.trim()||(p=!0),l+=a+"\n",e=e.substring(a.length+1),s=c.slice(h)}}r.loose||(a?r.loose=!0:/\n *\n *$/.test(l)&&(a=!0));let u,k=null;this.options.gfm&&(k=/^\[[ xX]\] /.exec(o),k&&(u="[ ] "!==k[0],o=o.replace(/^\[[ xX]\] +/,""))),r.items.push({type:"list_item",raw:l,task:!!k,checked:u,loose:!1,text:o,tokens:[]}),r.raw+=l}r.items[r.items.length-1].raw=l.trimEnd(),r.items[r.items.length-1].text=o.trimEnd(),r.raw=r.raw.trimEnd();for(let e=0;e<r.items.length;e++)if(this.lexer.state.top=!1,r.items[e].tokens=this.lexer.blockTokens(r.items[e].text,[]),!r.loose){const t=r.items[e].tokens.filter((e=>"space"===e.type)),n=t.length>0&&t.some((e=>/\n.*\n/.test(e.raw)));r.loose=n}if(r.loose)for(let e=0;e<r.items.length;e++)r.items[e].loose=!0;return r}}html(e){const t=this.rules.block.html.exec(e);if(t){return{type:"html",block:!0,raw:t[0],pre:"pre"===t[1]||"script"===t[1]||"style"===t[1],text:t[0]}}}def(e){const t=this.rules.block.def.exec(e);if(t){const e=t[1].toLowerCase().replace(/\s+/g," "),n=t[2]?t[2].replace(/^<(.*)>$/,"$1").replace(this.rules.inline.anyPunctuation,"$1"):"",s=t[3]?t[3].substring(1,t[3].length-1).replace(this.rules.inline.anyPunctuation,"$1"):t[3];return{type:"def",tag:e,raw:t[0],href:n,title:s}}}table(e){const t=this.rules.block.table.exec(e);if(!t)return;if(!/[:|]/.test(t[2]))return;const n=d(t[1]),s=t[2].replace(/^\||\| *$/g,"").split("|"),r=t[3]&&t[3].trim()?t[3].replace(/\n[ \t]*$/,"").split("\n"):[],i={type:"table",raw:t[0],header:[],align:[],rows:[]};if(n.length===s.length){for(const e of s)/^ *-+: *$/.test(e)?i.align.push("right"):/^ *:-+: *$/.test(e)?i.align.push("center"):/^ *:-+ *$/.test(e)?i.align.push("left"):i.align.push(null);for(const e of n)i.header.push({text:e,tokens:this.lexer.inline(e)});for(const e of r)i.rows.push(d(e,i.header.length).map((e=>({text:e,tokens:this.lexer.inline(e)}))));return i}}lheading(e){const t=this.rules.block.lheading.exec(e);if(t)return{type:"heading",raw:t[0],depth:"="===t[2].charAt(0)?1:2,text:t[1],tokens:this.lexer.inline(t[1])}}paragraph(e){const t=this.rules.block.paragraph.exec(e);if(t){const e="\n"===t[1].charAt(t[1].length-1)?t[1].slice(0,-1):t[1];return{type:"paragraph",raw:t[0],text:e,tokens:this.lexer.inline(e)}}}text(e){const t=this.rules.block.text.exec(e);if(t)return{type:"text",raw:t[0],text:t[0],tokens:this.lexer.inline(t[0])}}escape(e){const t=this.rules.inline.escape.exec(e);if(t)return{type:"escape",raw:t[0],text:c(t[1])}}tag(e){const t=this.rules.inline.tag.exec(e);if(t)return!this.lexer.state.inLink&&/^<a /i.test(t[0])?this.lexer.state.inLink=!0:this.lexer.state.inLink&&/^<\/a>/i.test(t[0])&&(this.lexer.state.inLink=!1),!this.lexer.state.inRawBlock&&/^<(pre|code|kbd|script)(\s|>)/i.test(t[0])?this.lexer.state.inRawBlock=!0:this.lexer.state.inRawBlock&&/^<\/(pre|code|kbd|script)(\s|>)/i.test(t[0])&&(this.lexer.state.inRawBlock=!1),{type:"html",raw:t[0],inLink:this.lexer.state.inLink,inRawBlock:this.lexer.state.inRawBlock,block:!1,text:t[0]}}link(e){const t=this.rules.inline.link.exec(e);if(t){const e=t[2].trim();if(!this.options.pedantic&&/^</.test(e)){if(!/>$/.test(e))return;const t=x(e.slice(0,-1),"\\");if((e.length-t.length)%2==0)return}else{const e=function(e,t){if(-1===e.indexOf(t[1]))return-1;let n=0;for(let s=0;s<e.length;s++)if("\\"===e[s])s++;else if(e[s]===t[0])n++;else if(e[s]===t[1]&&(n--,n<0))return s;return-1}(t[2],"()");if(e>-1){const n=(0===t[0].indexOf("!")?5:4)+t[1].length+e;t[2]=t[2].substring(0,e),t[0]=t[0].substring(0,n).trim(),t[3]=""}}let n=t[2],s="";if(this.options.pedantic){const e=/^([^'"]*[^\s])\s+(['"])(.*)\2/.exec(n);e&&(n=e[1],s=e[3])}else s=t[3]?t[3].slice(1,-1):"";return n=n.trim(),/^</.test(n)&&(n=this.options.pedantic&&!/>$/.test(e)?n.slice(1):n.slice(1,-1)),b(t,{href:n?n.replace(this.rules.inline.anyPunctuation,"$1"):n,title:s?s.replace(this.rules.inline.anyPunctuation,"$1"):s},t[0],this.lexer)}}reflink(e,t){let n;if((n=this.rules.inline.reflink.exec(e))||(n=this.rules.inline.nolink.exec(e))){const e=t[(n[2]||n[1]).replace(/\s+/g," ").toLowerCase()];if(!e){const e=n[0].charAt(0);return{type:"text",raw:e,text:e}}return b(n,e,n[0],this.lexer)}}emStrong(e,t,n=""){let s=this.rules.inline.emStrongLDelim.exec(e);if(!s)return;if(s[3]&&n.match(/[\p{L}\p{N}]/u))return;if(!(s[1]||s[2]||"")||!n||this.rules.inline.punctuation.exec(n)){const n=[...s[0]].length-1;let r,i,l=n,o=0;const a="*"===s[0][0]?this.rules.inline.emStrongRDelimAst:this.rules.inline.emStrongRDelimUnd;for(a.lastIndex=0,t=t.slice(-1*e.length+n);null!=(s=a.exec(t));){if(r=s[1]||s[2]||s[3]||s[4]||s[5]||s[6],!r)continue;if(i=[...r].length,s[3]||s[4]){l+=i;continue}if((s[5]||s[6])&&n%3&&!((n+i)%3)){o+=i;continue}if(l-=i,l>0)continue;i=Math.min(i,i+l+o);const t=[...s[0]][0].length,a=e.slice(0,n+s.index+t+i);if(Math.min(n,i)%2){const e=a.slice(1,-1);return{type:"em",raw:a,text:e,tokens:this.lexer.inlineTokens(e)}}const c=a.slice(2,-2);return{type:"strong",raw:a,text:c,tokens:this.lexer.inlineTokens(c)}}}}codespan(e){const t=this.rules.inline.code.exec(e);if(t){let e=t[2].replace(/\n/g," ");const n=/[^ ]/.test(e),s=/^ /.test(e)&&/ $/.test(e);return n&&s&&(e=e.substring(1,e.length-1)),e=c(e,!0),{type:"codespan",raw:t[0],text:e}}}br(e){const t=this.rules.inline.br.exec(e);if(t)return{type:"br",raw:t[0]}}del(e){const t=this.rules.inline.del.exec(e);if(t)return{type:"del",raw:t[0],text:t[2],tokens:this.lexer.inlineTokens(t[2])}}autolink(e){const t=this.rules.inline.autolink.exec(e);if(t){let e,n;return"@"===t[2]?(e=c(t[1]),n="mailto:"+e):(e=c(t[1]),n=e),{type:"link",raw:t[0],text:e,href:n,tokens:[{type:"text",raw:e,text:e}]}}}url(e){let t;if(t=this.rules.inline.url.exec(e)){let e,n;if("@"===t[2])e=c(t[0]),n="mailto:"+e;else{let s;do{s=t[0],t[0]=this.rules.inline._backpedal.exec(t[0])?.[0]??""}while(s!==t[0]);e=c(t[0]),n="www."===t[1]?"http://"+t[0]:t[0]}return{type:"link",raw:t[0],text:e,href:n,tokens:[{type:"text",raw:e,text:e}]}}}inlineText(e){const t=this.rules.inline.text.exec(e);if(t){let e;return e=this.lexer.state.inRawBlock?t[0]:c(t[0]),{type:"text",raw:t[0],text:e}}}}const m=/^ {0,3}((?:-[\t ]*){3,}|(?:_[ \t]*){3,}|(?:\*[ \t]*){3,})(?:\n+|$)/,y=/(?:[*+-]|\d{1,9}[.)])/,$=k(/^(?!bull |blockCode|fences|blockquote|heading|html)((?:.|\n(?!\s*?\n|bull |blockCode|fences|blockquote|heading|html))+?)\n {0,3}(=+|-+) *(?:\n+|$)/).replace(/bull/g,y).replace(/blockCode/g,/ {4}/).replace(/fences/g,/ {0,3}(?:`{3,}|~{3,})/).replace(/blockquote/g,/ {0,3}>/).replace(/heading/g,/ {0,3}#{1,6}/).replace(/html/g,/ {0,3}<[^\n>]+>\n/).getRegex(),z=/^([^\n]+(?:\n(?!hr|heading|lheading|blockquote|fences|list|html|table| +\n)[^\n]+)*)/,T=/(?!\s*\])(?:\\.|[^\[\]\\])+/,R=k(/^ {0,3}\[(label)\]: *(?:\n *)?([^<\s][^\s]*|<.*?>)(?:(?: +(?:\n *)?| *\n *)(title))? *(?:\n+|$)/).replace("label",T).replace("title",/(?:"(?:\\"?|[^"\\])*"|'[^'\n]*(?:\n[^'\n]+)*\n?'|\([^()]*\))/).getRegex(),_=k(/^( {0,3}bull)([ \t][^\n]+?)?(?:\n|$)/).replace(/bull/g,y).getRegex(),A="address|article|aside|base|basefont|blockquote|body|caption|center|col|colgroup|dd|details|dialog|dir|div|dl|dt|fieldset|figcaption|figure|footer|form|frame|frameset|h[1-6]|head|header|hr|html|iframe|legend|li|link|main|menu|menuitem|meta|nav|noframes|ol|optgroup|option|p|param|search|section|summary|table|tbody|td|tfoot|th|thead|title|tr|track|ul",S=/<!--(?:-?>|[\s\S]*?(?:-->|$))/,I=k("^ {0,3}(?:<(script|pre|style|textarea)[\\s>][\\s\\S]*?(?:</\\1>[^\\n]*\\n+|$)|comment[^\\n]*(\\n+|$)|<\\?[\\s\\S]*?(?:\\?>\\n*|$)|<![A-Z][\\s\\S]*?(?:>\\n*|$)|<!\\[CDATA\\[[\\s\\S]*?(?:\\]\\]>\\n*|$)|</?(tag)(?: +|\\n|/?>)[\\s\\S]*?(?:(?:\\n *)+\\n|$)|<(?!script|pre|style|textarea)([a-z][\\w-]*)(?:attribute)*? */?>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n *)+\\n|$)|</(?!script|pre|style|textarea)[a-z][\\w-]*\\s*>(?=[ \\t]*(?:\\n|$))[\\s\\S]*?(?:(?:\\n *)+\\n|$))","i").replace("comment",S).replace("tag",A).replace("attribute",/ +[a-zA-Z:_][\w.:-]*(?: *= *"[^"\n]*"| *= *'[^'\n]*'| *= *[^\s"'=<>`]+)?/).getRegex(),E=k(z).replace("hr",m).replace("heading"," {0,3}#{1,6}(?:\\s|$)").replace("|lheading","").replace("|table","").replace("blockquote"," {0,3}>").replace("fences"," {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list"," {0,3}(?:[*+-]|1[.)]) ").replace("html","</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag",A).getRegex(),q={blockquote:k(/^( {0,3}> ?(paragraph|[^\n]*)(?:\n|$))+/).replace("paragraph",E).getRegex(),code:/^( {4}[^\n]+(?:\n(?: *(?:\n|$))*)?)+/,def:R,fences:/^ {0,3}(`{3,}(?=[^`\n]*(?:\n|$))|~{3,})([^\n]*)(?:\n|$)(?:|([\s\S]*?)(?:\n|$))(?: {0,3}\1[~`]* *(?=\n|$)|$)/,heading:/^ {0,3}(#{1,6})(?=\s|$)(.*)(?:\n+|$)/,hr:m,html:I,lheading:$,list:_,newline:/^(?: *(?:\n|$))+/,paragraph:E,table:f,text:/^[^\n]+/},Z=k("^ *([^\\n ].*)\\n {0,3}((?:\\| *)?:?-+:? *(?:\\| *:?-+:? *)*(?:\\| *)?)(?:\\n((?:(?! *\\n|hr|heading|blockquote|code|fences|list|html).*(?:\\n|$))*)\\n*|$)").replace("hr",m).replace("heading"," {0,3}#{1,6}(?:\\s|$)").replace("blockquote"," {0,3}>").replace("code"," {4}[^\\n]").replace("fences"," {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list"," {0,3}(?:[*+-]|1[.)]) ").replace("html","</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag",A).getRegex(),L={...q,table:Z,paragraph:k(z).replace("hr",m).replace("heading"," {0,3}#{1,6}(?:\\s|$)").replace("|lheading","").replace("table",Z).replace("blockquote"," {0,3}>").replace("fences"," {0,3}(?:`{3,}(?=[^`\\n]*\\n)|~{3,})[^\\n]*\\n").replace("list"," {0,3}(?:[*+-]|1[.)]) ").replace("html","</?(?:tag)(?: +|\\n|/?>)|<(?:script|pre|style|textarea|!--)").replace("tag",A).getRegex()},P={...q,html:k("^ *(?:comment *(?:\\n|\\s*$)|<(tag)[\\s\\S]+?</\\1> *(?:\\n{2,}|\\s*$)|<tag(?:\"[^\"]*\"|'[^']*'|\\s[^'\"/>\\s]*)*?/?> *(?:\\n{2,}|\\s*$))").replace("comment",S).replace(/tag/g,"(?!(?:a|em|strong|small|s|cite|q|dfn|abbr|data|time|code|var|samp|kbd|sub|sup|i|b|u|mark|ruby|rt|rp|bdi|bdo|span|br|wbr|ins|del|img)\\b)\\w+(?!:|[^\\w\\s@]*@)\\b").getRegex(),def:/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +(["(][^\n]+[")]))? *(?:\n+|$)/,heading:/^(#{1,6})(.*)(?:\n+|$)/,fences:f,lheading:/^(.+?)\n {0,3}(=+|-+) *(?:\n+|$)/,paragraph:k(z).replace("hr",m).replace("heading"," *#{1,6} *[^\n]").replace("lheading",$).replace("|table","").replace("blockquote"," {0,3}>").replace("|fences","").replace("|list","").replace("|html","").replace("|tag","").getRegex()},Q=/^\\([!"#$%&'()*+,\-./:;<=>?@\[\]\\^_`{|}~])/,v=/^( {2,}|\\)\n(?!\s*$)/,B="\\p{P}\\p{S}",C=k(/^((?![*_])[\spunctuation])/,"u").replace(/punctuation/g,B).getRegex(),M=k(/^(?:\*+(?:((?!\*)[punct])|[^\s*]))|^_+(?:((?!_)[punct])|([^\s_]))/,"u").replace(/punct/g,B).getRegex(),O=k("^[^_*]*?__[^_*]*?\\*[^_*]*?(?=__)|[^*]+(?=[^*])|(?!\\*)[punct](\\*+)(?=[\\s]|$)|[^punct\\s](\\*+)(?!\\*)(?=[punct\\s]|$)|(?!\\*)[punct\\s](\\*+)(?=[^punct\\s])|[\\s](\\*+)(?!\\*)(?=[punct])|(?!\\*)[punct](\\*+)(?!\\*)(?=[punct])|[^punct\\s](\\*+)(?=[^punct\\s])","gu").replace(/punct/g,B).getRegex(),D=k("^[^_*]*?\\*\\*[^_*]*?_[^_*]*?(?=\\*\\*)|[^_]+(?=[^_])|(?!_)[punct](_+)(?=[\\s]|$)|[^punct\\s](_+)(?!_)(?=[punct\\s]|$)|(?!_)[punct\\s](_+)(?=[^punct\\s])|[\\s](_+)(?!_)(?=[punct])|(?!_)[punct](_+)(?!_)(?=[punct])","gu").replace(/punct/g,B).getRegex(),j=k(/\\([punct])/,"gu").replace(/punct/g,B).getRegex(),H=k(/^<(scheme:[^\s\x00-\x1f<>]*|email)>/).replace("scheme",/[a-zA-Z][a-zA-Z0-9+.-]{1,31}/).replace("email",/[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+(@)[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(?![-_])/).getRegex(),U=k(S).replace("(?:--\x3e|$)","--\x3e").getRegex(),X=k("^comment|^</[a-zA-Z][\\w:-]*\\s*>|^<[a-zA-Z][\\w-]*(?:attribute)*?\\s*/?>|^<\\?[\\s\\S]*?\\?>|^<![a-zA-Z]+\\s[\\s\\S]*?>|^<!\\[CDATA\\[[\\s\\S]*?\\]\\]>").replace("comment",U).replace("attribute",/\s+[a-zA-Z:_][\w.:-]*(?:\s*=\s*"[^"]*"|\s*=\s*'[^']*'|\s*=\s*[^\s"'=<>`]+)?/).getRegex(),F=/(?:\[(?:\\.|[^\[\]\\])*\]|\\.|`[^`]*`|[^\[\]\\`])*?/,N=k(/^!?\[(label)\]\(\s*(href)(?:\s+(title))?\s*\)/).replace("label",F).replace("href",/<(?:\\.|[^\n<>\\])+>|[^\s\x00-\x1f]*/).replace("title",/"(?:\\"?|[^"\\])*"|'(?:\\'?|[^'\\])*'|\((?:\\\)?|[^)\\])*\)/).getRegex(),G=k(/^!?\[(label)\]\[(ref)\]/).replace("label",F).replace("ref",T).getRegex(),J=k(/^!?\[(ref)\](?:\[\])?/).replace("ref",T).getRegex(),K={_backpedal:f,anyPunctuation:j,autolink:H,blockSkip:/\[[^[\]]*?\]\([^\(\)]*?\)|`[^`]*?`|<[^<>]*?>/g,br:v,code:/^(`+)([^`]|[^`][\s\S]*?[^`])\1(?!`)/,del:f,emStrongLDelim:M,emStrongRDelimAst:O,emStrongRDelimUnd:D,escape:Q,link:N,nolink:J,punctuation:C,reflink:G,reflinkSearch:k("reflink|nolink(?!\\()","g").replace("reflink",G).replace("nolink",J).getRegex(),tag:X,text:/^(`+|[^`])(?:(?= {2,}\n)|[\s\S]*?(?:(?=[\\<!\[`*_]|\b_|$)|[^ ](?= {2,}\n)))/,url:f},V={...K,link:k(/^!?\[(label)\]\((.*?)\)/).replace("label",F).getRegex(),reflink:k(/^!?\[(label)\]\s*\[([^\]]*)\]/).replace("label",F).getRegex()},W={...K,escape:k(Q).replace("])","~|])").getRegex(),url:k(/^((?:ftp|https?):\/\/|www\.)(?:[a-zA-Z0-9\-]+\.?)+[^\s<]*|^email/,"i").replace("email",/[A-Za-z0-9._+-]+(@)[a-zA-Z0-9-_]+(?:\.[a-zA-Z0-9-_]*[a-zA-Z0-9])+(?![-_])/).getRegex(),_backpedal:/(?:[^?!.,:;*_'"~()&]+|\([^)]*\)|&(?![a-zA-Z0-9]+;$)|[?!.,:;*_'"~)]+(?!$))+/,del:/^(~~?)(?=[^\s~])([\s\S]*?[^\s~])\1(?=[^~]|$)/,text:/^([`~]+|[^`~])(?:(?= {2,}\n)|(?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)|[\s\S]*?(?:(?=[\\<!\[`*~_]|\b_|https?:\/\/|ftp:\/\/|www\.|$)|[^ ](?= {2,}\n)|[^a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-](?=[a-zA-Z0-9.!#$%&'*+\/=?_`{\|}~-]+@)))/},Y={...W,br:k(v).replace("{2,}","*").getRegex(),text:k(W.text).replace("\\b_","\\b_| {2,}\\n").replace(/\{2,\}/g,"*").getRegex()},ee={normal:q,gfm:L,pedantic:P},te={normal:K,gfm:W,breaks:Y,pedantic:V};class ne{tokens;options;state;tokenizer;inlineQueue;constructor(t){this.tokens=[],this.tokens.links=Object.create(null),this.options=t||e.defaults,this.options.tokenizer=this.options.tokenizer||new w,this.tokenizer=this.options.tokenizer,this.tokenizer.options=this.options,this.tokenizer.lexer=this,this.inlineQueue=[],this.state={inLink:!1,inRawBlock:!1,top:!0};const n={block:ee.normal,inline:te.normal};this.options.pedantic?(n.block=ee.pedantic,n.inline=te.pedantic):this.options.gfm&&(n.block=ee.gfm,this.options.breaks?n.inline=te.breaks:n.inline=te.gfm),this.tokenizer.rules=n}static get rules(){return{block:ee,inline:te}}static lex(e,t){return new ne(t).lex(e)}static lexInline(e,t){return new ne(t).inlineTokens(e)}lex(e){e=e.replace(/\r\n|\r/g,"\n"),this.blockTokens(e,this.tokens);for(let e=0;e<this.inlineQueue.length;e++){const t=this.inlineQueue[e];this.inlineTokens(t.src,t.tokens)}return this.inlineQueue=[],this.tokens}blockTokens(e,t=[]){let n,s,r,i;for(e=this.options.pedantic?e.replace(/\t/g,"    ").replace(/^ +$/gm,""):e.replace(/^( *)(\t+)/gm,((e,t,n)=>t+"    ".repeat(n.length)));e;)if(!(this.options.extensions&&this.options.extensions.block&&this.options.extensions.block.some((s=>!!(n=s.call({lexer:this},e,t))&&(e=e.substring(n.raw.length),t.push(n),!0)))))if(n=this.tokenizer.space(e))e=e.substring(n.raw.length),1===n.raw.length&&t.length>0?t[t.length-1].raw+="\n":t.push(n);else if(n=this.tokenizer.code(e))e=e.substring(n.raw.length),s=t[t.length-1],!s||"paragraph"!==s.type&&"text"!==s.type?t.push(n):(s.raw+="\n"+n.raw,s.text+="\n"+n.text,this.inlineQueue[this.inlineQueue.length-1].src=s.text);else if(n=this.tokenizer.fences(e))e=e.substring(n.raw.length),t.push(n);else if(n=this.tokenizer.heading(e))e=e.substring(n.raw.length),t.push(n);else if(n=this.tokenizer.hr(e))e=e.substring(n.raw.length),t.push(n);else if(n=this.tokenizer.blockquote(e))e=e.substring(n.raw.length),t.push(n);else if(n=this.tokenizer.list(e))e=e.substring(n.raw.length),t.push(n);else if(n=this.tokenizer.html(e))e=e.substring(n.raw.length),t.push(n);else if(n=this.tokenizer.def(e))e=e.substring(n.raw.length),s=t[t.length-1],!s||"paragraph"!==s.type&&"text"!==s.type?this.tokens.links[n.tag]||(this.tokens.links[n.tag]={href:n.href,title:n.title}):(s.raw+="\n"+n.raw,s.text+="\n"+n.raw,this.inlineQueue[this.inlineQueue.length-1].src=s.text);else if(n=this.tokenizer.table(e))e=e.substring(n.raw.length),t.push(n);else if(n=this.tokenizer.lheading(e))e=e.substring(n.raw.length),t.push(n);else{if(r=e,this.options.extensions&&this.options.extensions.startBlock){let t=1/0;const n=e.slice(1);let s;this.options.extensions.startBlock.forEach((e=>{s=e.call({lexer:this},n),"number"==typeof s&&s>=0&&(t=Math.min(t,s))})),t<1/0&&t>=0&&(r=e.substring(0,t+1))}if(this.state.top&&(n=this.tokenizer.paragraph(r)))s=t[t.length-1],i&&"paragraph"===s.type?(s.raw+="\n"+n.raw,s.text+="\n"+n.text,this.inlineQueue.pop(),this.inlineQueue[this.inlineQueue.length-1].src=s.text):t.push(n),i=r.length!==e.length,e=e.substring(n.raw.length);else if(n=this.tokenizer.text(e))e=e.substring(n.raw.length),s=t[t.length-1],s&&"text"===s.type?(s.raw+="\n"+n.raw,s.text+="\n"+n.text,this.inlineQueue.pop(),this.inlineQueue[this.inlineQueue.length-1].src=s.text):t.push(n);else if(e){const t="Infinite loop on byte: "+e.charCodeAt(0);if(this.options.silent){console.error(t);break}throw new Error(t)}}return this.state.top=!0,t}inline(e,t=[]){return this.inlineQueue.push({src:e,tokens:t}),t}inlineTokens(e,t=[]){let n,s,r,i,l,o,a=e;if(this.tokens.links){const e=Object.keys(this.tokens.links);if(e.length>0)for(;null!=(i=this.tokenizer.rules.inline.reflinkSearch.exec(a));)e.includes(i[0].slice(i[0].lastIndexOf("[")+1,-1))&&(a=a.slice(0,i.index)+"["+"a".repeat(i[0].length-2)+"]"+a.slice(this.tokenizer.rules.inline.reflinkSearch.lastIndex))}for(;null!=(i=this.tokenizer.rules.inline.blockSkip.exec(a));)a=a.slice(0,i.index)+"["+"a".repeat(i[0].length-2)+"]"+a.slice(this.tokenizer.rules.inline.blockSkip.lastIndex);for(;null!=(i=this.tokenizer.rules.inline.anyPunctuation.exec(a));)a=a.slice(0,i.index)+"++"+a.slice(this.tokenizer.rules.inline.anyPunctuation.lastIndex);for(;e;)if(l||(o=""),l=!1,!(this.options.extensions&&this.options.extensions.inline&&this.options.extensions.inline.some((s=>!!(n=s.call({lexer:this},e,t))&&(e=e.substring(n.raw.length),t.push(n),!0)))))if(n=this.tokenizer.escape(e))e=e.substring(n.raw.length),t.push(n);else if(n=this.tokenizer.tag(e))e=e.substring(n.raw.length),s=t[t.length-1],s&&"text"===n.type&&"text"===s.type?(s.raw+=n.raw,s.text+=n.text):t.push(n);else if(n=this.tokenizer.link(e))e=e.substring(n.raw.length),t.push(n);else if(n=this.tokenizer.reflink(e,this.tokens.links))e=e.substring(n.raw.length),s=t[t.length-1],s&&"text"===n.type&&"text"===s.type?(s.raw+=n.raw,s.text+=n.text):t.push(n);else if(n=this.tokenizer.emStrong(e,a,o))e=e.substring(n.raw.length),t.push(n);else if(n=this.tokenizer.codespan(e))e=e.substring(n.raw.length),t.push(n);else if(n=this.tokenizer.br(e))e=e.substring(n.raw.length),t.push(n);else if(n=this.tokenizer.del(e))e=e.substring(n.raw.length),t.push(n);else if(n=this.tokenizer.autolink(e))e=e.substring(n.raw.length),t.push(n);else if(this.state.inLink||!(n=this.tokenizer.url(e))){if(r=e,this.options.extensions&&this.options.extensions.startInline){let t=1/0;const n=e.slice(1);let s;this.options.extensions.startInline.forEach((e=>{s=e.call({lexer:this},n),"number"==typeof s&&s>=0&&(t=Math.min(t,s))})),t<1/0&&t>=0&&(r=e.substring(0,t+1))}if(n=this.tokenizer.inlineText(r))e=e.substring(n.raw.length),"_"!==n.raw.slice(-1)&&(o=n.raw.slice(-1)),l=!0,s=t[t.length-1],s&&"text"===s.type?(s.raw+=n.raw,s.text+=n.text):t.push(n);else if(e){const t="Infinite loop on byte: "+e.charCodeAt(0);if(this.options.silent){console.error(t);break}throw new Error(t)}}else e=e.substring(n.raw.length),t.push(n);return t}}class se{options;constructor(t){this.options=t||e.defaults}code(e,t,n){const s=(t||"").match(/^\S*/)?.[0];return e=e.replace(/\n$/,"")+"\n",s?'<pre><code class="language-'+c(s)+'">'+(n?e:c(e,!0))+"</code></pre>\n":"<pre><code>"+(n?e:c(e,!0))+"</code></pre>\n"}blockquote(e){return`<blockquote>\n${e}</blockquote>\n`}html(e,t){return e}heading(e,t,n){return`<h${t}>${e}</h${t}>\n`}hr(){return"<hr>\n"}list(e,t,n){const s=t?"ol":"ul";return"<"+s+(t&&1!==n?' start="'+n+'"':"")+">\n"+e+"</"+s+">\n"}listitem(e,t,n){return`<li>${e}</li>\n`}checkbox(e){return"<input "+(e?'checked="" ':"")+'disabled="" type="checkbox">'}paragraph(e){return`<p>${e}</p>\n`}table(e,t){return t&&(t=`<tbody>${t}</tbody>`),"<table>\n<thead>\n"+e+"</thead>\n"+t+"</table>\n"}tablerow(e){return`<tr>\n${e}</tr>\n`}tablecell(e,t){const n=t.header?"th":"td";return(t.align?`<${n} align="${t.align}">`:`<${n}>`)+e+`</${n}>\n`}strong(e){return`<strong>${e}</strong>`}em(e){return`<em>${e}</em>`}codespan(e){return`<code>${e}</code>`}br(){return"<br>"}del(e){return`<del>${e}</del>`}link(e,t,n){const s=g(e);if(null===s)return n;let r='<a href="'+(e=s)+'"';return t&&(r+=' title="'+t+'"'),r+=">"+n+"</a>",r}image(e,t,n){const s=g(e);if(null===s)return n;let r=`<img src="${e=s}" alt="${n}"`;return t&&(r+=` title="${t}"`),r+=">",r}text(e){return e}}class re{strong(e){return e}em(e){return e}codespan(e){return e}del(e){return e}html(e){return e}text(e){return e}link(e,t,n){return""+n}image(e,t,n){return""+n}br(){return""}}class ie{options;renderer;textRenderer;constructor(t){this.options=t||e.defaults,this.options.renderer=this.options.renderer||new se,this.renderer=this.options.renderer,this.renderer.options=this.options,this.textRenderer=new re}static parse(e,t){return new ie(t).parse(e)}static parseInline(e,t){return new ie(t).parseInline(e)}parse(e,t=!0){let n="";for(let s=0;s<e.length;s++){const r=e[s];if(this.options.extensions&&this.options.extensions.renderers&&this.options.extensions.renderers[r.type]){const e=r,t=this.options.extensions.renderers[e.type].call({parser:this},e);if(!1!==t||!["space","hr","heading","code","table","blockquote","list","html","paragraph","text"].includes(e.type)){n+=t||"";continue}}switch(r.type){case"space":continue;case"hr":n+=this.renderer.hr();continue;case"heading":{const e=r;n+=this.renderer.heading(this.parseInline(e.tokens),e.depth,p(this.parseInline(e.tokens,this.textRenderer)));continue}case"code":{const e=r;n+=this.renderer.code(e.text,e.lang,!!e.escaped);continue}case"table":{const e=r;let t="",s="";for(let t=0;t<e.header.length;t++)s+=this.renderer.tablecell(this.parseInline(e.header[t].tokens),{header:!0,align:e.align[t]});t+=this.renderer.tablerow(s);let i="";for(let t=0;t<e.rows.length;t++){const n=e.rows[t];s="";for(let t=0;t<n.length;t++)s+=this.renderer.tablecell(this.parseInline(n[t].tokens),{header:!1,align:e.align[t]});i+=this.renderer.tablerow(s)}n+=this.renderer.table(t,i);continue}case"blockquote":{const e=r,t=this.parse(e.tokens);n+=this.renderer.blockquote(t);continue}case"list":{const e=r,t=e.ordered,s=e.start,i=e.loose;let l="";for(let t=0;t<e.items.length;t++){const n=e.items[t],s=n.checked,r=n.task;let o="";if(n.task){const e=this.renderer.checkbox(!!s);i?n.tokens.length>0&&"paragraph"===n.tokens[0].type?(n.tokens[0].text=e+" "+n.tokens[0].text,n.tokens[0].tokens&&n.tokens[0].tokens.length>0&&"text"===n.tokens[0].tokens[0].type&&(n.tokens[0].tokens[0].text=e+" "+n.tokens[0].tokens[0].text)):n.tokens.unshift({type:"text",text:e+" "}):o+=e+" "}o+=this.parse(n.tokens,i),l+=this.renderer.listitem(o,r,!!s)}n+=this.renderer.list(l,t,s);continue}case"html":{const e=r;n+=this.renderer.html(e.text,e.block);continue}case"paragraph":{const e=r;n+=this.renderer.paragraph(this.parseInline(e.tokens));continue}case"text":{let i=r,l=i.tokens?this.parseInline(i.tokens):i.text;for(;s+1<e.length&&"text"===e[s+1].type;)i=e[++s],l+="\n"+(i.tokens?this.parseInline(i.tokens):i.text);n+=t?this.renderer.paragraph(l):l;continue}default:{const e='Token with "'+r.type+'" type was not found.';if(this.options.silent)return console.error(e),"";throw new Error(e)}}}return n}parseInline(e,t){t=t||this.renderer;let n="";for(let s=0;s<e.length;s++){const r=e[s];if(this.options.extensions&&this.options.extensions.renderers&&this.options.extensions.renderers[r.type]){const e=this.options.extensions.renderers[r.type].call({parser:this},r);if(!1!==e||!["escape","html","link","image","strong","em","codespan","br","del","text"].includes(r.type)){n+=e||"";continue}}switch(r.type){case"escape":{const e=r;n+=t.text(e.text);break}case"html":{const e=r;n+=t.html(e.text);break}case"link":{const e=r;n+=t.link(e.href,e.title,this.parseInline(e.tokens,t));break}case"image":{const e=r;n+=t.image(e.href,e.title,e.text);break}case"strong":{const e=r;n+=t.strong(this.parseInline(e.tokens,t));break}case"em":{const e=r;n+=t.em(this.parseInline(e.tokens,t));break}case"codespan":{const e=r;n+=t.codespan(e.text);break}case"br":n+=t.br();break;case"del":{const e=r;n+=t.del(this.parseInline(e.tokens,t));break}case"text":{const e=r;n+=t.text(e.text);break}default:{const e='Token with "'+r.type+'" type was not found.';if(this.options.silent)return console.error(e),"";throw new Error(e)}}}return n}}class le{options;constructor(t){this.options=t||e.defaults}static passThroughHooks=new Set(["preprocess","postprocess","processAllTokens"]);preprocess(e){return e}postprocess(e){return e}processAllTokens(e){return e}}class oe{defaults={async:!1,breaks:!1,extensions:null,gfm:!0,hooks:null,pedantic:!1,renderer:null,silent:!1,tokenizer:null,walkTokens:null};options=this.setOptions;parse=this.#e(ne.lex,ie.parse);parseInline=this.#e(ne.lexInline,ie.parseInline);Parser=ie;Renderer=se;TextRenderer=re;Lexer=ne;Tokenizer=w;Hooks=le;constructor(...e){this.use(...e)}walkTokens(e,t){let n=[];for(const s of e)switch(n=n.concat(t.call(this,s)),s.type){case"table":{const e=s;for(const s of e.header)n=n.concat(this.walkTokens(s.tokens,t));for(const s of e.rows)for(const e of s)n=n.concat(this.walkTokens(e.tokens,t));break}case"list":{const e=s;n=n.concat(this.walkTokens(e.items,t));break}default:{const e=s;this.defaults.extensions?.childTokens?.[e.type]?this.defaults.extensions.childTokens[e.type].forEach((s=>{const r=e[s].flat(1/0);n=n.concat(this.walkTokens(r,t))})):e.tokens&&(n=n.concat(this.walkTokens(e.tokens,t)))}}return n}use(...e){const t=this.defaults.extensions||{renderers:{},childTokens:{}};return e.forEach((e=>{const n={...e};if(n.async=this.defaults.async||n.async||!1,e.extensions&&(e.extensions.forEach((e=>{if(!e.name)throw new Error("extension name required");if("renderer"in e){const n=t.renderers[e.name];t.renderers[e.name]=n?function(...t){let s=e.renderer.apply(this,t);return!1===s&&(s=n.apply(this,t)),s}:e.renderer}if("tokenizer"in e){if(!e.level||"block"!==e.level&&"inline"!==e.level)throw new Error("extension level must be 'block' or 'inline'");const n=t[e.level];n?n.unshift(e.tokenizer):t[e.level]=[e.tokenizer],e.start&&("block"===e.level?t.startBlock?t.startBlock.push(e.start):t.startBlock=[e.start]:"inline"===e.level&&(t.startInline?t.startInline.push(e.start):t.startInline=[e.start]))}"childTokens"in e&&e.childTokens&&(t.childTokens[e.name]=e.childTokens)})),n.extensions=t),e.renderer){const t=this.defaults.renderer||new se(this.defaults);for(const n in e.renderer){if(!(n in t))throw new Error(`renderer '${n}' does not exist`);if("options"===n)continue;const s=n,r=e.renderer[s],i=t[s];t[s]=(...e)=>{let n=r.apply(t,e);return!1===n&&(n=i.apply(t,e)),n||""}}n.renderer=t}if(e.tokenizer){const t=this.defaults.tokenizer||new w(this.defaults);for(const n in e.tokenizer){if(!(n in t))throw new Error(`tokenizer '${n}' does not exist`);if(["options","rules","lexer"].includes(n))continue;const s=n,r=e.tokenizer[s],i=t[s];t[s]=(...e)=>{let n=r.apply(t,e);return!1===n&&(n=i.apply(t,e)),n}}n.tokenizer=t}if(e.hooks){const t=this.defaults.hooks||new le;for(const n in e.hooks){if(!(n in t))throw new Error(`hook '${n}' does not exist`);if("options"===n)continue;const s=n,r=e.hooks[s],i=t[s];le.passThroughHooks.has(n)?t[s]=e=>{if(this.defaults.async)return Promise.resolve(r.call(t,e)).then((e=>i.call(t,e)));const n=r.call(t,e);return i.call(t,n)}:t[s]=(...e)=>{let n=r.apply(t,e);return!1===n&&(n=i.apply(t,e)),n}}n.hooks=t}if(e.walkTokens){const t=this.defaults.walkTokens,s=e.walkTokens;n.walkTokens=function(e){let n=[];return n.push(s.call(this,e)),t&&(n=n.concat(t.call(this,e))),n}}this.defaults={...this.defaults,...n}})),this}setOptions(e){return this.defaults={...this.defaults,...e},this}lexer(e,t){return ne.lex(e,t??this.defaults)}parser(e,t){return ie.parse(e,t??this.defaults)}#e(e,t){return(n,s)=>{const r={...s},i={...this.defaults,...r};!0===this.defaults.async&&!1===r.async&&(i.silent||console.warn("marked(): The async option was set to true by an extension. The async: false option sent to parse will be ignored."),i.async=!0);const l=this.#t(!!i.silent,!!i.async);if(null==n)return l(new Error("marked(): input parameter is undefined or null"));if("string"!=typeof n)return l(new Error("marked(): input parameter is of type "+Object.prototype.toString.call(n)+", string expected"));if(i.hooks&&(i.hooks.options=i),i.async)return Promise.resolve(i.hooks?i.hooks.preprocess(n):n).then((t=>e(t,i))).then((e=>i.hooks?i.hooks.processAllTokens(e):e)).then((e=>i.walkTokens?Promise.all(this.walkTokens(e,i.walkTokens)).then((()=>e)):e)).then((e=>t(e,i))).then((e=>i.hooks?i.hooks.postprocess(e):e)).catch(l);try{i.hooks&&(n=i.hooks.preprocess(n));let s=e(n,i);i.hooks&&(s=i.hooks.processAllTokens(s)),i.walkTokens&&this.walkTokens(s,i.walkTokens);let r=t(s,i);return i.hooks&&(r=i.hooks.postprocess(r)),r}catch(e){return l(e)}}}#t(e,t){return n=>{if(n.message+="\nPlease report this to https://github.com/markedjs/marked.",e){const e="<p>An error occurred:</p><pre>"+c(n.message+"",!0)+"</pre>";return t?Promise.resolve(e):e}if(t)return Promise.reject(n);throw n}}}const ae=new oe;function ce(e,t){return ae.parse(e,t)}ce.options=ce.setOptions=function(e){return ae.setOptions(e),ce.defaults=ae.defaults,n(ce.defaults),ce},ce.getDefaults=t,ce.defaults=e.defaults,ce.use=function(...e){return ae.use(...e),ce.defaults=ae.defaults,n(ce.defaults),ce},ce.walkTokens=function(e,t){return ae.walkTokens(e,t)},ce.parseInline=ae.parseInline,ce.Parser=ie,ce.parser=ie.parse,ce.Renderer=se,ce.TextRenderer=re,ce.Lexer=ne,ce.lexer=ne.lex,ce.Tokenizer=w,ce.Hooks=le,ce.parse=ce;const he=ce.options,pe=ce.setOptions,ue=ce.use,ke=ce.walkTokens,ge=ce.parseInline,fe=ce,de=ie.parse,xe=ne.lex;e.Hooks=le,e.Lexer=ne,e.Marked=oe,e.Parser=ie,e.Renderer=se,e.TextRenderer=re,e.Tokenizer=w,e.getDefaults=t,e.lexer=xe,e.marked=ce,e.options=he,e.parse=fe,e.parseInline=ge,e.parser=de,e.setOptions=pe,e.use=ue,e.walkTokens=ke}));
+</script>
+<script>
+const M = {"domains":[{"k":"ai","n":"AI 与深度学习","c":"#6366f1","s":"AI","sub":"模型、训练与推理栈","subs":[{"k":"base","n":"基础理论与训练原理"},{"k":"tf","n":"Transformer 与注意力"},{"k":"gen","n":"生成模型与强化学习"},{"k":"infra","n":"大模型训练与推理框架"},{"k":"edge","n":"端侧 AI 部署"}]},{"k":"gpu","n":"GPU 计算与并行编程","c":"#0ea5e9","s":"GPU","sub":"CUDA 生态与异构计算","subs":[{"k":"intro","n":"GPU 编程入门"},{"k":"libs","n":"CUDA 生态库"},{"k":"hpc","n":"高性能计算与通信"},{"k":"comp","n":"编译器与底层"}]},{"k":"gfx","n":"图形渲染与游戏开发","c":"#f97316","s":"图形","sub":"从数学到引擎","subs":[{"k":"fund","n":"图形学基础与数学"},{"k":"shader","n":"着色器与 API 设计"},{"k":"api","n":"主流图形 API"},{"k":"engine","n":"引擎与游戏工程"},{"k":"gamedesign","n":"游戏设计与数值"}]},{"k":"media","n":"音视频技术","c":"#ef4444","s":"音视频","sub":"标准、编码器与播放链路","subs":[{"k":"std","n":"编码标准与色彩"},{"k":"enc","n":"编码器源码剖析"},{"k":"player","n":"播放器与多媒体框架"},{"k":"capture","n":"采集与直播"},{"k":"march","n":"架构与工程选型"}]},{"k":"sys","n":"嵌入式 · 系统 · 网络","c":"#14b8a6","s":"系统","sub":"内核、服务端与视觉工程","subs":[{"k":"rtos","n":"嵌入式与 RTOS"},{"k":"store","n":"存储与可观测"},{"k":"web","n":"Web 与网络"},{"k":"cv","n":"计算机视觉工程"}]},{"k":"hw","n":"硬件 · 电路 · 芯片","c":"#a16207","s":"硬件","sub":"面向软件工程师的电学","subs":[{"k":"circuit","n":"电路与电学基础"},{"k":"filter","n":"滤波器与信号"},{"k":"chip","n":"芯片 · EDA · AI 辅助"}]},{"k":"dev","n":"语言 · 编译器 · 体系结构","c":"#8b5cf6","s":"语言","sub":"C++、汇编与工程工具","subs":[{"k":"lang","n":"语言特性与开发环境"},{"k":"build","n":"构建、测试与逆向"},{"k":"asm","n":"汇编与指令集架构"}]},{"k":"math","n":"数学 · 信号 · 算法","c":"#0d9488","s":"数学","sub":"所有方向的公共底座","subs":[{"k":"alg","n":"代数、变换与数值"}]},{"k":"arch","n":"架构 · 中间件 · 跨域","c":"#64748b","s":"架构","sub":"选型、总线与跨域","subs":[{"k":"bus","n":"事件总线与解耦"}]},{"k":"fin","n":"经济 · 金融 · 投资","c":"#16a34a","s":"经济","sub":"量化、投资与经济学阅读","subs":[{"k":"quant","n":"量化交易与读书"}]}],"levels":[{"k":1,"n":"入门","t":"建立概念","d":"零基础可读：术语、全景图、能跑通第一个例子","c":"#2f7d5d"},{"k":2,"n":"进阶","t":"上手实战","d":"需要一点背景：会用 API、能配置、能改代码","c":"#2563a8"},{"k":3,"n":"高级","t":"原理与源码","d":"面向有经验者：源码剖析、标准细节、性能优化","c":"#a4622a"},{"k":4,"n":"专家","t":"体系与架构","d":"跨域体系梳理、技术选型与工业级方案设计","c":"#6d4aa8"}],"layers":[{"k":6,"n":"应用架构 · 设计方法","d":"链路设计、选型决策、玩法与数值","c":"#6d4aa8"},{"k":5,"n":"框架 · 引擎 · 推理栈","d":"PyTorch/vLLM/CUTLASS、游戏引擎、播放器内核","c":"#2563a8"},{"k":4,"n":"GPU · 图形 · 媒体内核","d":"图形 API、编解码器、CUDA 库、采集与渲染","c":"#a4622a"},{"k":3,"n":"编译 · 工具链 · 底层","d":"汇编、构建系统、TVM/MLIR、Wasm","c":"#0f766e"},{"k":2,"n":"系统 · 运行时 · 网络","d":"RTOS、Nginx、SPDK、嵌入式生态","c":"#15803d"},{"k":1,"n":"硬件 · 芯片 · 电路","d":"电路、滤波器、数字/模拟/FPGA","c":"#b45309"},{"k":0,"n":"数学 · 物理 · 信号","d":"线性代数、复分析、FFT、概率统计","c":"#78716c"}],"entries":[{"f":"AI新模型路线学习-初学者版.md","n":"AI 新模型路线","s":"Transformer / Diffusion 之外还有哪些新模型路线","u":"base","lv":1,"ly":6,"kb":55,"ch":25784,"min":54,"h1":"AI 新模型路线学习 —— 初学者版","d":"ai","lvn":"入门"},{"f":"深度学习训练基础_反向传播与优化器.md","n":"训练基础","s":"反向传播推导与 SGD/Adam 等优化器直觉","u":"base","lv":1,"ly":5,"kb":22,"ch":11923,"min":25,"h1":"深度学习训练基础：反向传播与优化器","d":"ai","lvn":"入门"},{"f":"统计基础_t分布与互信息.md","n":"统计基础","s":"t 分布、峰度、贝叶斯估计与互信息","u":"base","lv":1,"ly":0,"kb":15,"ch":8752,"min":18,"h1":"统计基础：t 分布、峰度、贝叶斯估计与 Beta 分布","d":"ai","lvn":"入门"},{"f":"Tokenizer实现简单RAG示例.md","n":"Tokenizer · RAG","s":"手写 RAG 打通分词、向量检索与生成","u":"base","lv":2,"ly":5,"kb":30,"ch":16446,"min":34,"h1":"","d":"ai","lvn":"进阶"},{"f":"Ollama与LangChain对比.md","n":"LLM 框架选型","s":"Ollama / LangChain / AgentScope / LangGraph 能力边界","u":"base","lv":1,"ly":6,"kb":26,"ch":11991,"min":25,"h1":"AI 框架对比：从 Ollama/LangChain 到 AgentScope/LangGraph","d":"ai","lvn":"入门"},{"f":"Transformer框架学习-初学者版.md","n":"Transformer 入门","s":"注意力、位置编码与训练全流程零基础讲解","u":"tf","lv":1,"ly":5,"kb":130,"ch":69362,"min":145,"h1":"Transformer 框架学习 —— 初学者版","d":"ai","lvn":"入门"},{"f":"Transformer 深度笔记.md","n":"Transformer 深读","s":"从零件到整机：逐层拆解架构与实现取舍","u":"tf","lv":2,"ly":5,"kb":48,"ch":25999,"min":54,"h1":"Transformer 深度笔记：从零件到整机","d":"ai","lvn":"进阶"},{"f":"Attention机制深度笔记.md","n":"Attention 深度","s":"注意力变体、KV Cache 与推理侧优化","u":"tf","lv":3,"ly":5,"kb":151,"ch":75529,"min":157,"h1":"Attention 机制深度笔记：从训练基础到 LLM 推理","d":"ai","lvn":"高级"},{"f":"FlashAttention源码学习指南.md","n":"FlashAttention","s":"IO 感知的分块注意力：推导与源码","u":"tf","lv":3,"ly":4,"kb":17,"ch":9322,"min":19,"h1":"FlashAttention 源码学习指南：大模型时代的地基算子","d":"ai","lvn":"高级"},{"f":"生成模型学习-初学者版.md","n":"生成模型入门","s":"GAN / VAE / 扩散家族的统一视角","u":"gen","lv":1,"ly":5,"kb":55,"ch":25405,"min":53,"h1":"生成模型学习 —— 初学者版","d":"ai","lvn":"入门"},{"f":"扩散模型Diffusion Models-初学者版.md","n":"Diffusion","s":"前向加噪、反向去噪与采样器完整推导","u":"gen","lv":1,"ly":5,"kb":46,"ch":24027,"min":50,"h1":"扩散模型（Diffusion Models）学习 —— 初学者版","d":"ai","lvn":"入门"},{"f":"蒙特卡洛方法与强化学习.md","n":"蒙特卡洛 · RL","s":"用随机采样近似决策：MCTS 与策略评估","u":"gen","lv":2,"ly":5,"kb":15,"ch":8376,"min":17,"h1":"蒙特卡洛方法与强化学习","d":"ai","lvn":"进阶"},{"f":"强化学习算法总结-初学者版.md","n":"强化学习总结","s":"DQN → PPO → AlphaGo 主线算法与公式速查","u":"gen","lv":2,"ly":5,"kb":209,"ch":85025,"min":177,"h1":"强化学习算法总结：从“奖励”到 AlphaGo","d":"ai","lvn":"进阶"},{"f":"大模型训练框架学习指南.md","n":"训练框架","s":"Megatron / DeepSpeed / FSDP 并行策略与显存账本","u":"infra","lv":2,"ly":5,"kb":18,"ch":10572,"min":22,"h1":"大模型训练框架学习指南：Megatron-LM / DeepSpeed / FSDP 三剑客","d":"ai","lvn":"进阶"},{"f":"torch.compile编程学习指南.md","n":"torch.compile","s":"Dynamo + Inductor 编译链路与图优化","u":"infra","lv":2,"ly":3,"kb":23,"ch":13633,"min":28,"h1":"torch.compile (Inductor) 编程学习指南（Windows/Linux + RTX 3060 + PyTorch 2.x）","d":"ai","lvn":"进阶"},{"f":"vLLM编程学习指南.md","n":"vLLM","s":"PagedAttention、连续批处理与服务化部署","u":"infra","lv":2,"ly":5,"kb":15,"ch":8721,"min":18,"h1":"vLLM 编程学习指南（Linux + NVIDIA/AMD GPU + Python 3.10+）","d":"ai","lvn":"进阶"},{"f":"SGLang编程学习指南.md","n":"SGLang","s":"RadixAttention 与结构化生成 DSL","u":"infra","lv":2,"ly":5,"kb":14,"ch":8399,"min":17,"h1":"SGLang 编程学习指南（Linux + NVIDIA GPU + Python 3.10+）","d":"ai","lvn":"进阶"},{"f":"TensorRT-LLM编程学习指南.md","n":"TensorRT-LLM","s":"引擎构建、量化与 in-flight batching","u":"infra","lv":3,"ly":5,"kb":15,"ch":8784,"min":18,"h1":"TensorRT-LLM 编程学习指南（Linux + Ada/Ampere/Hopper + CUDA 12.x）","d":"ai","lvn":"高级"},{"f":"llama.cpp编程学习指南.md","n":"llama.cpp","s":"纯 C/C++ 端侧推理、量化格式与 GGUF","u":"infra","lv":2,"ly":5,"kb":15,"ch":8777,"min":18,"h1":"llama.cpp 编程学习指南（Windows/Linux/macOS + CPU / GPU / Apple Silicon）","d":"ai","lvn":"进阶"},{"f":"边缘AI学习指导.md","n":"边缘 AI 路线","s":"端侧部署全景：算子、量化、调度与平台差异","u":"edge","lv":1,"ly":6,"kb":64,"ch":32660,"min":68,"h1":"边缘AI（Edge AI）学习指导","d":"ai","lvn":"入门"},{"f":"Android边缘AI实战攻略.md","n":"Android 端侧 AI","s":"NNAPI / GPU Delegate / LiteRT 全链路实战","u":"edge","lv":3,"ly":6,"kb":67,"ch":39863,"min":83,"h1":"Android 边缘AI 实战攻略","d":"ai","lvn":"高级"},{"f":"iPhone边缘AI实战攻略.md","n":"iOS 端侧 AI","s":"Core ML + ANE 的模型转换与性能调优","u":"edge","lv":3,"ly":6,"kb":101,"ch":55130,"min":115,"h1":"iPhone 边缘AI 实战攻略","d":"ai","lvn":"高级"},{"f":"GPU编程工具全景.md","n":"GPU 工具全景","s":"CUDA / Triton / Metal / WebGPU 生态选型地图","u":"intro","lv":1,"ly":4,"kb":38,"ch":20289,"min":42,"h1":"GPU 编程工具全景","d":"gpu","lvn":"入门"},{"f":"M1_GPU编程入门_PyTorch_MPS.md","n":"M1 · MPS","s":"苹果 M1 上 PyTorch MPS 后端上手","u":"intro","lv":1,"ly":4,"kb":13,"ch":9024,"min":19,"h1":"M1 Mac GPU 编程入门指南","d":"gpu","lvn":"入门"},{"f":"CUDA线程索引映射详解.md","n":"线程索引映射","s":"1D/2D/3D 索引推导与 SIMT、合并访问本质","u":"intro","lv":2,"ly":4,"kb":34,"ch":16773,"min":35,"h1":"CUDA 线程索引映射详解（1D / 2D / 3D 及底层逻辑）","d":"gpu","lvn":"进阶"},{"f":"CUDA-AI编程学习指南.md","n":"CUDA 面向 AI","s":"从 kernel 到 GEMM / Reduce / 注意力算子","u":"intro","lv":2,"ly":4,"kb":70,"ch":37234,"min":78,"h1":"面向 AI 的 CUDA 编程学习指南（Windows + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"进阶"},{"f":"PyTorch自定义CUDA算子学习指南.md","n":"自定义算子","s":"打通 kernel、pybind 与 autograd 的最后一公里","u":"intro","lv":2,"ly":4,"kb":16,"ch":10116,"min":21,"h1":"PyTorch 自定义 CUDA 算子学习指南：打通 Kernel 与 Model 的最后一公里","d":"gpu","lvn":"进阶"},{"f":"CUDA-Graphs学习指南.md","n":"CUDA Graphs","s":"图捕获消除 launch 开销，推理场景提速","u":"intro","lv":3,"ly":4,"kb":13,"ch":7861,"min":16,"h1":"CUDA Graphs 学习指南：干掉 Kernel Launch 开销的性能杀器","d":"gpu","lvn":"高级"},{"f":"cuBLAS编程学习指南.md","n":"cuBLAS","s":"基础 GEMM API、内存布局与 stream 语义","u":"libs","lv":2,"ly":4,"kb":18,"ch":10542,"min":22,"h1":"cuBLAS 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"进阶"},{"f":"cuBLASLt编程学习指南.md","n":"cuBLASLt","s":"epilogue、启发式与算法选择的灵活变体","u":"libs","lv":3,"ly":4,"kb":17,"ch":10465,"min":22,"h1":"cuBLASLt 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"高级"},{"f":"cuFFT编程学习指南.md","n":"cuFFT","s":"FFT 计划、批处理与布局变换","u":"libs","lv":2,"ly":4,"kb":13,"ch":7607,"min":16,"h1":"cuFFT 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"进阶"},{"f":"cuRAND编程学习指南.md","n":"cuRAND","s":"高质量并行随机数与可复现性","u":"libs","lv":2,"ly":4,"kb":15,"ch":8182,"min":17,"h1":"cuRAND 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"进阶"},{"f":"cuSPARSE编程学习指南.md","n":"cuSPARSE","s":"稀疏格式与 SpMV / SpGEMM","u":"libs","lv":2,"ly":4,"kb":14,"ch":7836,"min":16,"h1":"cuSPARSE 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"进阶"},{"f":"cuSOLVER编程学习指南.md","n":"cuSOLVER","s":"稠密/稀疏分解与迭代求解","u":"libs","lv":2,"ly":4,"kb":14,"ch":8102,"min":17,"h1":"cuSOLVER 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"进阶"},{"f":"cuDNN编程学习指南.md","n":"cuDNN","s":"卷积、归一化、注意力算子与图 API","u":"libs","lv":2,"ly":4,"kb":15,"ch":9583,"min":20,"h1":"cuDNN 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"进阶"},{"f":"cuCollections编程学习指南.md","n":"cuCollections","s":"GPU 并发哈希表、B 树与累加器","u":"libs","lv":3,"ly":4,"kb":24,"ch":14290,"min":30,"h1":"cuCollections 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"高级"},{"f":"CUB编程学习指南.md","n":"CUB","s":"Block/Warp 级并行原语与设备级扫描","u":"libs","lv":3,"ly":4,"kb":25,"ch":14813,"min":31,"h1":"CUB 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"高级"},{"f":"Thrust编程学习指南.md","n":"Thrust","s":"类 STL 的高层并行算法与迭代器","u":"libs","lv":2,"ly":4,"kb":24,"ch":15204,"min":32,"h1":"Thrust 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"进阶"},{"f":"libcu++编程学习指南.md","n":"libcu++","s":"CUDA 版 C++ 标准库与原子/内存序","u":"libs","lv":3,"ly":4,"kb":29,"ch":17747,"min":37,"h1":"libcu++ 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"高级"},{"f":"CUTLASS编程学习指南.md","n":"CUTLASS","s":"模板化 GEMM：tile、warp、epilogue 分层","u":"libs","lv":3,"ly":4,"kb":32,"ch":18435,"min":38,"h1":"CUTLASS 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"高级"},{"f":"CuPy编程学习指南.md","n":"CuPy","s":"NumPy 兼容的 GPU 数组与自定义 kernel","u":"hpc","lv":2,"ly":4,"kb":39,"ch":21394,"min":45,"h1":"CuPy 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"进阶"},{"f":"Numba编程学习指南.md","n":"Numba","s":"Python JIT 到 CUDA：@cuda.jit 实战","u":"hpc","lv":2,"ly":3,"kb":39,"ch":22178,"min":46,"h1":"Numba 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"进阶"},{"f":"NCCL编程学习指南.md","n":"NCCL","s":"多卡集合通信原语与拓扑调优","u":"hpc","lv":3,"ly":4,"kb":17,"ch":9777,"min":20,"h1":"NCCL 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"高级"},{"f":"NVSHMEM编程学习指南.md","n":"NVSHMEM","s":"GPU 间 PGAS 共享内存与对称内存","u":"hpc","lv":3,"ly":4,"kb":17,"ch":9949,"min":21,"h1":"NVSHMEM 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"高级"},{"f":"NVIDIA-Warp编程学习指南.md","n":"Warp","s":"可微仿真框架与 kernel 化物理计算","u":"hpc","lv":3,"ly":5,"kb":42,"ch":23180,"min":48,"h1":"NVIDIA Warp 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"高级"},{"f":"Nsight性能分析学习指南.md","n":"Nsight 性能分析","s":"nsys / ncu 定位 CPU、GPU 与访存瓶颈","u":"comp","lv":2,"ly":3,"kb":14,"ch":8185,"min":17,"h1":"Nsight 性能分析学习指南：GPU 优化的\"X 光机\"","d":"gpu","lvn":"进阶"},{"f":"Triton编程学习指南.md","n":"Triton","s":"Python 写 GPU kernel：分块模型与自动调优","u":"comp","lv":2,"ly":3,"kb":39,"ch":22523,"min":47,"h1":"Triton 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"进阶"},{"f":"TVM编程学习指南.md","n":"TVM","s":"张量编译、调度原语与算子融合","u":"comp","lv":3,"ly":3,"kb":22,"ch":13301,"min":28,"h1":"TVM 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"高级"},{"f":"MLIR编译器底座学习指南.md","n":"MLIR","s":"Dialect / Pass 基础设施与 AI 编译器地基","u":"comp","lv":3,"ly":3,"kb":15,"ch":8212,"min":17,"h1":"MLIR 编译器底座学习指南：Triton / Mojo / TVM Unity 的共同地基","d":"gpu","lvn":"高级"},{"f":"PTX 汇编编程学习指南.md","n":"PTX 汇编","s":"C++ 与 SASS 之间的指令级控制","u":"comp","lv":3,"ly":4,"kb":29,"ch":16448,"min":34,"h1":"PTX 汇编编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）","d":"gpu","lvn":"高级"},{"f":"GPU渲染与图形学入门-初学者版.md","n":"图形学入门","s":"管线、着色器、光照模型的零基础全景","u":"fund","lv":1,"ly":4,"kb":33,"ch":16181,"min":34,"h1":"GPU 渲染与图形学入门 —— 初学者版","d":"gfx","lvn":"入门"},{"f":"图形学基础-虎书与LearnOpenGL-初学者版.md","n":"虎书 + LearnOpenGL","s":"教材主线与工程实践双轨入门","u":"fund","lv":1,"ly":4,"kb":96,"ch":62135,"min":129,"h1":"图形学基础 —— 虎书 + LearnOpenGL 双主线入门版","d":"gfx","lvn":"入门"},{"f":"图形学中的8个坐标系详解.md","n":"8 个坐标系","s":"model→world→view→clip→NDC→screen 全链路","u":"fund","lv":2,"ly":4,"kb":88,"ch":36623,"min":76,"h1":"图形学中的 8 个坐标系详解","d":"gfx","lvn":"进阶"},{"f":"齐次坐标详解.md","n":"齐次坐标","s":"平移线性化、透视除法的工程视角","u":"fund","lv":2,"ly":0,"kb":27,"ch":11462,"min":24,"h1":"","d":"gfx","lvn":"进阶"},{"f":"射影平面与齐次坐标.md","n":"射影几何","s":"RP² 严格定义与无穷远点的几何意义","u":"fund","lv":3,"ly":0,"kb":40,"ch":19658,"min":41,"h1":"射影平面 $\\mathbb{RP}^2$ 与齐次坐标","d":"gfx","lvn":"高级"},{"f":"3D旋转与四元数.md","n":"四元数 · 旋转","s":"欧拉角、旋转矩阵、四元数的换算与插值","u":"fund","lv":3,"ly":0,"kb":164,"ch":81514,"min":170,"h1":"3D 旋转与四元数（Quaternion）—— 程序员视角","d":"gfx","lvn":"高级"},{"f":"如何把一张2D图像贴到三角网格立体上-纹理贴图详解.md","n":"纹理贴图","s":"UV、采样、过滤与 mipmap 的完整链路","u":"fund","lv":2,"ly":4,"kb":60,"ch":25683,"min":54,"h1":"如何把一张 2D 图像贴到三角网格立体上 —— 纹理贴图详解","d":"gfx","lvn":"进阶"},{"f":"光线追踪详解.md","n":"光线追踪","s":"求交、着色、采样与降噪","u":"fund","lv":3,"ly":4,"kb":39,"ch":17339,"min":36,"h1":"光线追踪（Ray Tracing）详解","d":"gfx","lvn":"高级"},{"f":"照相机标定.md","n":"相机标定","s":"内参/外参、畸变模型与标定流程","u":"fund","lv":3,"ly":0,"kb":81,"ch":40206,"min":84,"h1":"照相机标定（Camera Calibration）—— 程序员视角","d":"gfx","lvn":"高级"},{"f":"AI时代图形学开发知识体系.md","n":"图形学知识体系","s":"AI 时代图形技术栈全景与能力地图","u":"fund","lv":4,"ly":6,"kb":71,"ch":29819,"min":62,"h1":"AI 时代图形学开发知识体系","d":"gfx","lvn":"专家"},{"f":"游戏开发者数学-动态BVH.md","n":"动态 BVH","s":"增量更新、SAH 与自顶向下构建的取舍","u":"fund","lv":3,"ly":0,"kb":28,"ch":14365,"min":30,"h1":"游戏开发者的数学知识：动态边界体积层次结构（Dynamic BVH）","d":"gfx","lvn":"高级"},{"f":"GPU图形渲染中的着色器详解.md","n":"着色器详解","s":"顶点/几何/片元/计算着色器与编译链路","u":"shader","lv":2,"ly":4,"kb":65,"ch":29314,"min":61,"h1":"GPU 图形渲染中的着色器详解","d":"gfx","lvn":"进阶"},{"f":"图形API设计哲学对比-Vulkan-OpenGL-Metal-DirectX12.md","n":"API 设计哲学","s":"Vulkan/GL/Metal/DX12 的状态与同步模型对比","u":"shader","lv":4,"ly":4,"kb":43,"ch":23095,"min":48,"h1":"图形 API 设计哲学深度对比","d":"gfx","lvn":"专家"},{"f":"OpenGL 视频纹理渲染 —— 完整学习指南.md","n":"OpenGL · 视频纹理","s":"YUV 上传、色彩矩阵与渲染时序","u":"api","lv":3,"ly":4,"kb":66,"ch":27087,"min":56,"h1":"OpenGL 视频纹理渲染 —— 完整学习指南","d":"gfx","lvn":"高级"},{"f":"WebGL学习指南-从入门到精通.md","n":"WebGL","s":"Web 平台 GL 管线、上下文与性能边界","u":"api","lv":2,"ly":4,"kb":68,"ch":36754,"min":77,"h1":"WebGL 学习指南 —— 从入门到精通","d":"gfx","lvn":"进阶"},{"f":"WebGPU学习指南-从入门到精通.md","n":"WebGPU","s":"现代 Web GPU：pipeline、binding 与 compute","u":"api","lv":2,"ly":4,"kb":73,"ch":42787,"min":89,"h1":"WebGPU 学习指南 —— 从入门到精通","d":"gfx","lvn":"进阶"},{"f":"Metal学习指南-从入门到精通.md","n":"Metal","s":"苹果 GPU API：command buffer 与内存模型","u":"api","lv":2,"ly":4,"kb":45,"ch":26234,"min":55,"h1":"Metal 学习指南 —— 从入门到精通","d":"gfx","lvn":"进阶"},{"f":"Metal 视频纹理渲染 —— 完整学习指南.md","n":"Metal · 视频纹理","s":"CVPixelBuffer 到纹理的零拷贝路径","u":"api","lv":3,"ly":4,"kb":78,"ch":34199,"min":71,"h1":"Metal 视频纹理渲染 —— 完整学习指南","d":"gfx","lvn":"高级"},{"f":"DirectX 12学习指南-从入门到精通.md","n":"DirectX 12","s":"描述符堆、命令队列与显式同步","u":"api","lv":3,"ly":4,"kb":49,"ch":28335,"min":59,"h1":"DirectX 12 学习指南 —— 从入门到精通","d":"gfx","lvn":"高级"},{"f":"Vulkan学习指南-从入门到精通.md","n":"Vulkan","s":"显式 API 全流程：instance 到 command buffer","u":"api","lv":3,"ly":4,"kb":56,"ch":33200,"min":69,"h1":"Vulkan 学习指南 —— 从入门到精通","d":"gfx","lvn":"高级"},{"f":"Vulkan 视频纹理渲染 —— 完整学习指南.md","n":"Vulkan · 视频纹理","s":"硬解帧到纹理与跨队列同步","u":"api","lv":3,"ly":4,"kb":89,"ch":40361,"min":84,"h1":"Vulkan 视频纹理渲染 —— 完整学习指南","d":"gfx","lvn":"高级"},{"f":"bgfx学习指南-从入门到精通.md","n":"bgfx","s":"一份代码通吃 D3D/Vulkan/Metal/GL/WebGPU","u":"api","lv":2,"ly":5,"kb":38,"ch":24326,"min":51,"h1":"bgfx 学习指南 —— 从入门到精通","d":"gfx","lvn":"进阶"},{"f":"C++图形与游戏开发.md","n":"C++ 图形与游戏","s":"ECS 架构、渲染引擎与 3D 资产管线","u":"engine","lv":2,"ly":5,"kb":9,"ch":4434,"min":9,"h1":"C++ 图形与游戏开发：ECS 架构、渲染引擎与 3D 格式","d":"gfx","lvn":"进阶"},{"f":"EntityX学习指南-从入门到精通.md","n":"EntityX","s":"C++11 ECS 框架源码与架构拆解","u":"engine","lv":3,"ly":5,"kb":35,"ch":21752,"min":45,"h1":"EntityX 学习指南 —— 从入门到精通","d":"gfx","lvn":"高级"},{"f":"Filament学习指南-从入门到精通.md","n":"Filament","s":"Google PBR 引擎：材质系统、IBL 与后处理","u":"engine","lv":3,"ly":5,"kb":11,"ch":6479,"min":13,"h1":"Filament 学习指南 —— 从入门到精通","d":"gfx","lvn":"高级"},{"f":"Alembic学习指南-从入门到精通.md","n":"Alembic","s":"三维几何动画交换格式与 C++ 运行时","u":"engine","lv":2,"ly":5,"kb":9,"ch":5333,"min":11,"h1":"Alembic 学习指南 —— 从入门到精通","d":"gfx","lvn":"进阶"},{"f":"AI时代游戏开发知识体系.md","n":"游戏开发体系","s":"AI 时代游戏技术图谱与岗位能力矩阵","u":"engine","lv":4,"ly":6,"kb":21,"ch":9715,"min":20,"h1":"AI 时代游戏开发知识体系","d":"gfx","lvn":"专家"},{"f":"微信小游戏Demo开发步骤与参考例子.md","n":"微信小游戏","s":"从零到发布的 Demo 全流程","u":"engine","lv":1,"ly":6,"kb":31,"ch":16659,"min":35,"h1":"微信小游戏Demo开发步骤与参考例子","d":"gfx","lvn":"入门"},{"f":"CocosCreator入门指南.md","n":"Cocos Creator","s":"引擎界面、组件与首个可玩场景","u":"engine","lv":1,"ly":5,"kb":19,"ch":9447,"min":20,"h1":"Cocos Creator 入门指南","d":"gfx","lvn":"入门"},{"f":"BABYLON.JS_深度解读.md","n":"Babylon.js","s":"v9 工程结构与渲染架构深度解读","u":"engine","lv":3,"ly":5,"kb":70,"ch":38671,"min":81,"h1":"Babylon.js v9.11.0 工程深度解读","d":"gfx","lvn":"高级"},{"f":"three.js-Analysis-guide.md","n":"three.js","s":"r184 源码：场景图、材质与 WebGL 后端","u":"engine","lv":3,"ly":5,"kb":75,"ch":38652,"min":81,"h1":"Three.js r184 源码分析指南：从入门到架构进阶","d":"gfx","lvn":"高级"},{"f":"游戏设计全景概要-完整维度地图.md","n":"游戏设计全景","s":"五大领域 14 个维度的设计地图","u":"gamedesign","lv":1,"ly":6,"kb":31,"ch":11757,"min":24,"h1":"游戏设计全景概要 · 完整维度地图","d":"gfx","lvn":"入门"},{"f":"游戏数值设计-1.4-全局概要与知识地图.md","n":"数值设计地图","s":"数值体系模块划分与相互关联的导航图","u":"gamedesign","lv":1,"ly":6,"kb":11,"ch":3812,"min":8,"h1":"游戏数值设计 · 全局概要与知识地图","d":"gfx","lvn":"入门"},{"f":"游戏数值设计入门-1.4.1-经济篇.md","n":"数值 · 经济","s":"产消循环、货币层级与通胀控制","u":"gamedesign","lv":2,"ly":6,"kb":12,"ch":4488,"min":9,"h1":"游戏数值设计入门 · 经济篇","d":"gfx","lvn":"进阶"},{"f":"游戏数值设计入门-1.4.2-成长篇.md","n":"数值 · 成长","s":"经验曲线、等级与属性投放节奏","u":"gamedesign","lv":2,"ly":6,"kb":9,"ch":3581,"min":7,"h1":"游戏数值设计入门 · 成长篇","d":"gfx","lvn":"进阶"},{"f":"游戏数值设计入门-1.4.3-战斗篇.md","n":"数值 · 战斗","s":"伤害公式、防御减免与暴击期望","u":"gamedesign","lv":2,"ly":6,"kb":9,"ch":4048,"min":8,"h1":"游戏数值设计入门 · 战斗篇","d":"gfx","lvn":"进阶"},{"f":"游戏数值设计入门-1.4.4-概率篇.md","n":"数值 · 概率","s":"抽卡、掉落与保底机制的期望与方差","u":"gamedesign","lv":2,"ly":6,"kb":8,"ch":3441,"min":7,"h1":"游戏数值设计入门 · 概率篇","d":"gfx","lvn":"进阶"},{"f":"游戏数值设计入门-1.4.5-平衡篇.md","n":"数值 · 平衡","s":"PVE 难度、PVP 公平与职业平衡","u":"gamedesign","lv":2,"ly":6,"kb":8,"ch":3121,"min":7,"h1":"游戏数值设计入门 · 平衡篇","d":"gfx","lvn":"进阶"},{"f":"游戏数值设计入门-1.4.6-付费篇.md","n":"数值 · 付费","s":"商业化分层与免费玩家体验边界","u":"gamedesign","lv":2,"ly":6,"kb":9,"ch":3498,"min":7,"h1":"游戏数值设计入门 · 付费篇","d":"gfx","lvn":"进阶"},{"f":"游戏数值设计入门-1.4.7-数据篇.md","n":"数值 · 数据","s":"上线后指标验证、AB 实验与迭代调优","u":"gamedesign","lv":2,"ly":6,"kb":10,"ch":4449,"min":9,"h1":"游戏数值设计入门 · 数据篇","d":"gfx","lvn":"进阶"},{"f":"游戏技能系统-战术位移算法解析.md","n":"技能 · 位移算法","s":"Apex 战术位移的 10 步状态机与碰撞处理","u":"gamedesign","lv":4,"ly":6,"kb":36,"ch":15990,"min":33,"h1":"游戏技能系统：战术位移\"穿越\"算法解析","d":"gfx","lvn":"专家"},{"f":"HSV颜色空间.md","n":"HSV","s":"色相/饱和度/明度的几何与用法","u":"std","lv":1,"ly":0,"kb":4,"ch":1881,"min":4,"h1":"HSV 颜色空间","d":"media","lvn":"入门"},{"f":"色彩空间表示与转换.md","n":"色彩空间","s":"BT.601/709/2020 与 RGB↔YUV 矩阵推导","u":"std","lv":2,"ly":4,"kb":204,"ch":76211,"min":159,"h1":"色彩空间表示与转换","d":"media","lvn":"进阶"},{"f":"音频编码知识体系.md","n":"音频编码","s":"PCM → AAC/Opus 的编码链与心理声学","u":"std","lv":2,"ly":4,"kb":60,"ch":27251,"min":57,"h1":"音频编码知识体系","d":"media","lvn":"进阶"},{"f":"H.264标准深入浅出-从语法元素到工程实战.md","n":"H.264","s":"语法元素、宏块与熵编码逐层拆解","u":"std","lv":3,"ly":4,"kb":31,"ch":17116,"min":36,"h1":"H.264 / AVC 标准深入浅出——从语法元素到工程实战","d":"media","lvn":"高级"},{"f":"H.265标准深入浅出-从CTU四叉树到工程实战.md","n":"H.265","s":"CTU 四叉树、PU/TU 划分与工程实现","u":"std","lv":3,"ly":4,"kb":35,"ch":20846,"min":43,"h1":"H.265 / HEVC 标准深入浅出——从 CTU 四叉树到工程实战","d":"media","lvn":"高级"},{"f":"视频编码码控深入浅出-九大开源编码器对比与统一模型.md","n":"码率控制","s":"九大编码器 RDO/码控模型横向统一","u":"std","lv":4,"ly":4,"kb":332,"ch":161194,"min":336,"h1":"**视频编码码控深入浅出——九大开源编码器对比与统一模型**","d":"media","lvn":"专家"},{"f":"x264汇编优化深度分析.md","n":"x264 汇编优化","s":"手写 SIMD 相对编译器的真实收益","u":"enc","lv":3,"ly":3,"kb":9,"ch":4216,"min":9,"h1":"x264 汇编优化深度分析","d":"media","lvn":"高级"},{"f":"汇编加速原理——从x264源码看手写汇编的价值.md","n":"汇编加速原理","s":"从 x264 热点看手写汇编的价值边界","u":"enc","lv":3,"ly":3,"kb":51,"ch":24410,"min":51,"h1":"汇编加速原理——从 x264 源码看手写汇编的价值","d":"media","lvn":"高级"},{"f":"x264_x265快速算法解析.md","n":"快速算法","s":"提前终止、快速运动估计等加速策略全集","u":"enc","lv":3,"ly":4,"kb":174,"ch":67386,"min":140,"h1":"x264/x265 快速算法全解析","d":"media","lvn":"高级"},{"f":"最新版x264源码深入浅出-从工业级编码器到性能榨取.md","n":"x264 源码","s":"工业级编码器主流程、线程与性能榨取","u":"enc","lv":3,"ly":4,"kb":227,"ch":114258,"min":238,"h1":"","d":"media","lvn":"高级"},{"f":"最新版x265源码深入浅出-从工业级HEVC编码器到性能榨取.md","n":"x265 源码","s":"工业级 HEVC 编码器源码与性能榨取","u":"enc","lv":3,"ly":4,"kb":98,"ch":53499,"min":111,"h1":"最新版 x265 源码深入浅出——从工业级 HEVC 编码器到性能榨取","d":"media","lvn":"高级"},{"f":"OpenH264源码深入浅出-Cisco开源RTC编码器全景剖析.md","n":"OpenH264","s":"Cisco RTC 编码器架构与实时取舍","u":"enc","lv":3,"ly":4,"kb":40,"ch":23809,"min":50,"h1":"OpenH264 源码深入浅出——Cisco 开源 RTC 编码器全景剖析","d":"media","lvn":"高级"},{"f":"Kvazaar源码深入浅出-学院派开源HEVC编码器全景剖析.md","n":"Kvazaar","s":"学院派 HEVC 编码器全景剖析","u":"enc","lv":3,"ly":4,"kb":38,"ch":22419,"min":47,"h1":"Kvazaar 源码深入浅出——学院派开源 HEVC 编码器全景剖析","d":"media","lvn":"高级"},{"f":"播放器音画同步设计与实现.md","n":"播放端音画同步","s":"音频主时钟、丢帧与变速不变调","u":"player","lv":3,"ly":5,"kb":37,"ch":20612,"min":43,"h1":"","d":"media","lvn":"高级"},{"f":"播放器中YUV视频帧的GPU渲染详解.md","n":"YUV GPU 渲染","s":"纹理格式、shader 转换与零拷贝","u":"player","lv":3,"ly":4,"kb":55,"ch":26087,"min":54,"h1":"播放器中 YUV 视频帧的 GPU 渲染详解","d":"media","lvn":"高级"},{"f":"VLC源码学习指南.md","n":"VLC 源码","s":"模块系统与 demux/decode 主链路","u":"player","lv":3,"ly":5,"kb":41,"ch":24428,"min":51,"h1":"VLC 源码学习指南","d":"media","lvn":"高级"},{"f":"VLC源码深度解析.md","n":"VLC 深度","s":"输入、解码、渲染与同步的深度追踪","u":"player","lv":3,"ly":5,"kb":60,"ch":32497,"min":68,"h1":"VLC 媒体播放器源码深度解析","d":"media","lvn":"高级"},{"f":"FFmpeg源码学习指南.md","n":"FFmpeg 源码","s":"avformat/avcodec 结构与滤镜图","u":"player","lv":3,"ly":5,"kb":100,"ch":56767,"min":118,"h1":"","d":"media","lvn":"高级"},{"f":"GStreamer源码学习指南.md","n":"GStreamer 源码","s":"element/pad 模型与 pipeline 调度","u":"player","lv":3,"ly":5,"kb":104,"ch":59874,"min":125,"h1":"GStreamer 源码学习指南","d":"media","lvn":"高级"},{"f":"hls.js-code-analysis.md","n":"hls.js","s":"Web HLS：ABR、缓冲区与追帧策略","u":"player","lv":3,"ly":5,"kb":134,"ch":71194,"min":148,"h1":"hls.js 代码工程深度分析文档","d":"media","lvn":"高级"},{"f":"屏幕画面采集 —— 完整技术指南.md","n":"屏幕采集","s":"各平台采集 API、编码与低延迟链路","u":"capture","lv":3,"ly":4,"kb":163,"ch":75591,"min":157,"h1":"屏幕画面采集 —— 完整技术指南","d":"media","lvn":"高级"},{"f":"开播侧画面采集设计与实现.md","n":"开播侧采集","s":"多 GPU/显示器选择与零拷贝上屏","u":"capture","lv":3,"ly":6,"kb":30,"ch":17392,"min":36,"h1":"","d":"media","lvn":"高级"},{"f":"开播侧-采集端音画同步设计与实现.md","n":"采集端音画同步","s":"采集时间戳、时钟漂移与对齐策略","u":"capture","lv":3,"ly":6,"kb":85,"ch":45109,"min":94,"h1":"开播侧（采集端）音画同步设计与实现","d":"media","lvn":"高级"},{"f":"直播开播端-Pipeline与事件总线-选型与实现方案.md","n":"开播端架构选型","s":"PC/移动/跨端三条主线的框架组合","u":"march","lv":4,"ly":6,"kb":50,"ch":28102,"min":59,"h1":"直播开播端 Pipeline 与进程内事件总线 —— 选型指南（PC / 移动 / 跨端三条主线）","d":"media","lvn":"专家"},{"f":"播放器-Pipeline与事件总线-选型与实现方案.md","n":"播放器架构选型","s":"播放内核选型与 AVSync / Seek 心智模型","u":"march","lv":4,"ly":6,"kb":57,"ch":32830,"min":68,"h1":"播放器 Pipeline 与进程内事件总线 —— 选型指南（PC / 移动 / 跨端三条主线）","d":"media","lvn":"专家"},{"f":"统一消息总线-开播与播放器一体化实现方案.md","n":"统一消息总线","s":"Topic 化总线同时承载数据面与控制面","u":"march","lv":4,"ly":6,"kb":83,"ch":45901,"min":96,"h1":"统一消息总线 (UMB) —— 开播与播放器一体化实现方案","d":"media","lvn":"专家"},{"f":"嵌入式系统生态_Arduino到RT-Thread.md","n":"嵌入式生态","s":"Arduino → RT-Thread 的生态位与选型","u":"rtos","lv":1,"ly":2,"kb":12,"ch":5341,"min":11,"h1":"嵌入式系统生态：从 Arduino 到 RT-Thread","d":"sys","lvn":"入门"},{"f":"ROS 2 与机器人空间数学.md","n":"ROS 2","s":"节点/话题模型与位姿变换数学","u":"rtos","lv":2,"ly":2,"kb":13,"ch":7123,"min":15,"h1":"ROS 2 与机器人空间数学","d":"sys","lvn":"进阶"},{"f":"FreeRTOS-Kernel源码学习指南.md","n":"FreeRTOS 源码","s":"调度器、队列与内存管理的实现","u":"rtos","lv":3,"ly":2,"kb":65,"ch":34599,"min":72,"h1":"FreeRTOS-Kernel 源码学习指南","d":"sys","lvn":"高级"},{"f":"uCOS-III学习指南.md","n":"µC/OS-III","s":"完整 RTOS 内核源码与移植要点","u":"rtos","lv":3,"ly":2,"kb":184,"ch":86627,"min":180,"h1":"µC/OS-III 实时操作系统源码学习指南","d":"sys","lvn":"高级"},{"f":"Zabbix监控系统简介.md","n":"Zabbix","s":"监控架构、采集方式与告警闭环","u":"store","lv":1,"ly":2,"kb":3,"ch":1162,"min":2,"h1":"Zabbix 监控系统简介","d":"sys","lvn":"入门"},{"f":"SPDK高性能存储技术.md","n":"SPDK","s":"轮询模式、用户态驱动与零拷贝 I/O","u":"store","lv":3,"ly":2,"kb":3,"ch":1608,"min":3,"h1":"SPDK：高性能存储开发工具包","d":"sys","lvn":"高级"},{"f":"WebAssembly深入浅出-从原理到跨端工程实战.md","n":"WebAssembly","s":"二进制格式、线性内存与跨端嵌入","u":"web","lv":3,"ly":3,"kb":26,"ch":15443,"min":32,"h1":"WebAssembly 深入浅出——从原理到跨端工程实战","d":"sys","lvn":"高级"},{"f":"nginx源码学习指南.md","n":"Nginx 源码","s":"事件循环、连接池与模块化架构","u":"web","lv":3,"ly":2,"kb":126,"ch":70747,"min":147,"h1":"Nginx 源码学习指南","d":"sys","lvn":"高级"},{"f":"OpenCV源码学习指南.md","n":"OpenCV 源码","s":"模块划分、Mat 内存与 IPP 加速","u":"cv","lv":3,"ly":5,"kb":102,"ch":57090,"min":119,"h1":"","d":"sys","lvn":"高级"},{"f":"光流法详解.md","n":"光流法","s":"Lucas-Kanade 与稠密光流的推导与实现","u":"cv","lv":2,"ly":0,"kb":32,"ch":13738,"min":29,"h1":"光流法（Optical Flow）详解","d":"sys","lvn":"进阶"},{"f":"导向滤波详解.md","n":"导向滤波","s":"保边平滑的线性模型与 O(1) 实现","u":"cv","lv":2,"ly":0,"kb":36,"ch":15371,"min":32,"h1":"导向滤波（Guided Filter）详解","d":"sys","lvn":"进阶"},{"f":"电子学-部分名词解释.md","n":"电子学名词（简）","s":"常用概念的简明速查","u":"circuit","lv":1,"ly":1,"kb":39,"ch":16357,"min":34,"h1":"电子学——名词解释","d":"hw","lvn":"入门"},{"f":"电子学-名词解释.md","n":"电子学名词（详）","s":"更完整的名词与公式解释","u":"circuit","lv":1,"ly":1,"kb":39,"ch":16344,"min":34,"h1":"电子学——名词解释","d":"hw","lvn":"入门"},{"f":"电路与模拟电子技术-学习指导-初学者版.md","n":"电路 · 模电","s":"面向初学者的教材同步学习指导","u":"circuit","lv":1,"ly":0,"kb":69,"ch":29723,"min":62,"h1":"","d":"hw","lvn":"入门"},{"f":"程序员电路入门_LTspice到SPICE.md","n":"程序员电路入门","s":"用仿真理解电路，从 LTspice 到 SPICE","u":"circuit","lv":1,"ly":1,"kb":13,"ch":7095,"min":15,"h1":"程序员电路入门：从 LTspice 到标准 SPICE","d":"hw","lvn":"入门"},{"f":"LTspice入门指导.md","n":"LTspice","s":"虚拟实验台：建模、仿真与波形分析","u":"circuit","lv":2,"ly":1,"kb":114,"ch":51535,"min":107,"h1":"LTspice 入门指导","d":"hw","lvn":"进阶"},{"f":"LabVIEW简介.md","n":"LabVIEW","s":"图形化数据流编程与仪器控制","u":"circuit","lv":1,"ly":6,"kb":2,"ch":813,"min":2,"h1":"LabVIEW 简介","d":"hw","lvn":"入门"},{"f":"RC滤波器学习笔记.md","n":"RC 滤波器","s":"从电容复阻抗到一阶滤波的推导","u":"filter","lv":1,"ly":0,"kb":11,"ch":7236,"min":15,"h1":"从电容复阻抗到 RC 滤波器 —— 系统学习笔记","d":"hw","lvn":"入门"},{"f":"RC低通滤波器从基础到应用的系统学习笔记.md","n":"RC 低通","s":"复数基础 → 功率因数 → 滤波仿真全链","u":"filter","lv":2,"ly":0,"kb":15,"ch":8711,"min":18,"h1":"RC低通滤波器从基础到应用的系统学习笔记","d":"hw","lvn":"进阶"},{"f":"LC并联谐振电路_推导与分析.md","n":"LC 谐振","s":"阻抗、品质因数与谐振特性推导","u":"filter","lv":2,"ly":0,"kb":7,"ch":4110,"min":9,"h1":"LC 并联谐振电路 —— 推导与分析","d":"hw","lvn":"进阶"},{"f":"电声学基础_SPL与电抗.md","n":"电声学","s":"声压级、频响与电抗匹配","u":"filter","lv":2,"ly":0,"kb":10,"ch":5038,"min":10,"h1":"电声学基础：从扬声器频响到电抗","d":"hw","lvn":"进阶"},{"f":"AI时代模拟电路开发知识体系.md","n":"模拟电路体系","s":"全栈知识图谱与 AI 辅助设计位点","u":"chip","lv":4,"ly":1,"kb":35,"ch":14704,"min":31,"h1":"AI 时代模拟电路开发知识体系","d":"hw","lvn":"专家"},{"f":"AI辅助模拟电路设计.md","n":"AI 辅助模拟设计","s":"用模型替代手调 W/L 的探索路径","u":"chip","lv":2,"ly":1,"kb":11,"ch":5770,"min":12,"h1":"AI 辅助模拟电路设计","d":"hw","lvn":"进阶"},{"f":"AI时代数字电路开发知识体系.md","n":"数字电路体系","s":"RTL → 综合 → 验证的知识图谱","u":"chip","lv":4,"ly":1,"kb":47,"ch":22582,"min":47,"h1":"AI 时代数字电路开发知识体系","d":"hw","lvn":"专家"},{"f":"AI时代FPGA开发知识体系.md","n":"FPGA 体系","s":"FPGA 全栈图谱与工程流程","u":"chip","lv":4,"ly":1,"kb":34,"ch":15520,"min":32,"h1":"AI 时代 FPGA 开发知识体系","d":"hw","lvn":"专家"},{"f":"Python与Conda环境管理_macOS.md","n":"Python · Conda","s":"macOS/ARM 下的环境隔离与依赖治理","u":"lang","lv":1,"ly":3,"kb":21,"ch":13969,"min":29,"h1":"Python 与 Conda 环境管理（macOS / ARM）","d":"dev","lvn":"入门"},{"f":"VSCode-Cpp全流程开发配置指南.md","n":"VSCode + C++","s":"编译、调试、格式化与工程化配置","u":"lang","lv":1,"ly":3,"kb":49,"ch":30166,"min":63,"h1":"VSCode + C++ 全流程开发配置实操指南","d":"dev","lvn":"入门"},{"f":"npm-case 示例 Demo 完整构建指南.md","n":"npm 工程示例","s":"从零配置到运行、调试与导出小游戏","u":"lang","lv":1,"ly":3,"kb":21,"ch":11171,"min":23,"h1":"npm-case 示例 Demo 完整构建指南","d":"dev","lvn":"入门"},{"f":"C++工具链与脚本引擎.md","n":"C++ 工具链","s":"编译链、ABI 与内嵌脚本引擎集成","u":"lang","lv":2,"ly":3,"kb":16,"ch":8256,"min":17,"h1":"C++ 工具链与脚本引擎","d":"dev","lvn":"进阶"},{"f":"C++23新特性解析与应用深入理解.md","n":"C++23","s":"新特性逐条解析与工程迁移建议","u":"lang","lv":3,"ly":3,"kb":109,"ch":65974,"min":137,"h1":"C++23 新特性解析与应用深入理解","d":"dev","lvn":"高级"},{"f":"编译构建工具全景指南-Make-CMake-Meson-Ninja等.md","n":"构建工具全景","s":"Make/CMake/Meson/Ninja 设计哲学与选型","u":"build","lv":2,"ly":3,"kb":88,"ch":50001,"min":104,"h1":"编译构建工具全景指南 —— Make / CMake / Meson / Ninja 等","d":"dev","lvn":"进阶"},{"f":"Hook与Trampoline深入浅出-跨平台函数拦截原理与工程实战.md","n":"Hook · Trampoline","s":"跨平台函数拦截原理与工程实现","u":"build","lv":3,"ly":3,"kb":33,"ch":18931,"min":39,"h1":"Hook 与 Trampoline 深入浅出——跨平台函数拦截原理与工程实战","d":"dev","lvn":"高级"},{"f":"GoogleTest与GoogleMock学习指南-从入门到精通.md","n":"GoogleTest","s":"Fixture、参数化、死亡测试与 EXPECT_CALL","u":"build","lv":2,"ly":3,"kb":11,"ch":7273,"min":15,"h1":"GoogleTest 与 GoogleMock 学习指南 —— 从入门到精通","d":"dev","lvn":"进阶"},{"f":"C与C++调用汇编语言深入浅出-跨平台实战.md","n":"C/C++ 调汇编","s":"ABI、内联汇编与跨平台互调","u":"asm","lv":2,"ly":3,"kb":40,"ch":22252,"min":46,"h1":"C 与 C++ 调用汇编语言深入浅出——跨平台实战指南","d":"dev","lvn":"进阶"},{"f":"ARM汇编深入浅出-从ARMv7到AArch64的工程实战指南.md","n":"ARM 汇编","s":"ARMv7 → AArch64 指令、寄存器与实战","u":"asm","lv":3,"ly":3,"kb":34,"ch":18219,"min":38,"h1":"ARM 汇编深入浅出——从 ARMv7 到 AArch64 的工程实战指南","d":"dev","lvn":"高级"},{"f":"x86-64汇编深入浅出-从IA-32到AVX-512的工程实战指南.md","n":"x86-64 汇编","s":"IA-32 → AVX-512 的指令演进与实战","u":"asm","lv":3,"ly":3,"kb":36,"ch":20067,"min":42,"h1":"x86-64 汇编深入浅出——从 IA-32 到 AVX-512 的工程实战指南","d":"dev","lvn":"高级"},{"f":"RISC-V架构深入浅出-从指令集到工程实战.md","n":"RISC-V","s":"指令集、特权级与工程实践","u":"asm","lv":3,"ly":3,"kb":30,"ch":16898,"min":35,"h1":"RISC-V 架构深入浅出——从指令集到工程实战","d":"dev","lvn":"高级"},{"f":"欧拉公式与e^{-iπ}.md","n":"欧拉公式","s":"复指数与旋转的直观联系","u":"alg","lv":1,"ly":0,"kb":2,"ch":993,"min":2,"h1":"欧拉公式与 $e^{-i\\pi}$","d":"math","lvn":"入门"},{"f":"DFT与FFT蝶形运算详解.md","n":"DFT · FFT","s":"蝶形结构、码位倒序与频谱分析","u":"alg","lv":2,"ly":0,"kb":8,"ch":3942,"min":8,"h1":"DFT 与 FFT：蝶形运算、码位倒序与频谱分析","d":"math","lvn":"进阶"},{"f":"Eigen学习指南-从入门到精通.md","n":"Eigen","s":"头文件级线性代数：矩阵、SVD 与几何变换","u":"alg","lv":2,"ly":3,"kb":8,"ch":4756,"min":10,"h1":"Eigen 学习指南 —— 从入门到精通","d":"math","lvn":"进阶"},{"f":"进程内事件总线-优秀开源库汇总.md","n":"事件总线选型","s":"8 种语言主流 Event Bus 横向对比与反模式","u":"bus","lv":2,"ly":6,"kb":15,"ch":9267,"min":19,"h1":"进程内事件总线（In-process Event Bus）优秀开源库汇总","d":"arch","lvn":"进阶"},{"f":"eventpp学习指南-从入门到精通.md","n":"eventpp","s":"CallbackList/Dispatcher/Queue 与自研 TopicRouter","u":"bus","lv":3,"ly":6,"kb":36,"ch":22118,"min":46,"h1":"eventpp 学习指南 —— 从入门到精通","d":"arch","lvn":"高级"},{"f":"量化交易推荐书籍.md","n":"量化书单","s":"按入门 → 进阶 → 高阶分级的阅读路线","u":"quant","lv":1,"ly":6,"kb":9,"ch":3446,"min":7,"h1":"量化交易推荐书籍汇总","d":"fin","lvn":"入门"}],"wiki":{"AI新模型路线学习-初学者版":"AI新模型路线学习-初学者版.md","AI 新模型路线学习 —— 初学者版":"AI新模型路线学习-初学者版.md","深度学习训练基础_反向传播与优化器":"深度学习训练基础_反向传播与优化器.md","深度学习训练基础：反向传播与优化器":"深度学习训练基础_反向传播与优化器.md","统计基础_t分布与互信息":"统计基础_t分布与互信息.md","统计基础：t 分布、峰度、贝叶斯估计与 Beta 分布":"统计基础_t分布与互信息.md","Tokenizer实现简单RAG示例":"Tokenizer实现简单RAG示例.md","Ollama与LangChain对比":"Ollama与LangChain对比.md","AI 框架对比：从 Ollama/LangChain 到 AgentScope/LangGraph":"Ollama与LangChain对比.md","Transformer框架学习-初学者版":"Transformer框架学习-初学者版.md","Transformer 框架学习 —— 初学者版":"Transformer框架学习-初学者版.md","Transformer 深度笔记":"Transformer 深度笔记.md","Transformer 深度笔记：从零件到整机":"Transformer 深度笔记.md","Attention机制深度笔记":"Attention机制深度笔记.md","Attention 机制深度笔记：从训练基础到 LLM 推理":"Attention机制深度笔记.md","FlashAttention源码学习指南":"FlashAttention源码学习指南.md","FlashAttention 源码学习指南：大模型时代的地基算子":"FlashAttention源码学习指南.md","生成模型学习-初学者版":"生成模型学习-初学者版.md","生成模型学习 —— 初学者版":"生成模型学习-初学者版.md","扩散模型Diffusion Models-初学者版":"扩散模型Diffusion Models-初学者版.md","扩散模型（Diffusion Models）学习 —— 初学者版":"扩散模型Diffusion Models-初学者版.md","蒙特卡洛方法与强化学习":"蒙特卡洛方法与强化学习.md","强化学习算法总结-初学者版":"强化学习算法总结-初学者版.md","强化学习算法总结：从“奖励”到 AlphaGo":"强化学习算法总结-初学者版.md","大模型训练框架学习指南":"大模型训练框架学习指南.md","大模型训练框架学习指南：Megatron-LM / DeepSpeed / FSDP 三剑客":"大模型训练框架学习指南.md","torch.compile编程学习指南":"torch.compile编程学习指南.md","torch.compile (Inductor) 编程学习指南（Windows/Linux + RTX 3060 + PyTorch 2.x）":"torch.compile编程学习指南.md","vLLM编程学习指南":"vLLM编程学习指南.md","vLLM 编程学习指南（Linux + NVIDIA/AMD GPU + Python 3.10+）":"vLLM编程学习指南.md","SGLang编程学习指南":"SGLang编程学习指南.md","SGLang 编程学习指南（Linux + NVIDIA GPU + Python 3.10+）":"SGLang编程学习指南.md","TensorRT-LLM编程学习指南":"TensorRT-LLM编程学习指南.md","TensorRT-LLM 编程学习指南（Linux + Ada/Ampere/Hopper + CUDA 12.x）":"TensorRT-LLM编程学习指南.md","llama.cpp编程学习指南":"llama.cpp编程学习指南.md","llama.cpp 编程学习指南（Windows/Linux/macOS + CPU / GPU / Apple Silicon）":"llama.cpp编程学习指南.md","边缘AI学习指导":"边缘AI学习指导.md","边缘AI（Edge AI）学习指导":"边缘AI学习指导.md","Android边缘AI实战攻略":"Android边缘AI实战攻略.md","Android 边缘AI 实战攻略":"Android边缘AI实战攻略.md","iPhone边缘AI实战攻略":"iPhone边缘AI实战攻略.md","iPhone 边缘AI 实战攻略":"iPhone边缘AI实战攻略.md","GPU编程工具全景":"GPU编程工具全景.md","GPU 编程工具全景":"GPU编程工具全景.md","M1_GPU编程入门_PyTorch_MPS":"M1_GPU编程入门_PyTorch_MPS.md","M1 Mac GPU 编程入门指南":"M1_GPU编程入门_PyTorch_MPS.md","CUDA线程索引映射详解":"CUDA线程索引映射详解.md","CUDA 线程索引映射详解（1D / 2D / 3D 及底层逻辑）":"CUDA线程索引映射详解.md","CUDA-AI编程学习指南":"CUDA-AI编程学习指南.md","面向 AI 的 CUDA 编程学习指南（Windows + RTX 3060 + CUDA 12.1）":"CUDA-AI编程学习指南.md","PyTorch自定义CUDA算子学习指南":"PyTorch自定义CUDA算子学习指南.md","PyTorch 自定义 CUDA 算子学习指南：打通 Kernel 与 Model 的最后一公里":"PyTorch自定义CUDA算子学习指南.md","CUDA-Graphs学习指南":"CUDA-Graphs学习指南.md","CUDA Graphs 学习指南：干掉 Kernel Launch 开销的性能杀器":"CUDA-Graphs学习指南.md","cuBLAS编程学习指南":"cuBLAS编程学习指南.md","cuBLAS 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"cuBLAS编程学习指南.md","cuBLASLt编程学习指南":"cuBLASLt编程学习指南.md","cuBLASLt 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"cuBLASLt编程学习指南.md","cuFFT编程学习指南":"cuFFT编程学习指南.md","cuFFT 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"cuFFT编程学习指南.md","cuRAND编程学习指南":"cuRAND编程学习指南.md","cuRAND 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"cuRAND编程学习指南.md","cuSPARSE编程学习指南":"cuSPARSE编程学习指南.md","cuSPARSE 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"cuSPARSE编程学习指南.md","cuSOLVER编程学习指南":"cuSOLVER编程学习指南.md","cuSOLVER 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"cuSOLVER编程学习指南.md","cuDNN编程学习指南":"cuDNN编程学习指南.md","cuDNN 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"cuDNN编程学习指南.md","cuCollections编程学习指南":"cuCollections编程学习指南.md","cuCollections 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"cuCollections编程学习指南.md","CUB编程学习指南":"CUB编程学习指南.md","CUB 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"CUB编程学习指南.md","Thrust编程学习指南":"Thrust编程学习指南.md","Thrust 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"Thrust编程学习指南.md","libcu++编程学习指南":"libcu++编程学习指南.md","libcu++ 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"libcu++编程学习指南.md","CUTLASS编程学习指南":"CUTLASS编程学习指南.md","CUTLASS 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"CUTLASS编程学习指南.md","CuPy编程学习指南":"CuPy编程学习指南.md","CuPy 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"CuPy编程学习指南.md","Numba编程学习指南":"Numba编程学习指南.md","Numba 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"Numba编程学习指南.md","NCCL编程学习指南":"NCCL编程学习指南.md","NCCL 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"NCCL编程学习指南.md","NVSHMEM编程学习指南":"NVSHMEM编程学习指南.md","NVSHMEM 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"NVSHMEM编程学习指南.md","NVIDIA-Warp编程学习指南":"NVIDIA-Warp编程学习指南.md","NVIDIA Warp 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"NVIDIA-Warp编程学习指南.md","Nsight性能分析学习指南":"Nsight性能分析学习指南.md","Nsight 性能分析学习指南：GPU 优化的\"X 光机\"":"Nsight性能分析学习指南.md","Triton编程学习指南":"Triton编程学习指南.md","Triton 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"Triton编程学习指南.md","TVM编程学习指南":"TVM编程学习指南.md","TVM 编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"TVM编程学习指南.md","MLIR编译器底座学习指南":"MLIR编译器底座学习指南.md","MLIR 编译器底座学习指南：Triton / Mojo / TVM Unity 的共同地基":"MLIR编译器底座学习指南.md","PTX 汇编编程学习指南":"PTX 汇编编程学习指南.md","PTX 汇编编程学习指南（Windows/Linux + RTX 3060 + CUDA 12.1）":"PTX 汇编编程学习指南.md","GPU渲染与图形学入门-初学者版":"GPU渲染与图形学入门-初学者版.md","GPU 渲染与图形学入门 —— 初学者版":"GPU渲染与图形学入门-初学者版.md","图形学基础-虎书与LearnOpenGL-初学者版":"图形学基础-虎书与LearnOpenGL-初学者版.md","图形学基础 —— 虎书 + LearnOpenGL 双主线入门版":"图形学基础-虎书与LearnOpenGL-初学者版.md","图形学中的8个坐标系详解":"图形学中的8个坐标系详解.md","图形学中的 8 个坐标系详解":"图形学中的8个坐标系详解.md","齐次坐标详解":"齐次坐标详解.md","射影平面与齐次坐标":"射影平面与齐次坐标.md","射影平面 $\\mathbb{RP}^2$ 与齐次坐标":"射影平面与齐次坐标.md","3D旋转与四元数":"3D旋转与四元数.md","3D 旋转与四元数（Quaternion）—— 程序员视角":"3D旋转与四元数.md","如何把一张2D图像贴到三角网格立体上-纹理贴图详解":"如何把一张2D图像贴到三角网格立体上-纹理贴图详解.md","如何把一张 2D 图像贴到三角网格立体上 —— 纹理贴图详解":"如何把一张2D图像贴到三角网格立体上-纹理贴图详解.md","光线追踪详解":"光线追踪详解.md","光线追踪（Ray Tracing）详解":"光线追踪详解.md","照相机标定":"照相机标定.md","照相机标定（Camera Calibration）—— 程序员视角":"照相机标定.md","AI时代图形学开发知识体系":"AI时代图形学开发知识体系.md","AI 时代图形学开发知识体系":"AI时代图形学开发知识体系.md","游戏开发者数学-动态BVH":"游戏开发者数学-动态BVH.md","游戏开发者的数学知识：动态边界体积层次结构（Dynamic BVH）":"游戏开发者数学-动态BVH.md","GPU图形渲染中的着色器详解":"GPU图形渲染中的着色器详解.md","GPU 图形渲染中的着色器详解":"GPU图形渲染中的着色器详解.md","图形API设计哲学对比-Vulkan-OpenGL-Metal-DirectX12":"图形API设计哲学对比-Vulkan-OpenGL-Metal-DirectX12.md","图形 API 设计哲学深度对比":"图形API设计哲学对比-Vulkan-OpenGL-Metal-DirectX12.md","OpenGL 视频纹理渲染 —— 完整学习指南":"OpenGL 视频纹理渲染 —— 完整学习指南.md","WebGL学习指南-从入门到精通":"WebGL学习指南-从入门到精通.md","WebGL 学习指南 —— 从入门到精通":"WebGL学习指南-从入门到精通.md","WebGPU学习指南-从入门到精通":"WebGPU学习指南-从入门到精通.md","WebGPU 学习指南 —— 从入门到精通":"WebGPU学习指南-从入门到精通.md","Metal学习指南-从入门到精通":"Metal学习指南-从入门到精通.md","Metal 学习指南 —— 从入门到精通":"Metal学习指南-从入门到精通.md","Metal 视频纹理渲染 —— 完整学习指南":"Metal 视频纹理渲染 —— 完整学习指南.md","DirectX 12学习指南-从入门到精通":"DirectX 12学习指南-从入门到精通.md","DirectX 12 学习指南 —— 从入门到精通":"DirectX 12学习指南-从入门到精通.md","Vulkan学习指南-从入门到精通":"Vulkan学习指南-从入门到精通.md","Vulkan 学习指南 —— 从入门到精通":"Vulkan学习指南-从入门到精通.md","Vulkan 视频纹理渲染 —— 完整学习指南":"Vulkan 视频纹理渲染 —— 完整学习指南.md","bgfx学习指南-从入门到精通":"bgfx学习指南-从入门到精通.md","bgfx 学习指南 —— 从入门到精通":"bgfx学习指南-从入门到精通.md","C++图形与游戏开发":"C++图形与游戏开发.md","C++ 图形与游戏开发：ECS 架构、渲染引擎与 3D 格式":"C++图形与游戏开发.md","EntityX学习指南-从入门到精通":"EntityX学习指南-从入门到精通.md","EntityX 学习指南 —— 从入门到精通":"EntityX学习指南-从入门到精通.md","Filament学习指南-从入门到精通":"Filament学习指南-从入门到精通.md","Filament 学习指南 —— 从入门到精通":"Filament学习指南-从入门到精通.md","Alembic学习指南-从入门到精通":"Alembic学习指南-从入门到精通.md","Alembic 学习指南 —— 从入门到精通":"Alembic学习指南-从入门到精通.md","AI时代游戏开发知识体系":"AI时代游戏开发知识体系.md","AI 时代游戏开发知识体系":"AI时代游戏开发知识体系.md","微信小游戏Demo开发步骤与参考例子":"微信小游戏Demo开发步骤与参考例子.md","CocosCreator入门指南":"CocosCreator入门指南.md","Cocos Creator 入门指南":"CocosCreator入门指南.md","BABYLON.JS_深度解读":"BABYLON.JS_深度解读.md","Babylon.js v9.11.0 工程深度解读":"BABYLON.JS_深度解读.md","three.js-Analysis-guide":"three.js-Analysis-guide.md","Three.js r184 源码分析指南：从入门到架构进阶":"three.js-Analysis-guide.md","游戏设计全景概要-完整维度地图":"游戏设计全景概要-完整维度地图.md","游戏设计全景概要 · 完整维度地图":"游戏设计全景概要-完整维度地图.md","游戏数值设计-1.4-全局概要与知识地图":"游戏数值设计-1.4-全局概要与知识地图.md","游戏数值设计 · 全局概要与知识地图":"游戏数值设计-1.4-全局概要与知识地图.md","游戏数值设计入门-1.4.1-经济篇":"游戏数值设计入门-1.4.1-经济篇.md","游戏数值设计入门 · 经济篇":"游戏数值设计入门-1.4.1-经济篇.md","游戏数值设计入门-1.4.2-成长篇":"游戏数值设计入门-1.4.2-成长篇.md","游戏数值设计入门 · 成长篇":"游戏数值设计入门-1.4.2-成长篇.md","游戏数值设计入门-1.4.3-战斗篇":"游戏数值设计入门-1.4.3-战斗篇.md","游戏数值设计入门 · 战斗篇":"游戏数值设计入门-1.4.3-战斗篇.md","游戏数值设计入门-1.4.4-概率篇":"游戏数值设计入门-1.4.4-概率篇.md","游戏数值设计入门 · 概率篇":"游戏数值设计入门-1.4.4-概率篇.md","游戏数值设计入门-1.4.5-平衡篇":"游戏数值设计入门-1.4.5-平衡篇.md","游戏数值设计入门 · 平衡篇":"游戏数值设计入门-1.4.5-平衡篇.md","游戏数值设计入门-1.4.6-付费篇":"游戏数值设计入门-1.4.6-付费篇.md","游戏数值设计入门 · 付费篇":"游戏数值设计入门-1.4.6-付费篇.md","游戏数值设计入门-1.4.7-数据篇":"游戏数值设计入门-1.4.7-数据篇.md","游戏数值设计入门 · 数据篇":"游戏数值设计入门-1.4.7-数据篇.md","游戏技能系统-战术位移算法解析":"游戏技能系统-战术位移算法解析.md","游戏技能系统：战术位移\"穿越\"算法解析":"游戏技能系统-战术位移算法解析.md","HSV颜色空间":"HSV颜色空间.md","HSV 颜色空间":"HSV颜色空间.md","色彩空间表示与转换":"色彩空间表示与转换.md","音频编码知识体系":"音频编码知识体系.md","H.264标准深入浅出-从语法元素到工程实战":"H.264标准深入浅出-从语法元素到工程实战.md","H.264 / AVC 标准深入浅出——从语法元素到工程实战":"H.264标准深入浅出-从语法元素到工程实战.md","H.265标准深入浅出-从CTU四叉树到工程实战":"H.265标准深入浅出-从CTU四叉树到工程实战.md","H.265 / HEVC 标准深入浅出——从 CTU 四叉树到工程实战":"H.265标准深入浅出-从CTU四叉树到工程实战.md","视频编码码控深入浅出-九大开源编码器对比与统一模型":"视频编码码控深入浅出-九大开源编码器对比与统一模型.md","**视频编码码控深入浅出——九大开源编码器对比与统一模型**":"视频编码码控深入浅出-九大开源编码器对比与统一模型.md","x264汇编优化深度分析":"x264汇编优化深度分析.md","x264 汇编优化深度分析":"x264汇编优化深度分析.md","汇编加速原理——从x264源码看手写汇编的价值":"汇编加速原理——从x264源码看手写汇编的价值.md","汇编加速原理——从 x264 源码看手写汇编的价值":"汇编加速原理——从x264源码看手写汇编的价值.md","x264_x265快速算法解析":"x264_x265快速算法解析.md","x264/x265 快速算法全解析":"x264_x265快速算法解析.md","最新版x264源码深入浅出-从工业级编码器到性能榨取":"最新版x264源码深入浅出-从工业级编码器到性能榨取.md","最新版x265源码深入浅出-从工业级HEVC编码器到性能榨取":"最新版x265源码深入浅出-从工业级HEVC编码器到性能榨取.md","最新版 x265 源码深入浅出——从工业级 HEVC 编码器到性能榨取":"最新版x265源码深入浅出-从工业级HEVC编码器到性能榨取.md","OpenH264源码深入浅出-Cisco开源RTC编码器全景剖析":"OpenH264源码深入浅出-Cisco开源RTC编码器全景剖析.md","OpenH264 源码深入浅出——Cisco 开源 RTC 编码器全景剖析":"OpenH264源码深入浅出-Cisco开源RTC编码器全景剖析.md","Kvazaar源码深入浅出-学院派开源HEVC编码器全景剖析":"Kvazaar源码深入浅出-学院派开源HEVC编码器全景剖析.md","Kvazaar 源码深入浅出——学院派开源 HEVC 编码器全景剖析":"Kvazaar源码深入浅出-学院派开源HEVC编码器全景剖析.md","播放器音画同步设计与实现":"播放器音画同步设计与实现.md","播放器中YUV视频帧的GPU渲染详解":"播放器中YUV视频帧的GPU渲染详解.md","播放器中 YUV 视频帧的 GPU 渲染详解":"播放器中YUV视频帧的GPU渲染详解.md","VLC源码学习指南":"VLC源码学习指南.md","VLC 源码学习指南":"VLC源码学习指南.md","VLC源码深度解析":"VLC源码深度解析.md","VLC 媒体播放器源码深度解析":"VLC源码深度解析.md","FFmpeg源码学习指南":"FFmpeg源码学习指南.md","GStreamer源码学习指南":"GStreamer源码学习指南.md","GStreamer 源码学习指南":"GStreamer源码学习指南.md","hls.js-code-analysis":"hls.js-code-analysis.md","hls.js 代码工程深度分析文档":"hls.js-code-analysis.md","屏幕画面采集 —— 完整技术指南":"屏幕画面采集 —— 完整技术指南.md","开播侧画面采集设计与实现":"开播侧画面采集设计与实现.md","开播侧-采集端音画同步设计与实现":"开播侧-采集端音画同步设计与实现.md","开播侧（采集端）音画同步设计与实现":"开播侧-采集端音画同步设计与实现.md","直播开播端-Pipeline与事件总线-选型与实现方案":"直播开播端-Pipeline与事件总线-选型与实现方案.md","直播开播端 Pipeline 与进程内事件总线 —— 选型指南（PC / 移动 / 跨端三条主线）":"直播开播端-Pipeline与事件总线-选型与实现方案.md","播放器-Pipeline与事件总线-选型与实现方案":"播放器-Pipeline与事件总线-选型与实现方案.md","播放器 Pipeline 与进程内事件总线 —— 选型指南（PC / 移动 / 跨端三条主线）":"播放器-Pipeline与事件总线-选型与实现方案.md","统一消息总线-开播与播放器一体化实现方案":"统一消息总线-开播与播放器一体化实现方案.md","统一消息总线 (UMB) —— 开播与播放器一体化实现方案":"统一消息总线-开播与播放器一体化实现方案.md","嵌入式系统生态_Arduino到RT-Thread":"嵌入式系统生态_Arduino到RT-Thread.md","嵌入式系统生态：从 Arduino 到 RT-Thread":"嵌入式系统生态_Arduino到RT-Thread.md","ROS 2 与机器人空间数学":"ROS 2 与机器人空间数学.md","FreeRTOS-Kernel源码学习指南":"FreeRTOS-Kernel源码学习指南.md","FreeRTOS-Kernel 源码学习指南":"FreeRTOS-Kernel源码学习指南.md","uCOS-III学习指南":"uCOS-III学习指南.md","µC/OS-III 实时操作系统源码学习指南":"uCOS-III学习指南.md","Zabbix监控系统简介":"Zabbix监控系统简介.md","Zabbix 监控系统简介":"Zabbix监控系统简介.md","SPDK高性能存储技术":"SPDK高性能存储技术.md","SPDK：高性能存储开发工具包":"SPDK高性能存储技术.md","WebAssembly深入浅出-从原理到跨端工程实战":"WebAssembly深入浅出-从原理到跨端工程实战.md","WebAssembly 深入浅出——从原理到跨端工程实战":"WebAssembly深入浅出-从原理到跨端工程实战.md","nginx源码学习指南":"nginx源码学习指南.md","Nginx 源码学习指南":"nginx源码学习指南.md","OpenCV源码学习指南":"OpenCV源码学习指南.md","光流法详解":"光流法详解.md","光流法（Optical Flow）详解":"光流法详解.md","导向滤波详解":"导向滤波详解.md","导向滤波（Guided Filter）详解":"导向滤波详解.md","电子学-部分名词解释":"电子学-部分名词解释.md","电子学——名词解释":"电子学-名词解释.md","电子学-名词解释":"电子学-名词解释.md","电路与模拟电子技术-学习指导-初学者版":"电路与模拟电子技术-学习指导-初学者版.md","程序员电路入门_LTspice到SPICE":"程序员电路入门_LTspice到SPICE.md","程序员电路入门：从 LTspice 到标准 SPICE":"程序员电路入门_LTspice到SPICE.md","LTspice入门指导":"LTspice入门指导.md","LTspice 入门指导":"LTspice入门指导.md","LabVIEW简介":"LabVIEW简介.md","LabVIEW 简介":"LabVIEW简介.md","RC滤波器学习笔记":"RC滤波器学习笔记.md","从电容复阻抗到 RC 滤波器 —— 系统学习笔记":"RC滤波器学习笔记.md","RC低通滤波器从基础到应用的系统学习笔记":"RC低通滤波器从基础到应用的系统学习笔记.md","LC并联谐振电路_推导与分析":"LC并联谐振电路_推导与分析.md","LC 并联谐振电路 —— 推导与分析":"LC并联谐振电路_推导与分析.md","电声学基础_SPL与电抗":"电声学基础_SPL与电抗.md","电声学基础：从扬声器频响到电抗":"电声学基础_SPL与电抗.md","AI时代模拟电路开发知识体系":"AI时代模拟电路开发知识体系.md","AI 时代模拟电路开发知识体系":"AI时代模拟电路开发知识体系.md","AI辅助模拟电路设计":"AI辅助模拟电路设计.md","AI 辅助模拟电路设计":"AI辅助模拟电路设计.md","AI时代数字电路开发知识体系":"AI时代数字电路开发知识体系.md","AI 时代数字电路开发知识体系":"AI时代数字电路开发知识体系.md","AI时代FPGA开发知识体系":"AI时代FPGA开发知识体系.md","AI 时代 FPGA 开发知识体系":"AI时代FPGA开发知识体系.md","Python与Conda环境管理_macOS":"Python与Conda环境管理_macOS.md","Python 与 Conda 环境管理（macOS / ARM）":"Python与Conda环境管理_macOS.md","VSCode-Cpp全流程开发配置指南":"VSCode-Cpp全流程开发配置指南.md","VSCode + C++ 全流程开发配置实操指南":"VSCode-Cpp全流程开发配置指南.md","npm-case 示例 Demo 完整构建指南":"npm-case 示例 Demo 完整构建指南.md","C++工具链与脚本引擎":"C++工具链与脚本引擎.md","C++ 工具链与脚本引擎":"C++工具链与脚本引擎.md","C++23新特性解析与应用深入理解":"C++23新特性解析与应用深入理解.md","C++23 新特性解析与应用深入理解":"C++23新特性解析与应用深入理解.md","编译构建工具全景指南-Make-CMake-Meson-Ninja等":"编译构建工具全景指南-Make-CMake-Meson-Ninja等.md","编译构建工具全景指南 —— Make / CMake / Meson / Ninja 等":"编译构建工具全景指南-Make-CMake-Meson-Ninja等.md","Hook与Trampoline深入浅出-跨平台函数拦截原理与工程实战":"Hook与Trampoline深入浅出-跨平台函数拦截原理与工程实战.md","Hook 与 Trampoline 深入浅出——跨平台函数拦截原理与工程实战":"Hook与Trampoline深入浅出-跨平台函数拦截原理与工程实战.md","GoogleTest与GoogleMock学习指南-从入门到精通":"GoogleTest与GoogleMock学习指南-从入门到精通.md","GoogleTest 与 GoogleMock 学习指南 —— 从入门到精通":"GoogleTest与GoogleMock学习指南-从入门到精通.md","C与C++调用汇编语言深入浅出-跨平台实战":"C与C++调用汇编语言深入浅出-跨平台实战.md","C 与 C++ 调用汇编语言深入浅出——跨平台实战指南":"C与C++调用汇编语言深入浅出-跨平台实战.md","ARM汇编深入浅出-从ARMv7到AArch64的工程实战指南":"ARM汇编深入浅出-从ARMv7到AArch64的工程实战指南.md","ARM 汇编深入浅出——从 ARMv7 到 AArch64 的工程实战指南":"ARM汇编深入浅出-从ARMv7到AArch64的工程实战指南.md","x86-64汇编深入浅出-从IA-32到AVX-512的工程实战指南":"x86-64汇编深入浅出-从IA-32到AVX-512的工程实战指南.md","x86-64 汇编深入浅出——从 IA-32 到 AVX-512 的工程实战指南":"x86-64汇编深入浅出-从IA-32到AVX-512的工程实战指南.md","RISC-V架构深入浅出-从指令集到工程实战":"RISC-V架构深入浅出-从指令集到工程实战.md","RISC-V 架构深入浅出——从指令集到工程实战":"RISC-V架构深入浅出-从指令集到工程实战.md","欧拉公式与e^{-iπ}":"欧拉公式与e^{-iπ}.md","欧拉公式与 $e^{-i\\pi}$":"欧拉公式与e^{-iπ}.md","DFT与FFT蝶形运算详解":"DFT与FFT蝶形运算详解.md","DFT 与 FFT：蝶形运算、码位倒序与频谱分析":"DFT与FFT蝶形运算详解.md","Eigen学习指南-从入门到精通":"Eigen学习指南-从入门到精通.md","Eigen 学习指南 —— 从入门到精通":"Eigen学习指南-从入门到精通.md","进程内事件总线-优秀开源库汇总":"进程内事件总线-优秀开源库汇总.md","进程内事件总线（In-process Event Bus）优秀开源库汇总":"进程内事件总线-优秀开源库汇总.md","eventpp学习指南-从入门到精通":"eventpp学习指南-从入门到精通.md","eventpp 学习指南 —— 从入门到精通":"eventpp学习指南-从入门到精通.md","量化交易推荐书籍":"量化交易推荐书籍.md","量化交易推荐书籍汇总":"量化交易推荐书籍.md"},"stats":{"n":160,"ch":3886700,"min":8089}};
+
+const D = {}, SUB = {}, LV = {}, LY = {};
+M.domains.forEach(d => { D[d.k]=d; d.subs.forEach(s => SUB[d.k+'|'+s.k]=s.n); });
+M.levels.forEach(l => LV[l.k]=l);
+M.layers.forEach(l => LY[l.k]=l);
+
+const LS='sn_read_v1';
+let read = new Set();
+try { read = new Set(JSON.parse(localStorage.getItem(LS)||'[]')); } catch(e){}
+const H0 = (location.hash||'').replace('#','');
+let state = { view:['domain','layer'].includes(H0)?H0:'domain', q:'' };
+
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const mdHref = f => encodeURIComponent(f).replace(/%2F/g,'/');
+const obHref = f => 'obsidian://open?vault=StudyNotes&file=' + encodeURIComponent(f.replace(/\.md$/,''));
+// 能否在页内渲染：file:// 下浏览器禁止 JS 读取本地文件，必须经由 http(s) 服务器访问
+const CAN_RENDER = /^(http|https):$/.test(location.protocol);
+
+let totalN = M.entries.length;
+
+/* ---------- header ---------- */
+document.getElementById('s-docs').innerHTML = totalN + '<small>篇</small>';
+document.getElementById('s-ch').innerHTML = (M.stats.ch/10000).toFixed(1) + '<small>万字</small>';
+document.getElementById('s-req').innerHTML = Math.round(M.stats.min/60) + '<small>小时</small>';
+document.getElementById('s-read').innerHTML = '<span id="readn">0</span><small>/'+totalN+'</small>';
+document.getElementById('h-n').textContent = totalN;
+
+/* ---------- chips / legend ---------- */
+document.getElementById('lvchips').innerHTML =
+  `<span class="lgd"><span class="lgd-lab">难度</span>` +
+  M.levels.map(l=>`<span class="lgd-i" title="${l.d}"><i style="background:${l.c}"></i>L${l.k} ${l.n}</span>`).join('') +
+  `</span><span class="res" id="res"></span>`;
+
+/* ---------- filter ---------- */
+function match(e){
+  const q = state.q.trim().toLowerCase();
+  if (!q) return true;
+  const hay = [e.n, e.s, e.f, D[e.d].n, SUB[e.d+'|'+e.u], LY[e.ly].n, 'L'+e.lv].join(' ').toLowerCase();
+  return q.split(/\s+/).every(t => hay.includes(t));
+}
+
+/* ---------- card ---------- */
+function card(e, showDom=true){
+  const r = read.has(e.f);
+  return `<article class="card${r?' read':''}" data-f="${esc(e.f)}" style="--dc:${D[e.d].c};--lc:${LV[e.lv].c}">
+    <div class="ctop">
+      <span class="lv lv${e.lv}" title="L${e.lv} ${LV[e.lv].n} · ${LV[e.lv].t}"><i class="ld"></i>L${e.lv} ${LV[e.lv].n}</span>
+      ${showDom?`<span class="dom"><b>${esc(D[e.d].s)}</b>· ${esc(SUB[e.d+'|'+e.u])}</span>`:''}
+      <button class="mk" data-mark="${esc(e.f)}" aria-label="标记已读" title="标记已读"></button>
+    </div>
+    <a class="nm" href="${mdHref(e.f)}" target="_blank" rel="noopener" title="${esc(e.f)} · 点击在页内阅读" data-md="${esc(e.f)}">${esc(e.n)}</a>
+    <p class="ds">${esc(e.s)}</p>
+    <div class="cmeta">
+      <span>${e.kb} KB</span><span class="sep"></span><span>约 ${e.min} 分钟</span>
+      <button class="ob" data-ob="${esc(e.f)}" title="在 Obsidian 中打开">Obsidian</button>
+    </div>
+  </article>`;
+}
+
+function sortE(a,b){
+  const da = M.domains.findIndex(d=>d.k===a.d), db = M.domains.findIndex(d=>d.k===b.d);
+  if (a.lv !== b.lv) return a.lv - b.lv;
+  if (da !== db) return da - db;
+  return b.kb - a.kb;
+}
+
+/* ---------- views ---------- */
+function viewDomain(){
+  const cnt = k => M.entries.filter(e => e.d===k && match(e)).length;
+  let out = '<nav class="jump"><span class="jlab">跳至</span>' + M.domains.filter(d=>cnt(d.k)).map(d =>
+    `<a href="#dm-${d.k}"><i style="background:${d.c}"></i>${d.s}<span>${cnt(d.k)}</span></a>`).join('') + '</nav>';
+  M.domains.forEach(d => {
+    const all = M.entries.filter(e => e.d===d.k && match(e));
+    if (!all.length) return;
+    const dist = M.levels.map(l => all.filter(e=>e.lv===l.k).length);
+    const bars = M.levels.map((l,i)=> dist[i]?`<span style="flex:${dist[i]};background:${l.c}"></span>`:'').join('');
+    out += `<section class="grp" id="dm-${d.k}" style="--c:${d.c}">
+      <div class="gh">
+        <div class="gnum">${String(M.domains.indexOf(d)+1).padStart(2,'0')}</div>
+        <div>
+          <h2><span class="dot" style="background:${d.c}"></span>${d.n}</h2>
+          <p>${d.sub} · ${M.levels.map((l,i)=>dist[i]?`L${l.k} ${dist[i]}`:'').filter(Boolean).join(' · ')}</p>
+          <div class="gbar">${bars}</div>
+        </div>
+        <div class="gcount"><b>${all.length}</b> 篇</div>
+      </div>`;
+    d.subs.forEach(s => {
+      const list = all.filter(e=>e.u===s.k).sort((a,b)=> a.lv-b.lv || b.kb-a.kb);
+      if (!list.length) return;
+      out += `<div class="subhead">${s.n}<span class="sc">${list.length}</span></div>
+              <div class="grid">${list.map(e=>card(e,false)).join('')}</div>`;
+    });
+    out += `</section>`;
+  });
+  return out;
+}
+
+function viewLayer(){
+  const cnt = k => M.entries.filter(e => e.ly===k && match(e)).length;
+  let out = '<nav class="jump"><span class="jlab">跳至</span>' + M.layers.filter(l=>cnt(l.k)).map(l =>
+    `<a href="#ly-${l.k}"><i style="background:${l.c}"></i>${l.n}<span>${cnt(l.k)}</span></a>`).join('') + '</nav>';
+  out += '<div class="stack">';
+  M.layers.forEach(l => {
+    const list = M.entries.filter(e => e.ly===l.k && match(e)).sort(sortE);
+    if (!list.length) return;
+    // 按知识领域再分组（仅渲染出现的领域，顺序沿用 M.domains）
+    const byDom = {};
+    list.forEach(e => { (byDom[e.d] = byDom[e.d] || []).push(e); });
+    let inner = '';
+    M.domains.forEach(d => {
+      if (!byDom[d.k]) return;
+      const dl = byDom[d.k];
+      inner += `<div class="subhead" id="ly-${l.k}-d-${d.k}">`
+        + `<span class="dot" style="background:${d.c}"></span>${d.n}`
+        + `<span class="sc">${dl.length} 篇</span></div>`
+        + `<div class="grid">${dl.map(e=>card(e,false)).join('')}</div>`;
+    });
+    out += `<section class="layer-sec" id="ly-${l.k}" style="--c:${l.c}">
+      <div class="lrail"><div class="lrail-in">
+        <div class="lnum">LAYER ${String(l.k).padStart(2,'0')}</div>
+        <div class="ltag"><span class="dot" style="background:${l.c}"></span>${l.n}</div>
+        <div class="ldesc">${l.d}</div>
+        <div class="lcount">${list.length} 篇 · ${Object.keys(byDom).length} 领域</div>
+      </div></div>
+      <div class="lbody">${inner}</div>
+    </section>`;
+  });
+  out += '</div>';
+  return out;
+}
+
+function render(){
+  const body = state.view==='domain' ? viewDomain() : viewLayer();
+  const n = M.entries.filter(match).length;
+  document.getElementById('view').innerHTML = n ? body :
+    `<div class="empty"><b>没有匹配的文档</b>换个关键词试试</div>`;
+  document.getElementById('res').innerHTML = `筛出 <b>${n}</b> / ${totalN} 篇`;
+  document.getElementById('clr').classList.toggle('show', !!state.q);
+  document.getElementById('readn').textContent = read.size;
+}
+
+/* ---------- in-page reader (markdown) ---------- */
+const MD = window.marked;
+const reader = document.getElementById('reader');
+const readerBody = document.getElementById('readerBody');
+const rDom = document.querySelector('.reader-meta .r-dom');
+const rLv = document.querySelector('.reader-meta .r-lv');
+const rTitle = document.querySelector('.reader-title');
+const readerObs = document.getElementById('readerObs');
+const readerRaw = document.getElementById('readerRaw');
+const hist = [];
+let curFile = null;
+
+function slug(s){ return s.trim().toLowerCase().replace(/\s+/g,'-').replace(/[^\w\u4e00-\u9fa5\-]/g,''); }
+
+function preMd(src){
+  const lines = src.split(/\r?\n/);
+  const out = [];
+  let infence = false;
+  for (let line of lines){
+    if (/^\s*(`{3,}|~{3,})/.test(line)){ infence = !infence; out.push(line); continue; }
+    if (infence){ out.push(line); continue; }
+    line = line
+      .replace(/!\[\[([^\]]+)\]\]/g, (_, p) => {
+        p = p.trim();
+        return /(^|\/).*\.(png|jpe?g|gif|webp|svg|bmp)$/i.test(p) || p.includes('/')
+          ? `![${p}](${p})` : `![[${p}]]`;
+      })
+      .replace(/\[\[#([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, h, a) => `::WLKA::${h.trim()}::${(a||h).trim()}::`)
+      .replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, t, a) => `::WLK::${t.trim()}::${(a||t).trim()}::`);
+    out.push(line);
+  }
+  return out.join('\n');
+}
+
+function walkText(node, fn){
+  for (const c of Array.from(node.childNodes)){
+    if (c.nodeType === 3) fn(c);
+    else if (c.nodeType === 1 && c.tagName !== 'PRE' && c.tagName !== 'CODE') walkText(c, fn);
+  }
+}
+function replaceTokens(root){
+  const re = /::WLK::([^:]+)::([^:]+)::|::WLKA::([^:]+)::([^:]+)::/g;
+  walkText(root, (tn) => {
+    const s = tn.nodeValue;
+    if (!/::WLK::|::WLKA::/.test(s)) return;
+    re.lastIndex = 0; let m, last = 0;
+    const frag = document.createDocumentFragment();
+    while ((m = re.exec(s))){
+      if (m.index > last) frag.appendChild(document.createTextNode(s.slice(last, m.index)));
+      const a = document.createElement('a');
+      if (m[1] !== undefined){
+        const f = M.wiki[m[1]];
+        a.textContent = m[2];
+        if (f){ a.href = '#'; a.className = 'wl'; a.dataset.md = f; }
+        else { a.href = '#'; a.className = 'wl broken'; a.title = '未找到笔记：' + m[1]; }
+      } else {
+        a.href = '#' + slug(m[3]); a.className = 'wl-anchor'; a.textContent = m[4];
+      }
+      frag.appendChild(a); last = re.lastIndex;
+    }
+    if (last < s.length) frag.appendChild(document.createTextNode(s.slice(last)));
+    tn.parentNode.replaceChild(frag, tn);
+  });
+}
+
+function renderMd(src){
+  // 剥离 YAML frontmatter（运行时读取的是原始 .md）
+  src = src.replace(/^---[\s\S]*?---\s*/, '');
+  readerBody.innerHTML = MD.parse(preMd(src), { breaks:false, gfm:true });
+  readerBody.querySelectorAll('img').forEach(im => { im.loading = 'lazy'; });
+  readerBody.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(h => { if (!h.id) h.id = slug(h.textContent); });
+  readerBody.querySelectorAll('a').forEach(a => {
+    const h = a.getAttribute('href') || '';
+    if (/\.md($|#)/.test(h)){
+      a.classList.add('wl'); a.dataset.md = decodeURIComponent(h.split('#')[0]);
+      a.setAttribute('target','_blank'); a.setAttribute('rel','noopener');
+    }
+  });
+  replaceTokens(readerBody);
+}
+
+async function openNote(file, push){
+  const e = M.entries.find(x => x.f === file);
+  if (!e) return;
+  if (push !== false) hist.push(file);
+  curFile = file;
+  rDom.textContent = D[e.d].n + ' · ' + (SUB[e.d + '|' + e.u] || '');
+  rLv.textContent = 'L' + e.lv + ' ' + (LV[e.lv] ? LV[e.lv].n : '');
+  rLv.className = 'r-lv lv' + e.lv;
+  rTitle.textContent = e.n;
+  readerObs.onclick = () => { window.location.href = obHref(e.f); };
+  readerRaw.href = mdHref(e.f);
+  document.getElementById('readerBack').style.visibility = hist.length > 1 ? 'visible' : 'hidden';
+  openReader();
+
+  if (!CAN_RENDER){
+    // file:// 下无法 fetch 本地文件：在新标签页直接打开 .md 原文
+    window.open(mdHref(e.f), '_blank');
+    closeReader();
+    return;
+  }
+  readerBody.innerHTML = '<div class="rd-loading">读取并渲染中…</div>';
+  readerBody.scrollTop = 0;
+  try {
+    const res = await fetch(mdHref(e.f), { cache:'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const src = await res.text();
+    renderMd(src);
+    readerBody.scrollTop = 0;
+  } catch (err){
+    readerBody.innerHTML = '<div class="empty"><b>无法读取文件</b>'
+      + '本地服务器可能未启动，或浏览器禁止读取本地文件。<br>'
+      + '<a class="r-btn" id="rdFallback" target="_blank" rel="noopener" href="'+mdHref(e.f)+'">打开原始 .md ↗</a></div>';
+  }
+}
+
+function openReader(){ reader.classList.add('open'); reader.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+function closeReader(){ reader.classList.remove('open'); reader.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+
+document.getElementById('readerClose').addEventListener('click', closeReader);
+document.getElementById('readerBackdrop').addEventListener('click', closeReader);
+document.getElementById('readerBack').addEventListener('click', () => {
+  if (hist.length > 1){ hist.pop(); openNote(hist[hist.length-1], false); }
+});
+readerBody.addEventListener('click', (ev) => {
+  const wl = ev.target.closest('a.wl');
+  if (wl){ ev.preventDefault(); openNote(wl.dataset.md, true); return; }
+  const an = ev.target.closest('a.wl-anchor');
+  if (an){ ev.preventDefault(); const t = document.getElementById(an.getAttribute('href').slice(1)); if (t) t.scrollIntoView({behavior:'smooth', block:'start'}); }
+});
+
+/* ---------- events ---------- */
+document.getElementById('tabs').addEventListener('click', e=>{
+  const b = e.target.closest('button[data-view]'); if(!b) return;
+  state.view = b.dataset.view;
+  [...e.currentTarget.children].forEach(x=>x.classList.toggle('on', x===b));
+  render();
+});
+
+document.getElementById('q').addEventListener('input', e=>{
+  state.q = e.target.value; render();
+});
+document.getElementById('clr').addEventListener('click', ()=>{
+  state.q=''; document.getElementById('q').value=''; render();
+});
+
+document.getElementById('view').addEventListener('click', e=>{
+  const nm = e.target.closest('.nm');
+  if (nm){
+    if (CAN_RENDER){ e.preventDefault(); openNote(nm.dataset.md); }
+    // 否则（file://）放行默认行为：直接打开 .md 原文
+    return;
+  }
+  const ob = e.target.closest('.ob');
+  if (ob){ e.preventDefault(); e.stopPropagation(); window.location.href = obHref(ob.dataset.ob); return; }
+  const mk = e.target.closest('.mk');
+  if (mk){
+    e.preventDefault(); const f = mk.dataset.mark;
+    if (read.has(f)) read.delete(f); else read.add(f);
+    localStorage.setItem(LS, JSON.stringify([...read]));
+    mk.closest('.card').classList.toggle('read', read.has(f));
+    document.getElementById('readn').textContent = read.size;
+  }
+});
+
+document.addEventListener('keydown', e=>{
+  if (e.key === '/' && document.activeElement !== document.getElementById('q') && !reader.classList.contains('open')){
+    e.preventDefault(); document.getElementById('q').focus();
+  }
+  if (e.key === 'Escape'){
+    if (reader.classList.contains('open')){ closeReader(); return; }
+    document.getElementById('q').value=''; state.q=''; document.getElementById('q').blur(); render();
+  }
+});
+
+if (!CAN_RENDER){
+  const sh = document.getElementById('servehint');
+  sh.hidden = false;
+  sh.innerHTML = '提示：当前以 <b>file://</b> 打开，点击标题会直接打开 .md 原文。'
+    + '如需在页内无缝阅读，请在 StudyNotes 目录运行 <code>python3 serve_notes.py</code>'
+    + '（或 <code>python3 -m http.server 8000</code>），再访问 <code>http://localhost:8000/学习地图.html</code>';
+}
+
+document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on', b.dataset.view===state.view));
+render();
+</script>
+</body>
+</html>
